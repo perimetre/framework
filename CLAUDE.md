@@ -60,7 +60,7 @@ Each package has:
 ### Authentication Setup
 
 - **For CI/CD**: Uses `GITHUB_TOKEN` automatically
-- **For developers**: `gh auth token | npm config set //npm.pkg.github.com/:_authToken /dev/stdin`
+- **For developers**: `npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"`
 - **Registry scope**: `@perimetre:registry=https://npm.pkg.github.com`
 
 ## Workflows
@@ -75,9 +75,12 @@ Each package has:
 ### Release Flow (Automated)
 
 1. PRs with changesets merge to main
-2. Changesets bot creates/updates "Version Packages" PR
-3. Merge version PR → Triggers publish workflow
-4. Packages auto-publish to GitHub Package Registry
+2. Release workflow automatically:
+   - Bumps package versions based on changesets
+   - Generates/updates CHANGELOG.md files
+   - Commits version changes to main
+   - Publishes packages to GitHub Package Registry
+3. No manual intervention required
 
 ### Version Strategy
 
@@ -96,14 +99,14 @@ Each package has:
 ## GitHub Actions Pipelines
 
 1. **CI Pipeline** (`ci.yml`): Runs on PRs - lint, typecheck, build
-2. **Release Pipeline** (`release.yml`): Runs on main - creates version PRs, publishes packages
+2. **Release Pipeline** (`release.yml`): Runs on main when changesets detected - auto-versions and publishes packages
 
 ## Usage in Projects
 
 ```bash
 # One-time auth
 gh auth login -h github.com -s read:packages
-gh auth token | npm config set //npm.pkg.github.com/:_authToken /dev/stdin
+npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
 
 # Install in project
 pnpm add @perimetre/eslint-config-nextjs
