@@ -19,54 +19,60 @@ Shared configurations and tooling for Perimetre projects.
 ### Initial Setup
 
 1. Clone the repository:
-   \`\`\`bash
+
+   ```bash
    gh repo clone perimetre/framework
    cd framework
-   \`\`\`
+   ```
 
 2. Authenticate with GitHub Package Registry:
-   \`\`\`bash
+
+   ```bash
    gh auth login
-   gh auth token | npm config set //npm.pkg.github.com/:\_authToken /dev/stdin
+   gh auth token | npm config set //npm.pkg.github.com/:_authToken /dev/stdin
    npm config set @perimetre:registry https://npm.pkg.github.com
-   \`\`\`
+   ```
 
 3. Install dependencies:
-   \`\`\`bash
+   ```bash
    pnpm install
-   \`\`\`
+   ```
 
 ## Development Workflow
 
 ### Making Changes
 
 1. Create a feature branch:
-   \`\`\`bash
+
+   ```bash
    git checkout -b feature/your-feature
-   \`\`\`
+   ```
 
 2. Make your changes to packages
 
 3. Run tests and linting:
-   \`\`\`bash
+
+   ```bash
    pnpm turbo run lint build
-   \`\`\`
+   ```
 
 4. Create a changeset:
-   \`\`\`bash
+
+   ```bash
    pnpm changeset
-   \`\`\`
+   ```
 
 5. Commit your changes:
-   \`\`\`bash
+
+   ```bash
    git add .
    git commit -m "feat: your feature description"
-   \`\`\`
+   ```
 
 6. Push and create a pull request:
-   \`\`\`bash
+   ```bash
    git push -u origin feature/your-feature
-   \`\`\`
+   ```
 
 ### Release Process
 
@@ -78,14 +84,11 @@ Releases are automated when PRs are merged to main:
 
 ## Using Packages in Projects
 
-\`\`\`bash
-
+```bash
 # Authenticate (one-time)
-
-gh auth token | npm config set //npm.pkg.github.com/:\_authToken /dev/stdin
+gh auth token | npm config set //npm.pkg.github.com/:_authToken /dev/stdin
 npm config set @perimetre:registry https://npm.pkg.github.com
 
 # Install packages
-
 pnpm add @perimetre/eslint-config-nextjs
-\`\`\`
+```
