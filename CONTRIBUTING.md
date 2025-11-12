@@ -58,11 +58,18 @@ pnpm changeset
 
 ### 4. Commit the Changeset File
 
+**IMPORTANT**: You MUST commit the changeset `.md` file(s) to your branch!
+
 ```bash
-git add .changeset/*.md
+# Add your code changes AND the changeset file
+git add .
 git commit -m "feat: add new feature"
+
+# Push to trigger pre-push validation
 git push
 ```
+
+The changeset files are NOT in `.gitignore` - they must be committed and pushed with your PR. The CI will consume (delete) them later during the automated release process.
 
 ## Semantic Versioning Guide
 
@@ -118,8 +125,10 @@ When the version command runs (in the Version PR):
 - All `.changeset/*.md` files are read
 - Package versions are bumped according to your specifications
 - CHANGELOG.md files are generated/updated
-- Changeset files are deleted (consumed)
-- Changes are committed
+- Changeset files are **deleted (consumed)**
+- All changes (version bumps, CHANGELOGs, deleted changesets) are **automatically committed and pushed** by the CI
+
+The CI has write permissions (`contents: write`) to automatically commit and push the version changes back to the Version PR.
 
 ## Internal Dependencies
 

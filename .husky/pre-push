@@ -3,4 +3,4 @@
 
 # Validate that changesets exist for modified packages
 # This can be bypassed with --no-verify if needed
-pnpm exec pls-changeset-me
+pnpm exec pls-changeset-me check

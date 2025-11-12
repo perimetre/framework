@@ -29,4 +29,6 @@ pnpm-debug.log*
 .turbo/
 
 # Changesets
-.changeset/*.md
+# NOTE: Changeset .md files MUST be committed!
+# Only ignore the README which is auto-generated
+.changeset/README.md

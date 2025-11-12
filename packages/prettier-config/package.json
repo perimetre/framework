@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-tailwindcss": "^0.6.10"
+  },
+  "description": "Prettier configuration for Perimetre projects",
+  "exports": "./index.js",
+  "files": [
+    "index.js"
+  ],
+  "main": "index.js",
+  "name": "@perimetre/prettier-config",
+  "packageManager": "pnpm@10.11.0",
+  "peerDependencies": {
+    "prettier": ">=3.0.0"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/prettier-config",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "type": "module",
+  "version": "0.0.0"
+}
