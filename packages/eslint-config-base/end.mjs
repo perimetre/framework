@@ -1,13 +1,15 @@
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import { defineConfig } from 'eslint/config';
 
-export default [
-  eslintPluginPrettierRecommended,
-  {
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname
-      }
+/**
+ * End configuration for ESLint
+ * This should be added at the end of your ESLint config array to apply Prettier formatting rules
+ */
+export default defineConfig(eslintPluginPrettierRecommended, {
+  languageOptions: {
+    parserOptions: {
+      projectService: true,
+      tsconfigRootDir: import.meta.dirname
     }
   }
-];
+});

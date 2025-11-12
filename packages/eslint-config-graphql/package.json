@@ -6,8 +6,15 @@
   "devDependencies": {
     "eslint": "^9.39.1"
   },
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "types": "./index.d.mts"
+    }
+  },
   "files": [
-    "index.mjs"
+    "index.mjs",
+    "index.d.mts"
   ],
   "main": "index.mjs",
   "name": "@perimetre/eslint-config-graphql",
@@ -27,7 +34,9 @@
     "url": "https://github.com/perimetre/framework.git"
   },
   "scripts": {
+    "build": "tsc",
     "lint": "eslint . --max-warnings 0"
   },
+  "types": "index.d.mts",
   "version": "0.0.2"
 }

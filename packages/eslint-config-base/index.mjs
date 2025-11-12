@@ -4,7 +4,7 @@ import jsdoc from 'eslint-plugin-jsdoc';
 import eslintPluginJsonc from 'eslint-plugin-jsonc';
 import perfectionist from 'eslint-plugin-perfectionist';
 import playwright from 'eslint-plugin-playwright';
-import { globalIgnores } from 'eslint/config';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import { dirname } from 'path';
 import tseslint from 'typescript-eslint';
 import { fileURLToPath } from 'url';
@@ -24,13 +24,16 @@ const compat = new FlatCompat({
  *
  * This configuration should work for both frontend and backend projects. Unrelated with react
  */
-export default [
+export default defineConfig(
   globalIgnores([
     '**/__generated__/',
     'node_modules',
     'dist',
     'build',
     'next-env.d.ts',
+    '**/*.d.ts',
+    '**/*.d.mts',
+    '**/*.d.cts',
     'package.json',
     '.idea',
     '.next',
@@ -140,7 +143,12 @@ export default [
             MethodDefinition: true
           }
         }
-      ],
+      ]
+    }
+  },
+  {
+    files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+    rules: {
       // We are using typescript already
       'jsdoc/require-param': 'off',
       // We are using typescript already
@@ -149,6 +157,13 @@ export default [
       'jsdoc/require-returns': 'off',
       // We are using typescript already
       'jsdoc/require-returns-type': 'off'
+    }
+  },
+  // Disable JSDoc type checking for .mjs files since we're using JSDoc for TypeScript declaration generation
+  {
+    files: ['**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
+    rules: {
+      'jsdoc/check-tag-names': 'off'
     }
   },
 
@@ -166,4 +181,4 @@ export default [
       ...playwright.configs['flat/recommended'].rules
     }
   }
-];
+);

@@ -2,6 +2,7 @@ import pluginQuery from '@tanstack/eslint-plugin-query';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import { defineConfig } from 'eslint/config';
 
 /**
  * React base ESLint configuration
@@ -10,7 +11,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
  * - Accessibility best practices are enforced.
  * - React hooks rules are applied to ensure proper usage.
  */
-export default [
+export default defineConfig(
   // React hooks recommended
   {
     ...reactHooks.configs['recommended-latest'],
@@ -81,4 +82,4 @@ export default [
       'jsdoc/require-jsdoc': 'off'
     }
   }
-];
+);
