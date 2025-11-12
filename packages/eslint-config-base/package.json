@@ -1,0 +1,26 @@
+{
+  "name": "@perimetre/eslint-config-base",
+  "version": "0.0.0",
+  "description": "Base ESLint configuration for Perimetre projects",
+  "main": "index.mjs",
+  "files": [
+    "index.mjs"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git",
+    "directory": "packages/eslint-config-base"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "eslint": ">= 9"
+  },
+  "packageManager": "pnpm@10.11.0"
+}

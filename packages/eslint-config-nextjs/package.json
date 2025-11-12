@@ -1,0 +1,28 @@
+{
+  "name": "@perimetre/eslint-config-nextjs",
+  "version": "0.0.0",
+  "description": "ESLint configuration for Next.js projects",
+  "main": "index.mjs",
+  "files": [
+    "index.mjs"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git",
+    "directory": "packages/eslint-config-nextjs"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "dependencies": {
+    "@perimetre/eslint-config-base": "workspace:*"
+  },
+  "peerDependencies": {
+    "eslint": ">= 9"
+  },
+  "packageManager": "pnpm@10.11.0"
+}
