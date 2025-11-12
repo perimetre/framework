@@ -1,4 +1,7 @@
-/* eslint-disable jsdoc/check-tag-names */
+ 
+import organizeImports from 'prettier-plugin-organize-imports';
+import tailwindcss from 'prettier-plugin-tailwindcss';
+
 /**
  * Prettier configuration for Perimetre projects
  * @type {import("prettier").Config}
@@ -8,7 +11,7 @@ const config = {
   trailingComma: 'none',
   semi: true,
   tabWidth: 2,
-  plugins: ['prettier-plugin-organize-imports', 'prettier-plugin-tailwindcss']
+  plugins: [organizeImports, tailwindcss]
 };
 
 export default config;
