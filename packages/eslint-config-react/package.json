@@ -1,7 +1,7 @@
 {
-  "name": "@perimetre/eslint-config-nextjs",
+  "name": "@perimetre/eslint-config-react",
   "version": "0.0.0",
-  "description": "ESLint configuration for Next.js projects",
+  "description": "React ESLint configuration for Perimetre projects",
   "main": "index.mjs",
   "files": [
     "index.mjs"
@@ -13,20 +13,23 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/perimetre/framework.git",
-    "directory": "packages/eslint-config-nextjs"
+    "directory": "packages/eslint-config-react"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0"
   },
-  "dependencies": {
-    "eslint-plugin-react-compiler": "19.1.0-rc.2"
-  },
   "peerDependencies": {
     "eslint": ">= 9",
-    "next": ">= 15"
+    "react": ">= 19"
   },
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
     "eslint": "^9.39.1"
+  },
+  "dependencies": {
+    "@tanstack/eslint-plugin-query": "^5.91.2",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1"
   }
 }

@@ -4,7 +4,8 @@
   "description": "Base ESLint configuration for Perimetre projects",
   "main": "index.mjs",
   "files": [
-    "index.mjs"
+    "index.mjs",
+    "end.mjs"
   ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
@@ -18,9 +19,26 @@
   "scripts": {
     "lint": "eslint . --max-warnings 0"
   },
-  "dependencies": {},
   "peerDependencies": {
     "eslint": ">= 9"
   },
-  "packageManager": "pnpm@10.11.0"
+  "packageManager": "pnpm@10.11.0",
+  "devDependencies": {
+    "eslint": "^9.39.1"
+  },
+  "dependencies": {
+    "@eslint/eslintrc": "github:eslint/eslintrc",
+    "@eslint/js": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsdoc": "^61.2.0",
+    "eslint-plugin-jsonc": "^2.21.0",
+    "eslint-plugin-perfectionist": "^4.15.1",
+    "eslint-plugin-playwright": "^2.3.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "prettier-eslint": "^16.4.2",
+    "typescript-eslint": "^8.46.4"
+  }
 }

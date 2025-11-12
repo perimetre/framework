@@ -1,7 +1,7 @@
 {
-  "name": "@perimetre/eslint-config-nextjs",
+  "name": "@perimetre/eslint-config-graphql",
   "version": "0.0.0",
-  "description": "ESLint configuration for Next.js projects",
+  "description": "Graphql ESLint configuration for Perimetre projects",
   "main": "index.mjs",
   "files": [
     "index.mjs"
@@ -13,20 +13,21 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/perimetre/framework.git",
-    "directory": "packages/eslint-config-nextjs"
+    "directory": "packages/eslint-config-graphql"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0"
   },
-  "dependencies": {
-    "eslint-plugin-react-compiler": "19.1.0-rc.2"
-  },
   "peerDependencies": {
     "eslint": ">= 9",
-    "next": ">= 15"
+    "graphql": ">= 16",
+    "graphql-tag": ">= 2"
   },
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
     "eslint": "^9.39.1"
+  },
+  "dependencies": {
+    "@graphql-eslint/eslint-plugin": "^4.4.0"
   }
 }
