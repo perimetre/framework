@@ -1,6 +1,7 @@
  
-import organizeImports from 'prettier-plugin-organize-imports';
-import tailwindcss from 'prettier-plugin-tailwindcss';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 /**
  * Prettier configuration for Perimetre projects
@@ -11,7 +12,10 @@ const config = {
   trailingComma: 'none',
   semi: true,
   tabWidth: 2,
-  plugins: [organizeImports, tailwindcss]
+  plugins: [
+    require.resolve('prettier-plugin-organize-imports'),
+    require.resolve('prettier-plugin-tailwindcss')
+  ]
 };
 
 export default config;
