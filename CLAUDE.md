@@ -102,7 +102,7 @@ Each package has:
 
 ```bash
 # One-time auth
-gh auth login
+gh auth login -h github.com -s read:packages
 gh auth token | npm config set //npm.pkg.github.com/:_authToken /dev/stdin
 
 # Install in project

@@ -28,8 +28,8 @@ Shared configurations and tooling for Perimetre projects.
 2. Authenticate with GitHub Package Registry:
 
    ```bash
-   gh auth login
-   gh auth token | npm config set //npm.pkg.github.com/:_authToken /dev/stdin
+   gh auth login -h github.com -s read:packages
+   npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
    npm config set @perimetre:registry https://npm.pkg.github.com
    ```
 
@@ -86,7 +86,7 @@ Releases are automated when PRs are merged to main:
 
 ```bash
 # Authenticate (one-time)
-gh auth token | npm config set //npm.pkg.github.com/:_authToken /dev/stdin
+npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
 npm config set @perimetre:registry https://npm.pkg.github.com
 
 # Install packages
