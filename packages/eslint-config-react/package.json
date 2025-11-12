@@ -1,35 +1,35 @@
 {
-  "name": "@perimetre/eslint-config-react",
-  "version": "0.0.0",
-  "description": "React ESLint configuration for Perimetre projects",
-  "main": "index.mjs",
-  "files": [
-    "index.mjs"
-  ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/perimetre/framework.git",
-    "directory": "packages/eslint-config-react"
-  },
-  "scripts": {
-    "lint": "eslint . --max-warnings 0"
-  },
-  "peerDependencies": {
-    "eslint": ">= 9",
-    "react": ">= 19"
-  },
-  "packageManager": "pnpm@10.11.0",
-  "devDependencies": {
-    "eslint": "^9.39.1"
-  },
   "dependencies": {
     "@tanstack/eslint-plugin-query": "^5.91.2",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1"
-  }
+  },
+  "description": "React ESLint configuration for Perimetre projects",
+  "devDependencies": {
+    "eslint": "^9.39.1"
+  },
+  "files": [
+    "index.mjs"
+  ],
+  "main": "index.mjs",
+  "name": "@perimetre/eslint-config-react",
+  "packageManager": "pnpm@10.11.0",
+  "peerDependencies": {
+    "eslint": ">= 9",
+    "react": ">= 19"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/eslint-config-react",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "version": "0.0.0"
 }

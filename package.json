@@ -9,19 +9,31 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "lint": "turbo run lint",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
     "typecheck": "turbo run typecheck",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "turbo run build && changeset publish",
     "prepare": "husky"
   },
+  "lint-staged": {
+    "*": [
+      "prettier --write --ignore-unknown"
+    ],
+    "*.{js,mjs,cjs,ts,tsx,json}": [
+      "eslint --fix"
+    ]
+  },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@perimetre/eslint-config-base": "workspace:*",
+    "eslint": "^9.39.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.6",
+    "prettier": "^3.6.2",
     "turbo": "latest",
     "typescript": "^5.9.3"
   },

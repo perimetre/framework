@@ -10,12 +10,12 @@
       "outputs": []
     },
     "test": {
-      "outputs": [],
-      "dependsOn": ["build"]
+      "dependsOn": ["build"],
+      "outputs": []
     },
     "typecheck": {
-      "outputs": [],
-      "dependsOn": ["build"]
+      "dependsOn": ["build"],
+      "outputs": []
     }
   }
 }

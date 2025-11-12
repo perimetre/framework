@@ -1,32 +1,32 @@
 {
-  "name": "@perimetre/eslint-config-nextjs",
-  "version": "0.0.0",
-  "description": "ESLint configuration for Next.js projects",
-  "main": "index.mjs",
-  "files": [
-    "index.mjs"
-  ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/perimetre/framework.git",
-    "directory": "packages/eslint-config-nextjs"
-  },
-  "scripts": {
-    "lint": "eslint . --max-warnings 0"
-  },
   "dependencies": {
     "eslint-plugin-react-compiler": "19.1.0-rc.2"
   },
+  "description": "ESLint configuration for Next.js projects",
+  "devDependencies": {
+    "eslint": "^9.39.1"
+  },
+  "files": [
+    "index.mjs"
+  ],
+  "main": "index.mjs",
+  "name": "@perimetre/eslint-config-nextjs",
+  "packageManager": "pnpm@10.11.0",
   "peerDependencies": {
     "eslint": ">= 9",
     "next": ">= 15"
   },
-  "packageManager": "pnpm@10.11.0",
-  "devDependencies": {
-    "eslint": "^9.39.1"
-  }
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/eslint-config-nextjs",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "version": "0.0.0"
 }

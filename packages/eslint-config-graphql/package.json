@@ -1,33 +1,33 @@
 {
-  "name": "@perimetre/eslint-config-graphql",
-  "version": "0.0.0",
+  "dependencies": {
+    "@graphql-eslint/eslint-plugin": "^4.4.0"
+  },
   "description": "Graphql ESLint configuration for Perimetre projects",
-  "main": "index.mjs",
+  "devDependencies": {
+    "eslint": "^9.39.1"
+  },
   "files": [
     "index.mjs"
   ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/perimetre/framework.git",
-    "directory": "packages/eslint-config-graphql"
-  },
-  "scripts": {
-    "lint": "eslint . --max-warnings 0"
-  },
+  "main": "index.mjs",
+  "name": "@perimetre/eslint-config-graphql",
+  "packageManager": "pnpm@10.11.0",
   "peerDependencies": {
     "eslint": ">= 9",
     "graphql": ">= 16",
     "graphql-tag": ">= 2"
   },
-  "packageManager": "pnpm@10.11.0",
-  "devDependencies": {
-    "eslint": "^9.39.1"
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
   },
-  "dependencies": {
-    "@graphql-eslint/eslint-plugin": "^4.4.0"
-  }
+  "repository": {
+    "directory": "packages/eslint-config-graphql",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "version": "0.0.0"
 }

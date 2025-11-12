@@ -1,5 +1,6 @@
 import { FlatCompat } from '@eslint/eslintrc';
 import eslint from '@eslint/js';
+import jsdoc from 'eslint-plugin-jsdoc';
 import eslintPluginJsonc from 'eslint-plugin-jsonc';
 import perfectionist from 'eslint-plugin-perfectionist';
 import playwright from 'eslint-plugin-playwright';
