@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Validate that changesets exist for modified packages
+# This can be bypassed with --no-verify if needed
+pnpm exec pls-changeset-me

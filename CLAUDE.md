@@ -134,3 +134,9 @@ pnpm release              # Build + publish (usually in CI)
 - CI/CD pipelines configured for automated publishing
 - Changesets configured for PR-based releases
 - Authentication handled via GitHub CLI for developers
+
+About contributing and commit guidelines:
+@CONTRIBUTING.md
+
+Project readme:
+@README.md
