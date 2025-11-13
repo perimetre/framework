@@ -1,5 +1,12 @@
 # @perimetre/eslint-config-base
 
+## 0.1.1
+
+### Patch Changes
+
+- 95e1a13: Fix TypeScript parser configuration to support JSON files and config files. Added `extraFileExtensions` for `.json` files and `allowDefaultProject` for config files like `*.config.mjs`, `*.config.js`, and `*.config.ts`.
+- 2c0a097: Updated ignored paths
+
 ## 0.1.0
 
 ### Minor Changes
