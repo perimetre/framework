@@ -8,6 +8,8 @@ on:
     paths:
       - 'packages/**'
       - '.changeset/**'
+      - 'pnpm-lockfile.yaml'
+      - '.github/workflows/release.yml'
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
