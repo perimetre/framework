@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-base
 
+## 0.1.1
+
+### Patch Changes
+
+- 2c0a097: Updated ignored paths
+
 ## 0.1.0
 
 ### Minor Changes
