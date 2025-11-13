@@ -1,5 +1,11 @@
 # @perimetre/lintstaged-config-nextjs
 
+## 0.0.2
+
+### Patch Changes
+
+- 64b9153: Also exports lint task
+
 ## 0.0.1
 
 ### Patch Changes
