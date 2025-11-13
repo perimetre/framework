@@ -34,14 +34,14 @@ export default defineConfig(
     '**/*.d.ts',
     '**/*.d.mts',
     '**/*.d.cts',
-    'package.json',
     '.idea',
     '.next',
     '.github',
     'test-results',
     'playwright-report',
     'graphql.schema.json',
-    'schema.graphql'
+    'schema.graphql',
+    '.claude'
   ]),
 
   // Added flat recommended configs

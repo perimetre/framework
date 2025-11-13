@@ -19,6 +19,9 @@ importers:
       '@perimetre/eslint-config-base':
         specifier: workspace:*
         version: link:packages/eslint-config-base
+      '@perimetre/prettier-config':
+        specifier: workspace:*
+        version: link:packages/prettier-config
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
