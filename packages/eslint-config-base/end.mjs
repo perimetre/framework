@@ -8,6 +8,8 @@ import { defineConfig } from 'eslint/config';
 export default defineConfig(eslintPluginPrettierRecommended, {
   languageOptions: {
     parserOptions: {
+      allowDefaultProject: ['*.config.mjs', '*.config.js', '*.config.ts'],
+      extraFileExtensions: ['.json'],
       projectService: true,
       tsconfigRootDir: import.meta.dirname
     }
