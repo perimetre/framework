@@ -1,0 +1,36 @@
+{
+  "description": "Base lintstaged configuration for Perimetre next.js",
+  "devDependencies": {
+    "lint-staged": "^16.2.6"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "types": "./index.d.mts"
+    }
+  },
+  "files": [
+    "index.mjs",
+    "index.d.mts"
+  ],
+  "main": "index.mjs",
+  "name": "@perimetre/lintstaged-config-nextjs",
+  "packageManager": "pnpm@10.11.0",
+  "peerDependencies": {
+    "lint-staged": ">= 16"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/lintstaged-config-nextjs",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "types": "index.d.mts",
+  "version": "0.0.0"
+}
