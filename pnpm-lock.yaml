@@ -138,6 +138,12 @@ importers:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
 
+  packages/lintstaged-config-nextjs:
+    devDependencies:
+      lint-staged:
+        specifier: ^16.2.6
+        version: 16.2.6
+
   packages/prettier-config:
     dependencies:
       prettier:
