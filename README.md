@@ -29,6 +29,7 @@ Shared configurations and tooling for Perimetre projects.
 
    ```bash
    gh auth login -h github.com -s read:packages
+   > Select SSH
    npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
    npm config set @perimetre:registry https://npm.pkg.github.com
    ```
@@ -84,11 +85,41 @@ Releases are automated when PRs are merged to main:
 
 ## Using Packages in Projects
 
-```bash
-# Authenticate (one-time)
-npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
-npm config set @perimetre:registry https://npm.pkg.github.com
+### Local Development Setup
 
-# Install packages
-pnpm add @perimetre/eslint-config-nextjs
-```
+1. Create `.npmrc` in your project root:
+
+   ```ini
+   @perimetre:registry=https://npm.pkg.github.com
+   //npm.pkg.github.com/:_authToken=${NPM_TOKEN}
+   ```
+
+2. Set up authentication token:
+
+   ```bash
+   # Option 1: Add to shell profile (recommended)
+   echo 'export NPM_TOKEN=$(gh auth token)' >> ~/.zshrc
+   source ~/.zshrc
+
+   # Option 2: Set for current session
+   export NPM_TOKEN=$(gh auth token)
+   ```
+
+3. Install packages:
+   ```bash
+   pnpm add @perimetre/eslint-config-nextjs
+   ```
+
+### CI/CD Setup (Cloudflare, Vercel, etc.)
+
+1. Create a GitHub Personal Access Token:
+   - Go to GitHub Settings → Developer settings → Personal access tokens
+   - Create token with `read:packages` scope
+   - Or use: `gh auth token` (for temporary token)
+
+2. Add environment variable to your CI/CD platform:
+   - **Variable name**: `NPM_TOKEN`
+   - **Value**: Your GitHub PAT
+   - **Scope**: Both production and preview environments
+
+3. Ensure `.npmrc` is committed to your project (the token uses environment variable substitution, so it's safe)
