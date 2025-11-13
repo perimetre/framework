@@ -15,7 +15,8 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "turbo run build && changeset publish",
-    "prepare": "husky"
+    "prepare": "husky",
+    "stage-build-output": "git add ppackages/*/*.d.mts packages/*/*.d.cts packages/*/*.d.ts 2>/dev/null || true"
   },
   "lint-staged": {
     "*": [
