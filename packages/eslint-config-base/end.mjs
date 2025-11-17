@@ -9,9 +9,7 @@ export default defineConfig(eslintPluginPrettierRecommended, {
   languageOptions: {
     parserOptions: {
       allowDefaultProject: ['*.config.mjs', '*.config.js', '*.config.ts'],
-      extraFileExtensions: ['.json'],
-      projectService: true,
-      tsconfigRootDir: import.meta.dirname
+      projectService: true
     }
   }
 });
