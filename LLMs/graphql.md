@@ -1,5 +1,9 @@
 # GraphQL + TanStack Query Usage Guide
 
+- This expects you have tanstack query and a GraphQL client set up.
+
+For more details on setup, refer to the [tanstack-query-and-graphql example](https://github.com/perimetre/framework/tree/main/examples/tanstack-query-and-graphql/).
+
 ## Query/Mutation Definition
 
 Define GraphQL operations in a dedicated file (e.g., `graphql.ts`):

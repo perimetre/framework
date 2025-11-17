@@ -1,5 +1,7 @@
 # TanStack Query Usage Guide
 
+For more details on setup, refer to the [tanstack-query-and-graphql example](https://github.com/perimetre/framework/tree/main/examples/tanstack-query-and-graphql/).
+
 ## Query Factory Pattern
 
 Define query options in a factory function for reuse across client and server:
