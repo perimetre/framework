@@ -1,0 +1,41 @@
+{
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.4.0"
+  },
+  "description": "Classnames utility",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "name": "@perimetre/classnames",
+  "packageManager": "pnpm@10.11.0",
+  "peerDependencies": {
+    "class-variance-authority": ">=0.7.0"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/classnames",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "version": "0.0.0"
+}

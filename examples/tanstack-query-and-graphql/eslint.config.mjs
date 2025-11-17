@@ -31,6 +31,22 @@ const eslintConfig = defineConfig([
     }
   },
   {
+    files: ['**/*.ts', '**/*.tsx'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              message: 'Import from "@/server/graphql"',
+              name: 'graphql-request'
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
     files: ['**/*.json'],
     rules: {
       '@typescript-eslint/no-unused-expressions': 'off'

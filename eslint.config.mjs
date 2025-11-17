@@ -10,17 +10,9 @@ export default [
   {
     languageOptions: {
       parserOptions: {
-        // Disable type-aware linting for the root since we don't have a tsconfig
-        projectService: false
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname
       }
-    },
-    // Override rules that require type information for non-TypeScript files
-    rules: {
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off'
     }
   }
 ];

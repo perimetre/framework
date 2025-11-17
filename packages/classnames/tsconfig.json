@@ -1,0 +1,31 @@
+{
+  // Why this tsconfig is different from other packages:
+  // - This package uses .ts files (TypeScript), while others use .mjs (JavaScript with JSDoc)
+  // - Type-aware ESLint rules (strictTypeChecked) require strictNullChecks to be enabled
+  // - The base tsconfig has strict: false for compatibility with .mjs packages
+  // - We override it here to enable strict mode for proper type checking
+
+  "compilerOptions": {
+    // Enable TypeScript project references (allows monorepo to reference this package)
+    "composite": true,
+
+    // Generate .d.ts declaration files for consumers
+    "declaration": true,
+
+    // Emit both .js and .d.ts files (not just declarations)
+    "emitDeclarationOnly": false,
+
+    // Output directory for compiled files
+    "outDir": "./dist",
+
+    // Source directory
+    "rootDir": ".",
+
+    // Enable strict type checking (required for ESLint's type-aware rules)
+    // This enables strictNullChecks, strictFunctionTypes, etc.
+    // Without this, ESLint rules like @typescript-eslint/no-unnecessary-condition fail
+    "strict": true
+  },
+  "extends": "../../tsconfig.base.json",
+  "include": ["index.ts"]
+}
