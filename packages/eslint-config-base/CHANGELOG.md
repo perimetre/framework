@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-base
 
+## 0.2.0
+
+### Minor Changes
+
+- 51477e5: Removes root dir config that would not work
+
 ## 0.1.2
 
 ### Patch Changes
