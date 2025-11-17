@@ -1,22 +1,42 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
+    // JavaScript support (for .mjs files with JSDoc)
     "allowJs": true,
     "checkJs": false,
+
+    // Type declarations
     "declaration": true,
     "declarationMap": false,
     "emitDeclarationOnly": true,
+    // Module system
     "esModuleInterop": true,
+
+    // Code quality
+    "forceConsistentCasingInFileNames": true,
     "isolatedDeclarations": false,
-    "lib": ["esnext"],
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "noImplicitAny": false,
+    "isolatedModules": true,
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+
+    // Performance
     "preserveSymlinks": false,
     "resolveJsonModule": true,
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
-    "strict": false,
-    "target": "esnext"
+
+    // Type checking (strict for better code quality)
+    "strict": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "target": "ESNext",
+    "verbatimModuleSyntax": true
   }
 }

@@ -1,0 +1,41 @@
+{
+  // This package uses TypeScript source files
+  // Most settings inherited from base, only package-specific overrides here
+
+  "compilerOptions": {
+    // Module interop
+    "allowSyntheticDefaultImports": true,
+
+    // Enable TypeScript project references
+    "composite": true,
+
+    // Generate source maps for debugging
+    "declarationMap": true,
+
+    // Emit both .js and .d.ts files (override base's emitDeclarationOnly: true)
+    "emitDeclarationOnly": false,
+
+    // Decorators support (for future use)
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+
+    // Include DOM types (for clipboard helper)
+    "lib": ["ES2022", "DOM"],
+
+    // Unused code detection (disabled for flexibility)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+
+    // Output and source directories
+    "outDir": "./dist",
+
+    // Code generation
+    "preserveConstEnums": true,
+    "removeComments": false,
+    "rootDir": "./src",
+    "sourceMap": true
+  },
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
+  "extends": "../../tsconfig.base.json",
+  "include": ["src/**/*"]
+}
