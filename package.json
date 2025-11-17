@@ -37,7 +37,6 @@
     "lint:fix": "eslint . --fix",
     "prepare": "husky",
     "release": "turbo run build && changeset publish",
-    "stage-build-output": "git add ppackages/*/*.d.mts packages/*/*.d.cts packages/*/*.d.ts 2>/dev/null || true",
     "typecheck": "turbo run typecheck",
     "version": "changeset version"
   },

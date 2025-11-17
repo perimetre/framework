@@ -1,1 +1,1 @@
-pnpm build && pnpm lint-staged && pnpm stage-build-output
+pnpm lint-staged

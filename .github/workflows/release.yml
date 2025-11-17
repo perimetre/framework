@@ -8,7 +8,7 @@ on:
     paths:
       - 'packages/**'
       - '.changeset/**'
-      - 'pnpm-lockfile.yaml'
+      - 'pnpm-lock.yaml'
       - '.github/workflows/release.yml'
 
 env:

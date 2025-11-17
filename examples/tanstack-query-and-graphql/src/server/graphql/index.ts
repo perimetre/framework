@@ -1,4 +1,6 @@
 import { fancyLog, LOG_COLOR } from '@/shared/lib/log';
+// This is the only file where this can be used
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { GraphQLClient } from 'graphql-request';
 import invariant from 'tiny-invariant';
 
