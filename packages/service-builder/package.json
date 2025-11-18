@@ -1,0 +1,52 @@
+{
+  "description": "A lightweight, type-safe service builder inspired by tRPC for creating dependency-injected services with validated inputs",
+  "devDependencies": {
+    "@perimetre/eslint-config-base": "workspace:*",
+    "@types/bun": "^1.1.16",
+    "@types/node": "^22.10.2",
+    "eslint": "^9.17.0",
+    "typescript": "^5.7.2",
+    "zod": "^4.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "keywords": [
+    "service",
+    "dependency-injection",
+    "typescript",
+    "validation",
+    "zod",
+    "type-safe"
+  ],
+  "license": "GPL-3.0",
+  "main": "./src/index.ts",
+  "name": "@perimetre/service-builder",
+  "peerDependencies": {
+    "zod": "^3.0.0 || ^4.0.0"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/service-builder",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "~/.bun/bin/bun test && tsc --project tsconfig.build.json",
+    "lint": "eslint .",
+    "test": "~/.bun/bin/bun test",
+    "typecheck": "tsc --project tsconfig.build.json --noEmit"
+  },
+  "types": "./src/index.ts",
+  "version": "0.1.0"
+}

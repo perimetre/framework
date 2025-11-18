@@ -16,6 +16,7 @@
     "index.mjs",
     "index.d.mts"
   ],
+  "license": "GPL-3.0",
   "main": "index.mjs",
   "name": "@perimetre/eslint-config-nextjs",
   "packageManager": "pnpm@10.11.0",

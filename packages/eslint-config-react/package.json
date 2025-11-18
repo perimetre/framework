@@ -19,6 +19,7 @@
     "index.mjs",
     "index.d.mts"
   ],
+  "license": "GPL-3.0",
   "main": "index.mjs",
   "name": "@perimetre/eslint-config-react",
   "packageManager": "pnpm@10.11.0",

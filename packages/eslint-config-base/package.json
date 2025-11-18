@@ -34,6 +34,7 @@
     "end.mjs",
     "end.d.mts"
   ],
+  "license": "GPL-3.0",
   "main": "index.mjs",
   "name": "@perimetre/eslint-config-base",
   "packageManager": "pnpm@10.11.0",

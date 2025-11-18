@@ -96,7 +96,3 @@ await makeCsv('./output', 'data.csv', [
 ## TypeScript Support
 
 This package includes full TypeScript definitions. All helpers are strongly typed.
-
-## License
-
-MIT

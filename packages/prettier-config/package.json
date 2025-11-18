@@ -8,6 +8,7 @@
   "files": [
     "index.js"
   ],
+  "license": "GPL-3.0",
   "main": "index.js",
   "name": "@perimetre/prettier-config",
   "packageManager": "pnpm@10.11.0",

@@ -79,7 +79,3 @@ Based on:
 - [tRPC Prisma Starter](https://github.com/trpc/examples-next-prisma-starter)
 - [tRPC WebSockets Starter](https://github.com/trpc/examples-next-prisma-websockets-starter)
 - Production usage in cpsst-booking
-
-## License
-
-MIT

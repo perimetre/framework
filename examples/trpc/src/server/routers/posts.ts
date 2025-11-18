@@ -1,7 +1,7 @@
 import { ForbiddenError } from '@/shared/exceptions';
 import { z } from 'zod';
 import { procedure, router } from '.';
-import * as postsService from '../services/posts';
+import { postsService } from '../services/posts';
 import { authedUserProcedure } from './middlewares/auth';
 import { cacheMiddleware, noCacheMiddleware } from './middlewares/cache';
 import { loggingProcedure } from './middlewares/logging';
@@ -31,12 +31,8 @@ export const postsRouter = async () =>
      * - Serves stale content for up to 2 minutes during revalidation
      */
     getAll: procedure.use(loggingProcedure).query(async () => {
-      const result = await postsService.getPosts();
-
-      if (!('ok' in result)) {
-        throw result; // Will be converted to tRPC error
-      }
-
+      const result = await postsService({}).getAll({});
+      if (result instanceof Error) throw result;
       return result.posts;
     }),
 
@@ -58,13 +54,12 @@ export const postsRouter = async () =>
         })
       )
       .query(async ({ input }) => {
-        const result = await postsService.getPostById({ id: input.id });
-
-        if (!('ok' in result)) {
-          throw result;
+        const result = await postsService({}).getById({ id: input.id });
+        if ('ok' in result) {
+          return result.post;
         }
 
-        return result.post;
+        throw result;
       }),
 
     /**
@@ -88,14 +83,10 @@ export const postsRouter = async () =>
         })
       )
       .query(async ({ input }) => {
-        const result = await postsService.getPostsByUserId({
+        const result = await postsService({}).getByUserId({
           userId: input.userId
         });
-
-        if (!('ok' in result)) {
-          throw result;
-        }
-
+        if (result instanceof Error) throw result;
         return result.posts;
       }),
 
@@ -121,12 +112,8 @@ export const postsRouter = async () =>
           throw new ForbiddenError('You can only create posts for yourself');
         }
 
-        const result = await postsService.createPost(input);
-
-        if (!('ok' in result)) {
-          throw result;
-        }
-
+        const result = await postsService({}).create(input);
+        if (result instanceof Error) throw result;
         return result.post;
       }),
 
@@ -146,12 +133,8 @@ export const postsRouter = async () =>
         })
       )
       .mutation(async ({ input }) => {
-        const result = await postsService.updatePost(input);
-
-        if (!('ok' in result)) {
-          throw result;
-        }
-
+        const result = await postsService({}).update(input);
+        if (result instanceof Error) throw result;
         return result.post;
       }),
 
@@ -168,12 +151,8 @@ export const postsRouter = async () =>
         })
       )
       .mutation(async ({ input }) => {
-        const result = await postsService.deletePost({ id: input.id });
-
-        if (!('ok' in result)) {
-          throw result;
-        }
-
+        const result = await postsService({}).delete({ id: input.id });
+        if (result instanceof Error) throw result;
         return { success: true };
       })
   });

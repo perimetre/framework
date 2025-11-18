@@ -16,6 +16,7 @@
   "files": [
     "dist"
   ],
+  "license": "GPL-3.0",
   "main": "./dist/index.js",
   "name": "@perimetre/classnames",
   "packageManager": "pnpm@10.11.0",

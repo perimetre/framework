@@ -2,6 +2,7 @@
   "name": "tanstack-query-and-graphql",
   "version": "0.1.0",
   "private": true,
+  "license": "GPL-3.0",
   "prettier": "@perimetre/prettier-config",
   "scripts": {
     "dev": "conc -n next,codegen -c green,cyan \"next dev\" \"pnpm codegen:watch\"",
