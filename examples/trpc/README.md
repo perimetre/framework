@@ -111,20 +111,52 @@ This allows for:
 
 ### 2. Service Layer Pattern
 
-Business logic separated from routers:
+Business logic separated from routers using `@perimetre/service-builder`.
+
+**⚠️ Critical Rule:** `ok: true` is **ONLY** for successful results.
 
 ```typescript
-// Service layer
-export const getPosts = async () => {
-  const response = await fetch(API_URL);
-  if (!response.ok) return new UnexpectedFetchError();
-  return { ok: true as const, posts: await response.json() };
+// ✅ CORRECT
+handler: async ({ input }) => {
+  if (error) return new NotFoundError(); // ✅ Return Error instance
+  return { ok: true as const, post }; // ✅ ok: true only for success
 };
 
-// Router
+// ❌ WRONG: Never return ok: false
+handler: async ({ input }) => {
+  if (error) return { ok: false, error: '...' }; // ❌ NEVER DO THIS
+  return { ok: true as const, post };
+};
+```
+
+**The Rule:**
+
+- ✅ Success → `{ ok: true as const, ...data }`
+- ✅ Failure → `new CustomError()` (Error instance)
+- ❌ Never → `{ ok: false, ... }`
+
+**Service Layer Example:**
+
+```typescript
+// Service layer with service-builder
+import { defineService } from '@perimetre/service-builder';
+
+export const postsService = defineService<Record<string, unknown>>()({
+  methods: ({ method }) => ({
+    getAll: method.input(z.object({})).handler(async () => {
+      const response = await fetch(API_URL);
+      // ✅ Return Error instance for failures (not ok: false)
+      if (!response.ok) return new UnexpectedFetchError();
+      // ✅ Return ok: true ONLY for success
+      return { ok: true as const, posts: await response.json() };
+    })
+  })
+});
+
+// Router - PREFERRED: Check for success discriminator
 getAll: procedure.query(async () => {
-  const result = await postsService.getPosts();
-  if (!('ok' in result)) throw result;
+  const result = await postsService({}).getAll({});
+  if (!('ok' in result)) throw result; // Check 'ok' property (primary pattern)
   return result.posts;
 });
 ```
@@ -149,13 +181,26 @@ procedure
 Following the pattern from `LLMs/error-handling-exception.md`:
 
 ```typescript
-// Return errors as values
-const result = await someOperation();
+// Return errors as values from service-builder
+const result = await postsService({}).getById({ id });
+
+// PREFERRED: Check for success discriminator first
 if (!('ok' in result)) {
   throw result; // tRPC converts to proper error response
 }
 // TypeScript knows result has 'ok' and data
+return result.post;
+
+// Alternative (when distinguishing error types):
+if (result instanceof NotFoundError) throw result;
+if (result instanceof UnauthorizedError) throw result;
+if ('ok' in result) return result.post;
 ```
+
+**Pattern Priority:**
+
+1. Use `!('ok' in result)` for simple success/error checks (primary)
+2. Use `instanceof` only when distinguishing between specific error types (secondary)
 
 ### 5. Input Validation with Zod
 

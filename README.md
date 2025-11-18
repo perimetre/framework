@@ -1,13 +1,46 @@
 # @perimetre/framework
 
-Shared configurations and tooling for Perimetre projects.
+Shared packages, configurations, and architectural patterns for Perimetre projects.
 
 ## Packages
 
-- `@perimetre/eslint-config-base` - Base ESLint configuration
-- `@perimetre/eslint-config-nextjs` - ESLint configuration for Next.js
+### Configuration Packages
+
+- `@perimetre/eslint-config-base` - Base ESLint rules for TypeScript projects
+- `@perimetre/eslint-config-nextjs` - Next.js ESLint configuration (extends base)
+- `@perimetre/eslint-config-react` - React ESLint with hooks, a11y, and TanStack Query rules
+- `@perimetre/eslint-config-graphql` - GraphQL ESLint configuration
+- `@perimetre/eslint-config-trpc` - tRPC-optimized ESLint configuration
+- `@perimetre/lintstaged-config-nextjs` - lint-staged configuration for Next.js projects
 - `@perimetre/prettier-config` - Prettier configuration
-- `@perimetre/tailwind-config` - Tailwind CSS configuration
+
+### Utility Packages
+
+- `@perimetre/service-builder` - Type-safe service layer builder with error-as-values pattern
+- `@perimetre/helpers` - Shared TypeScript utilities (Faker, CSV parsing)
+- `@perimetre/icons` - Accessible React icon wrapper with TypeScript enforcement
+- `@perimetre/classnames` - Classname utility combining clsx and tailwind-merge
+
+## Documentation
+
+### LLMs Directory
+
+AI-focused documentation for patterns and best practices:
+
+- `LLMs/error-handling-exception.md` - Error-as-values pattern with TypeScript
+- `LLMs/services.md` - Service layer architecture guide
+- `LLMs/trpc.md` - tRPC implementation patterns for Next.js
+- `LLMs/react-hook-form.md` - Form handling patterns
+- `LLMs/graphql.md` - GraphQL + TanStack Query usage
+- `LLMs/tanstack-query.md` - TanStack Query patterns
+- `LLMs/icons.md` - Icon implementation guide
+
+### Examples Directory
+
+Working example projects:
+
+- `examples/trpc/` - Full tRPC + service layer implementation
+- `examples/tanstack-query-and-graphql/` - GraphQL + TanStack Query integration
 
 ## Setup for Contributors
 
@@ -97,12 +130,10 @@ Releases are automated when PRs are merged to main:
 2. Set up authentication token:
 
    ```bash
-   # Option 1: Add to shell profile (recommended)
-   echo 'export NPM_TOKEN=$(gh auth token)' >> ~/.zshrc
-   source ~/.zshrc
-
-   # Option 2: Set for current session
-   export NPM_TOKEN=$(gh auth token)
+   gh auth login -h github.com -s read:packages
+   > Select SSH
+   npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
+   npm config set @perimetre:registry https://npm.pkg.github.com
    ```
 
 3. Install packages:

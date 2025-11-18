@@ -18,16 +18,16 @@ pnpm add @perimetre/icons
 
 ## Usage
 
-### Basic Usage
+### Creating Icon Components
 
-The `Icon` component wraps your SVG icons and enforces accessibility requirements through TypeScript:
+**IMPORTANT**: Never add `aria-hidden` or `label` to the icon component declaration. These should ALWAYS be provided at the usage site.
 
 ```tsx
 import Icon, { type IconProps } from '@perimetre/icons';
 
-// Option 1: Decorative icon (no screen reader announcement)
-const DecorativeIcon: React.FC<IconProps> = (props) => (
-  <Icon {...props} aria-hidden>
+// ✅ CORRECT: No aria-hidden or label in declaration
+const IconEyeOpen: React.FC<IconProps> = (props) => (
+  <Icon {...props}>
     <svg
       width="24"
       height="24"
@@ -39,20 +39,17 @@ const DecorativeIcon: React.FC<IconProps> = (props) => (
   </Icon>
 );
 
-// Option 2: Meaningful icon (with screen reader label)
-const MeaningfulIcon: React.FC<IconProps> = (props) => (
+// ❌ WRONG: Don't add aria-hidden in declaration
+const IconWrong: React.FC<IconProps> = (props) => (
+  <Icon {...props} aria-hidden>
+    <svg>...</svg>
+  </Icon>
+);
+
+// ❌ WRONG: Don't add label in declaration
+const IconAlsoWrong: React.FC<IconProps> = (props) => (
   <Icon {...props} label="Settings">
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"
-        fill="currentColor"
-      />
-    </svg>
+    <svg>...</svg>
   </Icon>
 );
 ```
@@ -64,7 +61,8 @@ Create individual icon components that wrap the base `Icon` component:
 ```tsx
 import Icon, { type IconProps } from '@perimetre/icons';
 
-const IconEyeOpenMono: React.FC<IconProps> = (props) => (
+// Icon component - no accessibility props here
+const IconEyeOpen: React.FC<IconProps> = (props) => (
   <Icon {...props}>
     <svg
       height="24"
@@ -72,7 +70,6 @@ const IconEyeOpenMono: React.FC<IconProps> = (props) => (
       width="24"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title>eye-open</title>
       <g fill="currentColor">
         <circle cx="12" cy="14" fill="currentColor" r="5" strokeWidth="0" />
         <path
@@ -85,29 +82,41 @@ const IconEyeOpenMono: React.FC<IconProps> = (props) => (
   </Icon>
 );
 
-export default IconEyeOpenMono;
+export default IconEyeOpen;
 ```
 
 ### Using Icons in Your App
 
-```tsx
-import IconEyeOpenMono from './icons/IconEyeOpenMono';
+Accessibility props are provided at the usage site, not in the component declaration:
 
-// Decorative icon (next to text)
+```tsx
+import IconEyeOpen from './icons/IconEyeOpen';
+
+// ✅ Decorative icon (next to text) - add aria-hidden at usage
 function Button() {
   return (
     <button>
-      <IconEyeOpenMono aria-hidden className="mr-2" />
+      <IconEyeOpen aria-hidden className="mr-2" />
       View Details
     </button>
   );
 }
 
-// Meaningful icon (icon-only button)
+// ✅ Meaningful icon (icon-only button) - add label at usage
 function IconButton() {
   return (
     <button>
-      <IconEyeOpenMono label="View Details" />
+      <IconEyeOpen label="View Details" />
+    </button>
+  );
+}
+
+// ✅ With internationalization
+function I18nButton() {
+  const { t } = useTranslation();
+  return (
+    <button>
+      <IconEyeOpen label={t('view_details')} />
     </button>
   );
 }

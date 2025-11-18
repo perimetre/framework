@@ -32,7 +32,7 @@ export const postsRouter = async () =>
      */
     getAll: procedure.use(loggingProcedure).query(async () => {
       const result = await postsService({}).getAll({});
-      if (result instanceof Error) throw result;
+      if (!('ok' in result)) throw result;
       return result.posts;
     }),
 
@@ -86,7 +86,7 @@ export const postsRouter = async () =>
         const result = await postsService({}).getByUserId({
           userId: input.userId
         });
-        if (result instanceof Error) throw result;
+        if (!('ok' in result)) throw result;
         return result.posts;
       }),
 
@@ -113,7 +113,7 @@ export const postsRouter = async () =>
         }
 
         const result = await postsService({}).create(input);
-        if (result instanceof Error) throw result;
+        if (!('ok' in result)) throw result;
         return result.post;
       }),
 
@@ -134,7 +134,7 @@ export const postsRouter = async () =>
       )
       .mutation(async ({ input }) => {
         const result = await postsService({}).update(input);
-        if (result instanceof Error) throw result;
+        if (!('ok' in result)) throw result;
         return result.post;
       }),
 
@@ -152,7 +152,7 @@ export const postsRouter = async () =>
       )
       .mutation(async ({ input }) => {
         const result = await postsService({}).delete({ id: input.id });
-        if (result instanceof Error) throw result;
+        if (!('ok' in result)) throw result;
         return { success: true };
       })
   });

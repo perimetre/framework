@@ -11,6 +11,46 @@ Instead of throwing exceptions and using try-catch blocks, return errors as valu
 - **Enables type narrowing** - TypeScript infers success/error states
 - **No dependencies required** - Pure TypeScript solution
 
+## ⚠️ Critical Rule: Success vs. Failure
+
+**IMPORTANT:** The `ok: true` discriminator is **ONLY** for successful results.
+
+```typescript
+// ✅ CORRECT: ok: true ONLY on success
+export const getUser = async (id: string) => {
+  const user = await db.user.findById(id);
+  if (!user) return new NotFoundError(); // ✅ Return Error instance
+  return { ok: true as const, user }; // ✅ ok: true only for success
+};
+
+// ❌ WRONG: Never return ok: false
+export const getUser = async (id: string) => {
+  const user = await db.user.findById(id);
+  if (!user) return { ok: false, error: 'Not found' }; // ❌ NEVER DO THIS
+  return { ok: true as const, user };
+};
+
+// ❌ WRONG: Never include ok in error results
+export const getUser = async (id: string) => {
+  const user = await db.user.findById(id);
+  if (!user) return { ok: false as const, error: new NotFoundError() }; // ❌ NEVER DO THIS
+  return { ok: true as const, user };
+};
+```
+
+**The Rule:**
+
+- ✅ Success → `{ ok: true as const, ...data }`
+- ✅ Failure → `new CustomError()` (Error instance)
+- ❌ Never → `{ ok: false, ... }`
+
+**Why this matters:**
+
+- TypeScript's discriminated unions work by checking for the presence of the discriminator property
+- `'ok' in result` checks if the `ok` property exists (success) or doesn't exist (error)
+- Returning `ok: false` breaks this pattern and confuses type narrowing
+- Error instances should never have an `ok` property
+
 ## Pattern 1: Custom Error Classes
 
 Create domain-specific errors with consistent structure:
@@ -60,7 +100,7 @@ export class ValidationError<T> extends Error {
 
 ### Approach A: Discriminated Union with `ok` Flag
 
-The most explicit pattern - success always has `ok: true`, errors are instances:
+The most explicit and **recommended** pattern - success always has `ok: true`, errors are instances:
 
 ```typescript
 export const getWorkspace = async () => {
@@ -81,7 +121,7 @@ export const getWorkspace = async () => {
   };
 };
 
-// Usage
+// Usage with 'ok' in result check (PREFERRED)
 const result = await getWorkspace();
 
 if ('ok' in result) {
@@ -90,6 +130,13 @@ if ('ok' in result) {
 } else {
   // TypeScript knows result is NotFoundError
   console.error(result.message);
+}
+
+// Alternative: instanceof check (when you need to distinguish error types)
+if (result instanceof NotFoundError) {
+  console.error('Not found:', result.message);
+} else if ('ok' in result) {
+  console.log(result.workspace.name);
 }
 ```
 
@@ -145,8 +192,17 @@ export const getEmailHtml = async (templateName: string, data: EmailData) => {
 // TypeScript infers: EmailError | { ok: true; html: string }
 const result = await getEmailHtml('booking', data);
 
-if (result instanceof EmailError) {
+// PREFERRED: Check for success first
+if ('ok' in result) {
+  console.log(result.html);
+} else {
+  // result is EmailError
   console.error(result.message);
+}
+
+// Use instanceof only when you need to distinguish between error types
+if (result instanceof EmailError) {
+  console.error('Email rendering failed:', result.message);
 } else if ('ok' in result) {
   console.log(result.html);
 }
@@ -154,35 +210,66 @@ if (result instanceof EmailError) {
 
 ## Pattern 3: Type Guards for Error Checking
 
-### Using `instanceof`
+### Using `'ok' in` Operator (PREFERRED)
 
-TypeScript infers error types from instanceof checks:
-
-```typescript
-const result = await loginAction(credentials);
-
-if (result instanceof ValidationError) {
-  displayValidationErrors(result.errors); // TypeScript infers 'errors' property
-} else if (result instanceof ForbiddenError) {
-  console.error(result.message); // TypeScript infers 'message' and 'statusCode'
-} else {
-  redirect('/dashboard'); // TypeScript knows this is success case
-}
-```
-
-### Using `in` Operator
-
-TypeScript infers discriminated union types:
+**This is the primary pattern** - check for the success discriminator first:
 
 ```typescript
 const tokenResult = await getAccessToken();
 
 if ('ok' in tokenResult) {
-  const token = tokenResult.accessToken; // Inferred from success branch
+  const token = tokenResult.accessToken; // TypeScript infers success type
 } else {
-  return tokenResult; // Inferred as error type
+  return tokenResult; // TypeScript infers error type
+}
+
+// Early return pattern (recommended for cleaner code)
+if (!('ok' in tokenResult)) return tokenResult;
+// Now tokenResult is guaranteed to be the success type
+const token = tokenResult.accessToken;
+```
+
+**Why prefer `'ok' in result`?**
+
+- ✅ Checks for the success discriminator (semantic intent)
+- ✅ Aligns with discriminated union pattern
+- ✅ Consistent across the codebase
+- ✅ Works perfectly with TypeScript narrowing
+
+### Using `instanceof` (SECONDARY)
+
+**Use `instanceof` only when you need to distinguish between specific error types:**
+
+```typescript
+const result = await loginAction(credentials);
+
+// When you need different handling for different error types
+if (result instanceof ValidationError) {
+  displayValidationErrors(result.errors); // TypeScript infers 'errors' property
+} else if (result instanceof ForbiddenError) {
+  console.error(result.message); // TypeScript infers 'message' and 'statusCode'
+} else if ('ok' in result) {
+  redirect('/dashboard'); // TypeScript knows this is success case
+}
+
+// Or in try-catch blocks (where instanceof is necessary)
+try {
+  const data = await externalAPI();
+} catch (error: unknown) {
+  if (error instanceof NetworkError) {
+    // Handle network errors specifically
+  } else if (error instanceof Error) {
+    // Handle generic errors
+  }
 }
 ```
+
+**When to use `instanceof`:**
+
+- ❌ **NOT** for simple success/error checks → use `'ok' in result`
+- ✅ When distinguishing between multiple error types
+- ✅ In try-catch blocks (error type checking)
+- ✅ Frontend code checking specific error instances (e.g., ZodFormErrors)
 
 ### Combining Multiple Checks
 
@@ -280,7 +367,8 @@ export async function createClientAction(data: ClientFormData) {
       ok: true as const,
       client
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    // Use instanceof in catch blocks (necessary for unknown errors)
     if (error instanceof Error) {
       return new ForbiddenError(error.message);
     }
@@ -300,28 +388,37 @@ const onSubmit = handleSubmit(async (data) => {
   try {
     const result = await loginAction(data);
 
+    // PREFERRED: Check for success first
     if ('ok' in result) {
       // Success - redirect
       router.push('/dashboard');
-    } else {
-      // Error handling
-      if (result instanceof ValidationError) {
-        // Apply field-level errors
-        applyZodErrorsToForm(result.errors, setError);
-      } else {
-        // Form-level error
-        setError('root.form', {
-          type: 'manual',
-          message: result.message
-        });
-      }
+      return;
     }
-  } catch {
-    // Fallback for unexpected errors
-    setError('root.form', {
-      type: 'manual',
-      message: 'An unexpected error occurred'
-    });
+
+    // Handle errors - use instanceof to distinguish error types
+    if (result instanceof ValidationError) {
+      // Apply field-level errors
+      applyZodErrorsToForm(result.errors, setError);
+    } else {
+      // Form-level error (other error types)
+      setError('root.form', {
+        type: 'manual',
+        message: result.message
+      });
+    }
+  } catch (error: unknown) {
+    // Fallback for unexpected errors - instanceof required for unknown
+    if (error instanceof Error) {
+      setError('root.form', {
+        type: 'manual',
+        message: error.message
+      });
+    } else {
+      setError('root.form', {
+        type: 'manual',
+        message: 'An unexpected error occurred'
+      });
+    }
   }
 });
 ```
@@ -487,7 +584,7 @@ Convert errors to HTTP responses in API routes:
 ```typescript
 // Utility to convert errors to HTTP responses
 export function errorToResponse(error: Error): Response {
-  // Check for custom errors with statusCode
+  // Use instanceof to check for custom errors (necessary for Error class checking)
   if ('statusCode' in error && typeof error.statusCode === 'number') {
     return Response.json(
       {
@@ -515,6 +612,12 @@ export async function POST(request: Request) {
   const body = await request.json();
   const result = await createUser(body);
 
+  // PREFERRED: Check for success first
+  if ('ok' in result) {
+    return Response.json(result.user, { status: 201 });
+  }
+
+  // Handle specific error types with instanceof
   if (result instanceof ValidationError) {
     return Response.json(
       { error: 'ValidationError', details: result.errors },
@@ -526,9 +629,8 @@ export async function POST(request: Request) {
     return errorToResponse(result);
   }
 
-  if ('ok' in result) {
-    return Response.json(result.user, { status: 201 });
-  }
+  // Fallback
+  return errorToResponse(result);
 }
 ```
 
@@ -545,16 +647,26 @@ export async function GET(request: Request) {
 
   const result = await getUser(id);
 
-  if (result instanceof NotFoundError || result instanceof UnauthorizedError) {
+  // PREFERRED: Check for success first
+  if ('ok' in result) return Response.json(result.user);
+
+  // Use instanceof to distinguish between specific error types
+  if (result instanceof NotFoundError) {
     return Response.json(
       { error: result.name, message: result.message },
       { status: result.statusCode }
     );
   }
 
-  if ('ok' in result) return Response.json(result.user);
+  if (result instanceof UnauthorizedError) {
+    return Response.json(
+      { error: result.name, message: result.message },
+      { status: result.statusCode }
+    );
+  }
 
-  return errorToResponse(result as Error);
+  // Fallback for other errors
+  return errorToResponse(result);
 }
 ```
 
@@ -611,6 +723,10 @@ export async function createBooking(data: BookingData) {
 export async function getUserPreferences(userId: string) {
   const result = await fetchPreferences(userId);
 
+  // Check for success first
+  if ('ok' in result) return result;
+
+  // Provide fallback for specific error type
   if (result instanceof NotFoundError) {
     return {
       ok: true as const,
@@ -618,6 +734,7 @@ export async function getUserPreferences(userId: string) {
     };
   }
 
+  // Propagate other errors
   return result;
 }
 ```
@@ -632,9 +749,10 @@ export async function fetchWithRetry<T>(
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     const result = await fn();
 
+    // Success case - return immediately
     if (!(result instanceof Error)) return result;
 
-    // Don't retry on client errors (4xx)
+    // Don't retry on client errors (4xx) - use instanceof for Error class checking
     if (
       'statusCode' in result &&
       result.statusCode >= 400 &&
@@ -716,19 +834,23 @@ if ('ok' in result) {
 
 ### DO
 
+- Use `ok: true as const` **ONLY** for successful results
+- Return Error instances for failures (never `ok: false`)
 - Return errors as values (discriminated unions)
-- Use `ok: true as const` for success discriminator
+- **Prefer `'ok' in result` for success/error checks** ✨
 - Let TypeScript infer return types from error classes
 - Create domain-specific error classes
 - Include metadata in errors (statusCode, context)
-- Use `instanceof` for error type checking
-- Use `in` operator for discriminated union checking
-- Type catch blocks as `unknown` and narrow
+- Use `'ok' in result` for primary error checking (discriminated union)
+- Use `instanceof` only when distinguishing error types or in catch blocks
+- Type catch blocks as `unknown` and narrow with `instanceof`
 - Log errors before returning them
 - Use `Promise.allSettled()` for graceful partial failures
 
 ### DON'T
 
+- **Return `ok: false` or include `ok` in error results** - CRITICAL ❌
+- Return objects with `ok` property for failures
 - Throw errors in business logic (use try-catch only at boundaries)
 - Use `any` type for errors
 - Explicitly type return values when TypeScript can infer them
@@ -737,7 +859,14 @@ if ('ok' in result) {
 - Omit `as const` on discriminators
 - Use plain `Error` class (create custom ones)
 - Mix throwing and returning error patterns
+- Use `instanceof Error` for simple success/error checks - use `'ok' in result` instead
 - Ignore partial failures in batch operations
+
+### Error Checking Pattern Priority
+
+1. **Primary**: `'ok' in result` - for success/error discrimination
+2. **Secondary**: `instanceof SpecificError` - when you need to distinguish between error types
+3. **Necessary**: `instanceof Error` - in catch blocks for unknown errors
 
 ## Complete Example
 

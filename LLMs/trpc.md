@@ -1,6 +1,6 @@
 # tRPC Implementation Guide
 
-Practical patterns for implementing tRPC in Next.js App Router applications. **For initial setup, see `examples/trpc/`**.
+Practical patterns for implementing tRPC in Next.js App Router applications. \*\*For initial setup, see `https://github.com/perimetre/framework/tree/main/examples/trpc`.
 
 ## What is tRPC?
 
@@ -18,7 +18,7 @@ src/
 └── shared/exceptions.ts    # Custom error classes
 ```
 
-**Setup**: Copy structure from `examples/trpc/` - all boilerplate is there.
+**Setup**: Copy structure from `https://github.com/perimetre/framework/tree/main/examples/trpc` - all boilerplate is there.
 
 ## Feature Router Pattern
 
@@ -28,14 +28,14 @@ src/
 import { z } from 'zod';
 import { procedure, router } from '.';
 import { authedUserProcedure } from './middlewares/auth';
-import * as postsService from '../services/posts';
+import { postsService } from '../services/posts';
 
 export const postsRouter = async () =>
   router({
     // Query: Fetch data (GET-like)
     getAll: procedure.use(loggingProcedure).query(async () => {
-      const result = await postsService.getPosts();
-      if (!('ok' in result)) throw result; // Error-as-value pattern
+      const result = await postsService({}).getAll({});
+      if (!('ok' in result)) throw result; // PREFERRED: Check for success discriminator
       return result.posts;
     }),
 
@@ -43,7 +43,7 @@ export const postsRouter = async () =>
     getById: procedure
       .input(z.object({ id: z.number().int().positive() }))
       .query(async ({ input }) => {
-        const result = await postsService.getPostById(input.id);
+        const result = await postsService({}).getById({ id: input.id });
         if (!('ok' in result)) throw result;
         return result.post;
       }),
@@ -59,7 +59,7 @@ export const postsRouter = async () =>
       )
       .mutation(async ({ input, ctx }) => {
         // ctx.user is available from authedUserProcedure
-        const result = await postsService.createPost({
+        const result = await postsService({}).create({
           ...input,
           userId: ctx.user.id
         });
@@ -144,37 +144,83 @@ procedure
 
 ## Service Layer Pattern
 
-Separate business logic from routers using **error-as-value pattern** (see `LLMs/error-handling-exception.md`):
+Separate business logic from routers using **`@perimetre/service-builder`** with error-as-value pattern (see `https://raw.githubusercontent.com/perimetre/framework/refs/heads/main/LLMs/error-handling-exception.md`).
+
+### ⚠️ Critical Rule: `ok: true` is ONLY for Success
 
 ```typescript
-import { NotFoundError, UnexpectedFetchError } from '@/shared/exceptions';
-
-export const getPostById = async (id: number) => {
-  const response = await fetch(`${API_URL}/posts/${id}`);
-
-  if (response.status === 404) {
-    return new NotFoundError();
-  }
-
-  if (!response.ok) {
-    return new UnexpectedFetchError();
-  }
-
-  const post = await response.json();
-
-  return {
-    ok: true as const, // Discriminator for type narrowing
-    post
-  };
+// ✅ CORRECT
+handler: async ({ input }) => {
+  if (error) return new NotFoundError(); // ✅ Return Error instance
+  return { ok: true as const, post }; // ✅ ok: true only for success
 };
+
+// ❌ WRONG: Never return ok: false
+handler: async ({ input }) => {
+  if (error) return { ok: false, error: '...' }; // ❌ NEVER DO THIS
+  return { ok: true as const, post };
+};
+```
+
+**The Rule:**
+
+- ✅ Success → `{ ok: true as const, ...data }`
+- ✅ Failure → `new CustomError()` (Error instance)
+- ❌ Never → `{ ok: false, ... }`
+
+### Service Layer Example
+
+```typescript
+import { defineService } from '@perimetre/service-builder';
+import { NotFoundError, UnexpectedFetchError } from '@/shared/exceptions';
+import { z } from 'zod';
+
+export const postsService = defineService<Record<string, unknown>>()({
+  methods: ({ method }) => ({
+    /**
+     * Fetch a single post by ID
+     */
+    getById: method
+      .input(z.object({ id: z.number().int().positive() }))
+      .handler(async ({ input }) => {
+        const response = await fetch(`${API_URL}/posts/${input.id}`);
+
+        // ✅ Return Error instances for failures (not ok: false)
+        if (response.status === 404) {
+          return new NotFoundError();
+        }
+
+        if (!response.ok) {
+          return new UnexpectedFetchError();
+        }
+
+        const post = await response.json();
+
+        // ✅ Return ok: true ONLY for success
+        return {
+          ok: true as const, // Discriminator for type narrowing
+          post
+        };
+      })
+
+    // Other methods: getAll, create, update, delete...
+  })
+});
+
+// Usage in router:
+const result = await postsService({}).getById({ id: input.id });
+if (!('ok' in result)) throw result;
+return result.post;
 ```
 
 **Benefits:**
 
+- Perfect type inference (no type assertions needed)
+- Built-in input validation with Zod
 - Explicit error handling (errors in return type)
+- Dependency injection through context
 - Type-safe (TypeScript narrows types)
-- Easy to test
-- Composable
+- Easy to test and compose
 
 ## Client Usage
 
@@ -218,17 +264,30 @@ export default async function PostsPage() {
 
 ## Error Handling
 
-See `LLMs/error-handling-exception.md` for error-as-value pattern. Custom error classes in `src/shared/exceptions.ts`.
+See `https://raw.githubusercontent.com/perimetre/framework/refs/heads/main/LLMs/error-handling-exception.md` for error-as-value pattern.
 
 ```typescript
 // Service returns errors as values
-const result = await service.getPost(id);
+const result = await postsService({}).getById({ id });
+
+// PREFERRED: Check for success discriminator first
 if (!('ok' in result)) throw result;  // Router throws to convert to tRPC error
+return result.post; // TypeScript knows this is the success type
+
+// Alternative (when distinguishing error types):
+if (result instanceof NotFoundError) throw result;
+if (result instanceof UnauthorizedError) throw result;
+if ('ok' in result) return result.post;
 
 // Client handles errors
 const { data, error } = trpc.posts.getById.useQuery({ id: 1 });
 if (error) return <div>Error: {error.message}</div>;
 ```
+
+**Pattern Priority:**
+
+1. Use `!('ok' in result)` for simple success/error checks
+2. Use `instanceof` only when you need to distinguish between specific error types
 
 ## Input Validation
 
@@ -241,29 +300,20 @@ if (error) return <div>Error: {error.message}</div>;
 
 ## Production Checklist
 
-### Authentication
-
-- [ ] Integrate real auth provider (Payload, NextAuth, Clerk)
-- [ ] Update `createContext` to extract user from headers/cookies
-- [ ] Implement proper session validation
-
 ### Error Handling
 
-- [ ] Add error logging service (Sentry, LogRocket)
 - [ ] Log errors in middleware
 - [ ] Return user-friendly messages
 
 ### Performance
 
 - [ ] Implement caching strategy (React cache, Redis)
-- [ ] Add rate limiting (Redis, Unkey)
 - [ ] Enable request batching (already configured)
 
 ### Security
 
 - [ ] Validate all inputs with Zod
 - [ ] Implement CSRF protection if needed
-- [ ] Add request size limits
 - [ ] Configure CORS appropriately
 
 ## Common Patterns
@@ -300,9 +350,8 @@ type CreatePostInput = RouterInput['posts']['create'];
 
 ## Resources
 
-- **Setup Example**: `examples/trpc/` - Complete working implementation
-- **Error Pattern**: `LLMs/error-handling-exception.md`
-- **Production Reference**: `cpsst-booking` codebase
+- **Setup Example**: `https://github.com/perimetre/framework/tree/main/examples/trpc` - Complete working implementation
+- **Error Pattern**: `https://raw.githubusercontent.com/perimetre/framework/refs/heads/main/LLMs/error-handling-exception.md`
 - **Official Docs**: https://trpc.io/
 
 ## Quick Reference

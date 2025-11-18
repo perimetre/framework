@@ -231,15 +231,23 @@ const onSubmit = handleSubmit(async (data) => {
   clearErrors('root.form');
   try {
     const result = await myAction(data);
+
+    // PREFERRED: Check for success first
     if ('ok' in result) return push('/success');
 
+    // Use instanceof to distinguish between error types
     if (result instanceof ValidationError) {
       applyZodErrorsToForm(result.errors, setError);
     } else {
       setError('root.form', { type: 'manual', message: result.message });
     }
-  } catch {
-    setError('root.form', { type: 'manual', message: 'Error occurred' });
+  } catch (error: unknown) {
+    // Use instanceof for unknown errors in catch blocks
+    if (error instanceof Error) {
+      setError('root.form', { type: 'manual', message: error.message });
+    } else {
+      setError('root.form', { type: 'manual', message: 'Error occurred' });
+    }
   }
 });
 ```

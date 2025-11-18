@@ -11,6 +11,39 @@ A lightweight, type-safe service builder inspired by tRPC for creating dependenc
 - 📦 **Zero bundle overhead** - Ships TypeScript source for optimal tree-shaking
 - 🪶 **Tiny** - ~200 lines of code, no runtime dependencies (except Zod peer dep)
 
+## ⚠️ Critical Pattern: Success vs. Failure
+
+**IMPORTANT:** The `ok: true` discriminator is **ONLY** for successful results.
+
+```typescript
+// ✅ CORRECT: Return ok: true ONLY on success
+handler: async ({ input }) => {
+  const user = await db.user.findById(input.id);
+  if (!user) return new NotFoundError(); // ✅ Return Error instance
+  return { ok: true as const, user }; // ✅ ok: true only for success
+};
+
+// ❌ WRONG: Never return ok: false
+handler: async ({ input }) => {
+  const user = await db.user.findById(input.id);
+  if (!user) return { ok: false, error: 'Not found' }; // ❌ NEVER DO THIS
+  return { ok: true as const, user };
+};
+
+// ❌ WRONG: Never include ok in error results
+handler: async ({ input }) => {
+  const user = await db.user.findById(input.id);
+  if (!user) return { ok: false as const, error: new NotFoundError() }; // ❌ NEVER DO THIS
+  return { ok: true as const, user };
+};
+```
+
+**The Rule:**
+
+- ✅ Success → `{ ok: true as const, ...data }`
+- ✅ Failure → `new CustomError()` (Error instance)
+- ❌ Never → `{ ok: false, ... }`
+
 ## Installation
 
 ```bash
@@ -49,13 +82,16 @@ const userService = defineService<{ db: Database }>()({
 const service = userService({ db: prisma });
 const result = await service.getById({ id: '123' });
 
-// 4. Handle results
-if (result instanceof NotFoundError) {
-  console.error('User not found');
-} else if (result instanceof Error) {
-  console.error('Error:', result.message);
-} else {
+// 4. Handle results (PREFERRED: Check for success first)
+if ('ok' in result) {
   console.log('User:', result.user); // ✨ TypeScript knows `user` exists!
+} else {
+  // Handle errors - use instanceof to distinguish error types
+  if (result instanceof NotFoundError) {
+    console.error('User not found');
+  } else {
+    console.error('Error:', result.message);
+  }
 }
 ```
 
@@ -88,7 +124,9 @@ const mathService = defineService<Record<string, unknown>>()({
 // Use it
 const service = mathService({});
 const result = await service.add({ a: 5, b: 3 });
-if (result instanceof Error) throw result;
+
+// PREFERRED: Check for success first
+if (!('ok' in result)) throw result;
 console.log(result.result); // 8 - TypeScript knows the type!
 ```
 
@@ -168,7 +206,9 @@ const service = userService({
 
 // Use it - full type safety!
 const result = await service.getAll({ limit: 5 });
-if (result instanceof Error) throw result;
+
+// PREFERRED: Check for success first
+if (!('ok' in result)) throw result;
 console.log(result.users); // ✨ TypeScript knows users is User[]
 ```
 
@@ -255,9 +295,8 @@ const calendarService = defineService<{ db: PrismaClient }>()({
 const service = calendarService({ db: prisma });
 const result = await service.getTrainerCalendar({ trainerId: '123' });
 
-if (result instanceof Error) {
-  console.error('Error:', result.message, result.statusCode);
-} else {
+// PREFERRED: Check for success first
+if ('ok' in result) {
   // ✨ Full type inference - no assertions needed!
   console.log('Trainer:', result.trainer.name);
   console.log('Events:', result.events.length);
@@ -267,6 +306,9 @@ if (result instanceof Error) {
     '-',
     result.workspaceHours.end
   );
+} else {
+  // Handle errors
+  console.error('Error:', result.message, result.statusCode);
 }
 ```
 
@@ -368,7 +410,8 @@ const postsService = defineService<Record<string, unknown>>()({
 export const postsRouter = router({
   getAll: procedure.query(async () => {
     const result = await postsService({}).getAll({});
-    if (result instanceof Error) throw result;
+    // PREFERRED: Check for success discriminator
+    if (!('ok' in result)) throw result;
     return result.posts; // ✨ TypeScript knows the type!
   }),
 
@@ -376,10 +419,9 @@ export const postsRouter = router({
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       const result = await postsService({}).getById({ id: input.id });
-      if ('ok' in result) {
-        return result.post; // ✨ Perfect inference!
-      }
-      throw result;
+      // PREFERRED: Check for success first
+      if (!('ok' in result)) throw result;
+      return result.post; // ✨ Perfect inference!
     })
 });
 ```
@@ -410,15 +452,17 @@ export async function createUserAction(formData: FormData) {
     email: formData.get('email') as string
   });
 
+  // PREFERRED: Check for success first
+  if ('ok' in result) {
+    return { user: result.user };
+  }
+
+  // Handle errors - use instanceof to distinguish error types
   if (result instanceof ServiceError) {
     return { error: result.message, statusCode: result.statusCode };
   }
 
-  if (result instanceof Error) {
-    return { error: 'An unexpected error occurred' };
-  }
-
-  return { user: result.user };
+  return { error: 'An unexpected error occurred' };
 }
 ```
 
@@ -435,6 +479,12 @@ app.get('/users/:id', async (req, res) => {
     id: req.params.id
   });
 
+  // PREFERRED: Check for success first
+  if ('ok' in result) {
+    return res.json(result.user);
+  }
+
+  // Handle errors - use instanceof for error type checking
   if (result instanceof ServiceError) {
     return res.status(result.statusCode).json({
       error: result.name,
@@ -442,11 +492,7 @@ app.get('/users/:id', async (req, res) => {
     });
   }
 
-  if (result instanceof Error) {
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-
-  res.json(result.user);
+  return res.status(500).json({ error: 'Internal server error' });
 });
 ```
 
@@ -457,22 +503,36 @@ app.get('/users/:id', async (req, res) => {
 ```typescript
 const result = await service.getById({ id: '123' });
 
-// Pattern 1: instanceof checks
-if (result instanceof NotFoundError) {
-  console.error('Not found');
-} else if (result instanceof Error) {
-  console.error('Error:', result.message);
-} else {
-  console.log('User:', result.user);
-}
-
-// Pattern 2: 'ok' discriminator
+// PREFERRED Pattern: 'ok' discriminator (check success first)
 if ('ok' in result) {
   console.log('User:', result.user);
 } else {
-  console.error('Error:', result.message);
+  // Use instanceof to distinguish between error types
+  if (result instanceof NotFoundError) {
+    console.error('Not found');
+  } else {
+    console.error('Error:', result.message);
+  }
 }
+
+// Alternative (early return pattern - recommended)
+if (!('ok' in result)) {
+  // Handle error
+  if (result instanceof NotFoundError) {
+    console.error('Not found');
+  } else {
+    console.error('Error:', result.message);
+  }
+  return;
+}
+// Now result is guaranteed to be success type
+console.log('User:', result.user);
 ```
+
+**Pattern Priority:**
+
+1. Use `'ok' in result` for success/error checks (primary)
+2. Use `instanceof` only when distinguishing error types (secondary)
 
 ### 2. Error Propagation
 
@@ -491,8 +551,8 @@ const postService = defineService<{ db: PrismaClient }>()({
         // Check user exists
         const userResult = await deps.user.getById({ id: input.userId });
 
-        // Propagate error if user service failed
-        if (userResult instanceof Error) return userResult;
+        // PREFERRED: Propagate error early if user service failed
+        if (!('ok' in userResult)) return userResult;
 
         // User exists, create post
         const post = await ctx.db.post.create({
@@ -518,8 +578,8 @@ const postsRouter = router({
     .query(async ({ input }) => {
       const result = await postsService({}).getById({ id: input.id });
 
-      // Throw errors to let tRPC handle them
-      if (result instanceof Error) throw result;
+      // PREFERRED: Check for success discriminator
+      if (!('ok' in result)) throw result;
 
       // Return success data
       return result.post; // ✨ Type is inferred perfectly!
@@ -818,7 +878,9 @@ const service = defineService<{ db: Database }>()({
 
 // When you call it:
 const result = await service({ db }).getUser({ id: '123' });
-if (result instanceof Error) throw result;
+
+// PREFERRED: Check for success first
+if (!('ok' in result)) throw result;
 
 // TypeScript knows ALL these properties exist:
 result.user; // ✓
@@ -830,15 +892,15 @@ result.ok; // ✓
 
 ```typescript
 handler: async ({ ctx, deps, input }) => {
-  // ✅ Clean, flat structure with early returns
+  // ✅ Clean, flat structure with early returns using 'ok' checks
   const userResult = await deps.user.getById({ id: input.userId });
-  if (userResult instanceof Error) return userResult;
+  if (!('ok' in userResult)) return userResult;
 
   const settingsResult = await deps.settings.get({});
-  if (settingsResult instanceof Error) return settingsResult;
+  if (!('ok' in settingsResult)) return settingsResult;
 
   const paymentResult = await deps.payments.charge(input.amount);
-  if (paymentResult instanceof Error) return paymentResult;
+  if (!('ok' in paymentResult)) return paymentResult;
 
   // All checks passed, create order
   return {
@@ -856,22 +918,33 @@ handler: async ({ ctx, deps, input }) => {
 
 ### ✅ DO
 
-- Use `ok: true as const` for the discriminator
+- Use `ok: true as const` **ONLY** for successful results
+- Return Error instances for failures (never `ok: false`)
 - Return errors instead of throwing them
-- Use `instanceof` for error type checks
+- **Use `'ok' in result` for success/error checks (primary pattern)** ✨
+- Use `instanceof` only when distinguishing error types (secondary)
 - Create domain-specific error classes
 - Use the `deps` pattern for service composition
 - Validate all inputs with Zod schemas
-- Use early returns to avoid nesting
+- Use early returns with `!('ok' in result)` to avoid nesting
 
 ### ❌ DON'T
 
+- **Return `ok: false` or include `ok` in error results** - CRITICAL ❌
+- Return objects with `ok` property for failures
 - Throw errors inside handlers (return them instead)
 - Use `ok: true` without `as const`
+- Use `instanceof Error` for simple success checks (use `'ok' in result` instead)
 - Mix throwing and returning error patterns
 - Skip input validation
 - Create circular service dependencies
 - Use `any` types (let TypeScript infer)
+
+### Error Checking Pattern Priority
+
+1. **Primary**: `'ok' in result` - for success/error discrimination
+2. **Secondary**: `instanceof SpecificError` - when distinguishing between error types
+3. **Necessary**: `instanceof Error` - in catch blocks for unknown errors
 
 ## API Reference
 

@@ -12,15 +12,20 @@
 ## Quick Reference
 
 ```tsx
-// ✅ Decorative icon (with visible text)
+// ✅ Decorative icon (with visible text) - aria-hidden at usage
 <button>
   <IconCheck aria-hidden className="mr-2" />
   Save Changes
 </button>
 
-// ✅ Meaningful icon (icon-only button)
+// ✅ Meaningful icon (icon-only button) - label at usage
 <button>
   <IconTrash label="Delete item" />
+</button>
+
+// ✅ With internationalization - label at usage
+<button>
+  <IconSettings label={t('settings')} />
 </button>
 
 // ❌ NEVER - Static SVG in Image component
@@ -61,9 +66,12 @@ Use https://svgomg.net/ with these settings:
 
 **File**: `src/components/icons/IconName.tsx`
 
+**CRITICAL**: Never add `aria-hidden` or `label` to the icon component declaration. These must ALWAYS be provided at the usage site.
+
 ```tsx
 import Icon, { type IconProps } from '@perimetre/icons';
 
+// ✅ CORRECT: No aria-hidden or label in declaration
 const IconName: React.FC<IconProps> = (props) => (
   <Icon {...props}>
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -75,14 +83,33 @@ const IconName: React.FC<IconProps> = (props) => (
 export default IconName;
 ```
 
+```tsx
+// ❌ WRONG: Don't add aria-hidden in declaration
+const IconWrong: React.FC<IconProps> = (props) => (
+  <Icon {...props} aria-hidden>
+    <svg>...</svg>
+  </Icon>
+);
+
+// ❌ WRONG: Don't add label in declaration
+const IconAlsoWrong: React.FC<IconProps> = (props) => (
+  <Icon {...props} label="Settings">
+    <svg>...</svg>
+  </Icon>
+);
+```
+
 **Key points:**
 
 - Use PascalCase: `IconCheckCircle`, `IconArrowLeft`
 - Always accept `IconProps` from `@perimetre/icons`
 - ALWAYS Spread `{...props}` onto `<Icon>`
 - SVG must use `currentColor` for fills/strokes
+- **NEVER** add `aria-hidden` or `label` in the component declaration
 
 ### 3. Usage Patterns
+
+Accessibility props are provided at the usage site:
 
 #### Decorative Icons (with text)
 
@@ -98,6 +125,14 @@ export default IconName;
 ```tsx
 <button aria-label="Close dialog">
   <IconX label="Close" className="h-6 w-6" />
+</button>
+```
+
+#### With Internationalization
+
+```tsx
+<button>
+  <IconSettings label={t('settings')} />
 </button>
 ```
 
@@ -232,5 +267,5 @@ Suggested existing icon libraries:
 
 ## Additional Resources
 
-- Full documentation: `packages/icons/README.md`
+- Full documentation: `https://raw.githubusercontent.com/perimetre/framework/refs/heads/main/packages/icons/README.md`
 - TypeScript types: `@perimetre/icons`
