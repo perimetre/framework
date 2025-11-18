@@ -1,5 +1,11 @@
 # @perimetre/helpers
 
+## 5.1.0
+
+### Minor Changes
+
+- bcce6b1: New `ForceRequiredProps` type
+
 ## 5.0.1
 
 ### Patch Changes
