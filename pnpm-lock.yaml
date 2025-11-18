@@ -210,9 +210,6 @@ importers:
       '@perimetre/eslint-config-base':
         specifier: workspace:*
         version: link:../eslint-config-base
-      '@perimetre/eslint-config-react':
-        specifier: workspace:*
-        version: link:../eslint-config-react
       '@types/react':
         specifier: ^18.3.27
         version: 18.3.27
