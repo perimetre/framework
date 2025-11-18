@@ -4,6 +4,15 @@
   "references": [
     {
       "path": "./packages/classnames"
+    },
+    {
+      "path": "./packages/helpers"
+    },
+    {
+      "path": "./packages/icons"
+    },
+    {
+      "path": "./packages/service-builder"
     }
   ]
 }

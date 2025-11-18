@@ -1,0 +1,45 @@
+{
+  "dependencies": {
+    "@radix-ui/react-accessible-icon": "^1.1.1",
+    "@radix-ui/react-slot": "^1.1.1"
+  },
+  "description": "Accessible React icon wrapper component for Perimetre projects",
+  "devDependencies": {
+    "@perimetre/eslint-config-base": "workspace:*",
+    "@types/react": "^18.3.27",
+    "eslint": "^9.39.1",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "GPL-3.0",
+  "main": "./dist/index.js",
+  "name": "@perimetre/icons",
+  "packageManager": "pnpm@10.11.0",
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/icons",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "version": "0.0.0"
+}
