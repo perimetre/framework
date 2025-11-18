@@ -18,18 +18,31 @@ export type AppendUndefinedWhereItsNull<TModel> = AppendTypeToKeyOfType<
 >;
 
 /**
- * A helper type that transforms selected fields in partial, and leave others intact
+ * Make keys K required without stripping `| undefined` from their value types.
+ * This preserves explicit `undefined` unions (and any widened undefined) while
+ * ensuring the properties themselves are required to be present.
+ * Implementation detail:
+ * - We enforce presence using a required `unknown` property, then intersect with `Pick<T, K>` to preserve the original value type exactly (including explicit `| undefined`).
+ * - This avoids TypeScript's behavior that can drop undefined` when removing the optional modifier with `-?`.
+ */
+export type ForceRequiredProps<T, K extends keyof T> = Omit<T, K> &
+  Pick<T, K> &
+  Required<Record<K, unknown>>;
+
+/**
+ * A helper type that transforms selected fields in partial, and leave others intact. Oposite of `PickOtherwisePartial`
  */
 export type PartialPick<T, K extends keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
 /**
- * A helper type that picks the provided properties, and make all other properties optional
+ * A helper type that picks the provided properties, and make all other properties optional. Oposite of `PartialPick`
  */
 export type PickOtherwisePartial<T, K extends keyof T> = Partial<Omit<T, K>> &
   Pick<T, K>;
 
 /**
  * A helper type that will remove the `Promise<Type>` from a type and only return the innter `Type`
+ * @deprecated Use `Awaited<Type>` instead
  */
 export type UnpackPromise<T> = T extends Promise<infer U> ? U : T;
