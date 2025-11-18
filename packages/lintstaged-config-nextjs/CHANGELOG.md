@@ -1,5 +1,11 @@
 # @perimetre/lintstaged-config-nextjs
 
+## 0.0.3
+
+### Patch Changes
+
+- dacc762: New License
+
 ## 0.0.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @perimetre/helpers
 
+## 5.0.1
+
+### Patch Changes
+
+- dacc762: New License
+
 ## 5.0.0
 
 ### Major Changes

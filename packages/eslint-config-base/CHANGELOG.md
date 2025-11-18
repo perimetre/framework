@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-base
 
+## 0.2.1
+
+### Patch Changes
+
+- dacc762: New License
+
 ## 0.2.0
 
 ### Minor Changes
