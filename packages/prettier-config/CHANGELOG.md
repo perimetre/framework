@@ -1,5 +1,11 @@
 # @perimetre/prettier-config
 
+## 0.0.5
+
+### Patch Changes
+
+- dacc762: New License
+
 ## 0.0.4
 
 ### Patch Changes

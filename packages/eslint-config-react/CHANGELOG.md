@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-react
 
+## 0.1.1
+
+### Patch Changes
+
+- dacc762: New License
+
 ## 0.1.0
 
 ### Minor Changes
