@@ -42,9 +42,9 @@
     "url": "https://github.com/perimetre/framework.git"
   },
   "scripts": {
-    "build": "~/.bun/bin/bun test && tsc --project tsconfig.build.json",
+    "build": "bun test && tsc --project tsconfig.build.json",
     "lint": "eslint .",
-    "test": "~/.bun/bin/bun test",
+    "test": "bun test",
     "typecheck": "tsc --project tsconfig.build.json --noEmit"
   },
   "types": "./src/index.ts",
