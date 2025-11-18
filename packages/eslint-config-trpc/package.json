@@ -1,0 +1,41 @@
+{
+  "dependencies": {
+    "@perimetre/eslint-config-base": "workspace:*",
+    "typescript-eslint": "^8.46.4"
+  },
+  "description": "tRPC-optimized ESLint configuration for Perimetre projects",
+  "devDependencies": {
+    "eslint": "^9.39.1"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "types": "./index.d.mts"
+    }
+  },
+  "files": [
+    "index.mjs",
+    "index.d.mts"
+  ],
+  "main": "index.mjs",
+  "name": "@perimetre/eslint-config-trpc",
+  "packageManager": "pnpm@10.11.0",
+  "peerDependencies": {
+    "eslint": ">= 9"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/eslint-config-trpc",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "types": "index.d.mts",
+  "version": "0.1.0"
+}
