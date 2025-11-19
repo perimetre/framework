@@ -1,0 +1,63 @@
+{
+  "chat.mcp.discovery.enabled": {
+    "claude-desktop": true,
+    "cursor-global": true,
+    "cursor-workspace": true,
+    "windsurf": true
+  },
+  "css.customData": [".vscode/css_custom_data.json"], // Tailwind CSS IntelliSense custom data
+  "editor.codeActionsOnSave": {
+    // Ensure code is formatted on save
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.formatOnSave": true, // Ensure code is formatted on save
+  "editor.quickSuggestions": {
+    // Fixes for tailwind completions
+    "other": true,
+    "strings": true
+  },
+  "editor.renderWhitespace": "trailing",
+  "files.associations": {
+    // Fixes for .env files syntax highlighting
+    ".env.development": "properties",
+    ".env.development.local": "properties",
+    ".env.local": "properties",
+    ".env.preview": "properties",
+    ".env.preview.local": "properties",
+    ".env.production": "properties",
+    ".env.production.local": "properties"
+  },
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": "commit-message.instructions.md"
+    }
+  ],
+  "github.copilot.chat.reviewSelection.instructions": [
+    {
+      "file": "code-review.instructions.md"
+    }
+  ],
+  "i18n-ally.enabledFrameworks": ["custom"], // * This is the fix for the getTranslations issue
+  "i18n-ally.keepFulfilled": true,
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.localesPaths": ["messages"], // E.g. "messages"
+  "i18n-ally.namespace": true,
+  "i18n-ally.sortKeys": true,
+  "i18n-ally.sourceLanguage": "en",
+  "tailwindCSS.classFunctions": ["cva", "cx", "cn"],
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "workbench.colorCustomizations": {
+    "editorWhitespace.foreground": "#fbff00"
+  },
+  // This is a react project, display labels as such
+  "workbench.editor.customLabels.patterns": {
+    "**/src/app/**/index.tsx": "${dirname} - Index",
+    "**/src/app/**/layout.tsx": "${dirname} - Layout",
+    "**/src/app/**/page.tsx": "${dirname} - Page",
+    "**/src/app/**/template.tsx": "${dirname} - Template",
+    "**/src/components/**/*.stories.tsx": "${dirname} - Story",
+    "**/src/components/**/index.tsx": "${dirname} - Component"
+  }
+}

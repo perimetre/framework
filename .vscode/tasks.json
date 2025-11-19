@@ -1,0 +1,24 @@
+{
+  "tasks": [
+    {
+      "args": ["${command:eslint.restart}"],
+      "command": "echo",
+      "label": "Restart ESLint Server",
+      "problemMatcher": [],
+      "type": "shell"
+    },
+    {
+      "args": ["${command:typescript.restartTsServer}"],
+      "command": "echo",
+      "label": "Restart TS Server",
+      "problemMatcher": [],
+      "type": "shell"
+    },
+    {
+      "dependsOn": ["Restart ESLint Server", "Restart TS Server"],
+      "dependsOrder": "sequence",
+      "label": "Restart ESLint and TS Server"
+    }
+  ],
+  "version": "2.0.0"
+}
