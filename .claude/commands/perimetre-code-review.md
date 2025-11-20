@@ -310,8 +310,3 @@ Discover: `gh api repos/perimetre/framework/contents/LLMs --jq '.[].name'`
 - **You must cite and link** each issue with documentation evidence
 - **Use full git SHA** when linking to files
 - **Provide context** when linking: Include 1 line before and after
-
----
-
-**Version:** 2.0
-**Based on:** Anthropic's multi-agent code review pattern, 141 Perimetre code reviews, framework patterns
