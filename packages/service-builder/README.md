@@ -7,6 +7,7 @@ A lightweight, type-safe service builder inspired by tRPC for creating dependenc
 - ✨ **Perfect type inference** - Types flow automatically without assertions (like tRPC!)
 - 🛡️ **Type-safe input validation** using Zod schemas
 - 🔌 **Dependency injection** through the deps pattern
+- 🔄 **Self-referential calls** - Methods can call other methods via `self` with full type safety
 - 🎯 **Error handling as values** (Go/Rust-like pattern)
 - 📦 **Zero bundle overhead** - Ships TypeScript source for optimal tree-shaking
 - 🪶 **Tiny** - ~200 lines of code, no runtime dependencies (except Zod peer dep)
@@ -55,13 +56,15 @@ pnpm add @perimetre/service-builder zod
 ## Quick Start
 
 ```typescript
-import { defineService, ServiceError } from '@perimetre/service-builder';
+import { defineService } from '@perimetre/service-builder';
 import { z } from 'zod';
 
-// 1. Define custom errors (optional but recommended)
-class NotFoundError extends ServiceError {
+// 1. Define custom errors (extend the base Error class)
+class NotFoundError extends Error {
+  readonly statusCode = 404;
   constructor(message = 'Not found') {
-    super(message, 404);
+    super(message);
+    this.name = 'NotFoundError';
   }
 }
 
@@ -114,7 +117,7 @@ const mathService = defineService<Record<string, unknown>>()({
       .input(z.object({ a: z.number(), b: z.number() }))
       .handler(async ({ input }) => {
         if (input.b === 0) {
-          return new ServiceError('Division by zero', 400);
+          return new Error('Division by zero');
         }
         return { ok: true as const, result: input.a / input.b };
       })
@@ -170,7 +173,7 @@ const userService = defineService<AppContext>()({
         });
 
         if (existing) {
-          return new ServiceError('Email already exists', 409);
+          return new Error('Email already exists');
         }
 
         const user = await ctx.db.user.create({ data: input });
@@ -312,7 +315,93 @@ if ('ok' in result) {
 }
 ```
 
-### 4. Multiple Service Dependencies
+### 4. Self-Referential Method Calls
+
+Methods can call other methods within the same service using the `self` parameter. There are two approaches:
+
+#### Option A: Typed Self with `.typed<TSelf>()` (Recommended)
+
+For full type safety on `self`, define an interface and use `.typed<TSelf>()`:
+
+```typescript
+// Define the service interface
+type IUserService = {
+  getById(input: { id: string }): Promise<{ ok: true; user: User } | Error>;
+  getByIdWithDetails(input: {
+    id: string;
+  }): Promise<{ ok: true; user: User; fullName: string } | Error>;
+};
+
+// Use .typed<TSelf>() for fully typed self
+const userService = defineService<{ db: PrismaClient }>().typed<IUserService>()(
+  {
+    methods: ({ method }) => ({
+      getById: method
+        .input(z.object({ id: z.string() }))
+        .handler(async ({ ctx, input }) => {
+          const user = await ctx.db.user.findUnique({
+            where: { id: input.id }
+          });
+          if (!user) return new NotFoundError();
+          return { ok: true as const, user };
+        }),
+
+      getByIdWithDetails: method
+        .input(z.object({ id: z.string() }))
+        .handler(async ({ input, self }) => {
+          // ✨ self is fully typed as IUserService!
+          const result = await self.getById({ id: input.id });
+          if (!('ok' in result)) return result;
+
+          return {
+            ok: true as const,
+            user: result.user,
+            fullName: `${result.user.firstName} ${result.user.lastName}`
+          };
+        })
+    })
+  }
+);
+```
+
+#### Option B: Untyped Self (Simple cases)
+
+Without `.typed<>()`, `self` is typed as `unknown`. Cast it when needed:
+
+```typescript
+const userService = defineService<{ db: PrismaClient }>()({
+  methods: ({ method }) => ({
+    getById: method
+      .input(z.object({ id: z.string() }))
+      .handler(async ({ ctx, input }) => {
+        const user = await ctx.db.user.findUnique({ where: { id: input.id } });
+        if (!user) return new NotFoundError();
+        return { ok: true as const, user };
+      }),
+
+    getByIdWithDetails: method
+      .input(z.object({ id: z.string() }))
+      .handler(async ({ input, self }) => {
+        // Cast self when needed
+        const typedSelf = self as {
+          getById: (input: {
+            id: string;
+          }) => Promise<{ ok: true; user: User } | Error>;
+        };
+        const result = await typedSelf.getById({ id: input.id });
+        if (!('ok' in result)) return result;
+
+        return {
+          ok: true as const,
+          user: result.user,
+          fullName: `${result.user.firstName} ${result.user.lastName}`
+        };
+      })
+  })
+});
+```
+
+### 5. Multiple Service Dependencies
 
 ```typescript
 const userService = defineService<{ db: PrismaClient }>()({
@@ -457,12 +546,8 @@ export async function createUserAction(formData: FormData) {
     return { user: result.user };
   }
 
-  // Handle errors - use instanceof to distinguish error types
-  if (result instanceof ServiceError) {
-    return { error: result.message, statusCode: result.statusCode };
-  }
-
-  return { error: 'An unexpected error occurred' };
+  // Handle errors
+  return { error: result.message };
 }
 ```
 
@@ -484,15 +569,12 @@ app.get('/users/:id', async (req, res) => {
     return res.json(result.user);
   }
 
-  // Handle errors - use instanceof for error type checking
-  if (result instanceof ServiceError) {
-    return res.status(result.statusCode).json({
-      error: result.name,
-      message: result.message
-    });
-  }
-
-  return res.status(500).json({ error: 'Internal server error' });
+  // Handle errors
+  const statusCode = 'statusCode' in result ? result.statusCode : 500;
+  return res.status(statusCode).json({
+    error: result.name,
+    message: result.message
+  });
 });
 ```
 
@@ -704,7 +786,7 @@ const paymentService = defineService<{ stripe: Stripe }>()({
           });
           return { ok: true as const, charge };
         } catch (error) {
-          return new ServiceError('Payment failed', 402);
+          return new Error('Payment failed');
         }
       })
   })
@@ -817,29 +899,32 @@ const orderService = defineService<{
 
 ## Custom Error Classes
 
-Define domain-specific errors for better error handling:
+Define domain-specific errors by extending the base `Error` class:
 
 ```typescript
-class ValidationError extends ServiceError {
+class ValidationError extends Error {
+  readonly statusCode = 400;
   constructor(public fields: Record<string, string[]>) {
-    super('Validation failed', 400);
+    super('Validation failed');
     this.name = 'ValidationError';
   }
 }
 
-class UnauthorizedError extends ServiceError {
+class UnauthorizedError extends Error {
+  readonly statusCode = 401;
   constructor(message = 'Unauthorized') {
-    super(message, 401);
+    super(message);
     this.name = 'UnauthorizedError';
   }
 }
 
-class PaymentError extends ServiceError {
+class PaymentError extends Error {
+  readonly statusCode = 402;
   constructor(
     public code: 'CARD_DECLINED' | 'INSUFFICIENT_FUNDS',
     message?: string
   ) {
-    super(message || code, 402);
+    super(message || code);
     this.name = 'PaymentError';
   }
 }
@@ -948,20 +1033,38 @@ handler: async ({ ctx, deps, input }) => {
 
 ## API Reference
 
-### `defineService<TContext>()(definition)`
+### `defineService<TContext>()`
 
-Create a type-safe service with the given context.
+Create a type-safe service builder with the given context.
 
 **Generic Parameters:**
 
 - `TContext` - The context type (e.g., `{ db: PrismaClient }`)
+
+**Returns a builder with two methods:**
+
+#### Direct call (untyped self)
+
+```typescript
+defineService<TContext>()(definition);
+```
+
+Creates a service where `self` is typed as `unknown`.
+
+#### `.typed<TSelf>()`
+
+```typescript
+defineService<TContext>().typed<TSelf>()(definition);
+```
+
+Creates a service where `self` is typed as `TSelf` for full type safety on self-referential calls.
 
 **Definition:**
 
 ```typescript
 {
   deps?: (ctx: TContext) => TDeps | Promise<TDeps>;
-  methods: (helpers: { method: MethodBuilder<TContext, TDeps> }) => TMethods;
+  methods: (helpers: { method: MethodBuilder<TContext, TDeps, TSelf> }) => TMethods;
 }
 ```
 
@@ -972,7 +1075,7 @@ Create a type-safe service with the given context.
 ### Method Builder
 
 ```typescript
-method.input(zodSchema).handler(async ({ ctx, deps, input }) => {
+method.input(zodSchema).handler(async ({ ctx, deps, input, self }) => {
   // Return { ok: true, ...data } for success
   // Return Error instance for failure
 });
@@ -983,23 +1086,32 @@ method.input(zodSchema).handler(async ({ ctx, deps, input }) => {
 - `ctx: TContext` - The service context (db, config, etc.)
 - `deps: TDeps` - Initialized dependencies from deps function
 - `input: TInput` - Validated input (typed from Zod schema)
+- `self: TSelf` - Reference to the current service instance (typed as `unknown` by default, or as `TSelf` when using `.typed<TSelf>()`)
 
 **Handler Return:**
 
 - Success: `{ ok: true as const, ...yourData }`
 - Error: Any `Error` instance (e.g., `new NotFoundError()`)
 
-### ServiceError
+### Custom Errors
 
-Base class for custom service errors with HTTP status codes.
+Create your own error classes by extending the base `Error` class:
 
 ```typescript
-class ServiceError extends Error {
-  constructor(message: string, statusCode: number = 500);
+class NotFoundError extends Error {
+  readonly statusCode = 404;
+  constructor(message = 'Not found') {
+    super(message);
+    this.name = 'NotFoundError';
+  }
+}
 
-  readonly statusCode: number;
-  name: string;
-  message: string;
+class UnauthorizedError extends Error {
+  readonly statusCode = 401;
+  constructor(message = 'Unauthorized') {
+    super(message);
+    this.name = 'UnauthorizedError';
+  }
 }
 ```
 

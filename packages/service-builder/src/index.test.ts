@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { z } from 'zod';
-import { defineService, ServiceError } from './index';
+import { defineService } from './index';
 
 // ============================================================================
-// Test Setup: Custom Errors
+// Test Setup: Types
 // ============================================================================
 
 type User = {
@@ -12,10 +12,32 @@ type User = {
   name: string;
 };
 
+// ============================================================================
+// Test Setup: Custom Errors
+// ============================================================================
+
+/**
+ * Base error class with status code for testing
+ */
+class StatusError extends Error {
+  /**
+   * Creates a new StatusError instance
+   * @param message - Error message
+   * @param statusCode - HTTP status code
+   */
+  constructor(
+    message: string,
+    public readonly statusCode: number
+  ) {
+    super(message);
+    this.name = 'StatusError';
+  }
+}
+
 /**
  * Custom error class for not found scenarios
  */
-class NotFoundError extends ServiceError {
+class NotFoundError extends StatusError {
   /**
    * Creates a new NotFoundError instance
    */
@@ -25,14 +47,10 @@ class NotFoundError extends ServiceError {
   }
 }
 
-// ============================================================================
-// Test Setup: Mock Data
-// ============================================================================
-
 /**
  * Custom error class for unauthorized scenarios
  */
-class UnauthorizedError extends ServiceError {
+class UnauthorizedError extends StatusError {
   /**
    * Creates a new UnauthorizedError instance
    */
@@ -41,6 +59,37 @@ class UnauthorizedError extends ServiceError {
     this.name = 'UnauthorizedError';
   }
 }
+
+// ============================================================================
+// Test Assertion Helpers
+// ============================================================================
+
+/**
+ * Asserts that a result is an error of a specific type and narrows the type
+ * @param result - The result to check
+ * @param errorClass - The expected error class
+ */
+function assertError<E extends Error>(
+  result: unknown,
+  errorClass: new (...args: never[]) => E
+): asserts result is E {
+  expect(result).toBeInstanceOf(errorClass);
+}
+
+/**
+ * Asserts that a result is a success (has 'ok' property) and narrows the type
+ * @param result - The result to check
+ */
+function assertSuccess<T extends { ok: true }>(
+  result: Error | T
+): asserts result is T {
+  expect(result).not.toBeInstanceOf(Error);
+  expect('ok' in result).toBe(true);
+}
+
+// ============================================================================
+// Test Setup: Mock Data
+// ============================================================================
 
 /**
  * Creates a mock database for testing
@@ -103,9 +152,9 @@ describe('defineService', () => {
     const service = userService({ db: mockDb });
     const result = await service.getById({ id: '1' });
 
-    expect('ok' in result).toBe(true);
-    expect('ok' in result && result.user.id).toBe('1');
-    expect('ok' in result && result.user.name).toBe('Alice');
+    assertSuccess(result);
+    expect(result.user.id).toBe('1');
+    expect(result.user.name).toBe('Alice');
   });
 
   test('should handle not found errors', async () => {
@@ -129,8 +178,8 @@ describe('defineService', () => {
     const service = userService({ db: mockDb });
     const result = await service.getById({ id: '999' });
 
-    expect(result instanceof NotFoundError).toBe(true);
-    expect(result instanceof NotFoundError && result.statusCode).toBe(404);
+    assertError(result, NotFoundError);
+    expect(result.statusCode).toBe(404);
   });
 
   test('should validate input with Zod schema', async () => {
@@ -156,16 +205,14 @@ describe('defineService', () => {
       name: 'Charlie',
       email: 'charlie@example.com'
     });
-    expect('ok' in validResult).toBe(true);
+    assertSuccess(validResult);
 
     const invalidResult = await service.create({
       name: 'Invalid',
       email: 'not-an-email'
     });
-    expect(invalidResult instanceof ServiceError).toBe(true);
-    expect(
-      invalidResult instanceof ServiceError && invalidResult.statusCode
-    ).toBe(400);
+    assertError(invalidResult, Error);
+    expect(invalidResult.message).toContain('Validation failed');
   });
 });
 
@@ -229,9 +276,9 @@ describe('dependencies', () => {
     const service = userService({ db: mockDb });
     const result = await service.getUserWithWorkspace({ id: '1' });
 
-    expect('ok' in result).toBe(true);
-    expect('ok' in result && result.user.id).toBe('1');
-    expect('ok' in result && result.workspace.name).toBe('Test Workspace');
+    assertSuccess(result);
+    expect(result.user.id).toBe('1');
+    expect(result.workspace.name).toBe('Test Workspace');
   });
 
   test('should cache deps per service instance', async () => {
@@ -324,22 +371,17 @@ describe('multiple methods', () => {
     const service = userService({ db: mockDb });
 
     const getAllResult = await service.getAll({});
-    expect('ok' in getAllResult).toBe(true);
+    assertSuccess(getAllResult);
 
     const createResult = await service.create({
       name: 'Dave',
       email: 'dave@example.com'
     });
-    expect('ok' in createResult).toBe(true);
+    assertSuccess(createResult);
 
-    // Since we asserted success, we can safely access the user.id
-    // Type assertion is valid here due to previous check
-    type SuccessResult = { ok: true; user: User } & typeof createResult;
-    const userId = (createResult as SuccessResult).user.id;
-
-    const getByIdResult = await service.getById({ id: userId });
-    expect('ok' in getByIdResult).toBe(true);
-    expect('ok' in getByIdResult && getByIdResult.user.name).toBe('Dave');
+    const getByIdResult = await service.getById({ id: createResult.user.id });
+    assertSuccess(getByIdResult);
+    expect(getByIdResult.user.name).toBe('Dave');
   });
 });
 
@@ -380,54 +422,354 @@ describe('error handling', () => {
       userId: '1',
       token: 'invalid'
     });
-    expect(unauthorizedResult instanceof UnauthorizedError).toBe(true);
+    assertError(unauthorizedResult, UnauthorizedError);
+    expect(unauthorizedResult.statusCode).toBe(401);
 
     const notFoundResult = await service.sensitiveOp({
       userId: '999',
       token: 'valid'
     });
-    expect(notFoundResult instanceof NotFoundError).toBe(true);
+    assertError(notFoundResult, NotFoundError);
+    expect(notFoundResult.statusCode).toBe(404);
 
     const successResult = await service.sensitiveOp({
       userId: '1',
       token: 'valid'
     });
-    expect('ok' in successResult).toBe(true);
+    assertSuccess(successResult);
+    expect(successResult.user.id).toBe('1');
   });
 });
 
 // ============================================================================
-// ServiceError Tests
+// Self-Referential Method Calls Tests (Untyped - self is unknown)
 // ============================================================================
 
-describe('ServiceError', () => {
-  test('should create error with default status code', () => {
-    const error = new ServiceError('Something went wrong');
-    expect(error.statusCode).toBe(500);
-    expect(error.message).toBe('Something went wrong');
-  });
+// Note: Without .typed<TSelf>(), self is typed as `unknown`
+// These tests demonstrate runtime behavior works correctly
+describe('self-referential calls (untyped)', () => {
+  test('should allow methods to call other methods via self', async () => {
+    const mockDb = createMockDb();
 
-  test('should create error with custom status code', () => {
-    const error = new ServiceError('Bad request', 400);
-    expect(error.statusCode).toBe(400);
-  });
-
-  test('should support inheritance', () => {
-    /**
-     * Custom error for testing inheritance
-     */
-    class CustomError extends ServiceError {
+    const userService = defineService<{ db: typeof mockDb }>()({
       /**
-       * Creates a new CustomError instance
+       * Defines service methods
        */
-      constructor() {
-        super('Custom error', 418);
-        this.name = 'CustomError';
-      }
-    }
+      methods: ({ method }) => ({
+        /**
+         * Gets a user by ID
+         */
+        getById: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ ctx, input }) => {
+            const user = await ctx.db.users.findById(input.id);
+            if (!user) return new NotFoundError();
+            return { ok: true as const, user };
+          }),
+        /**
+         * Gets a user with additional computed data by calling getById
+         */
+        getByIdWithDetails: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ input, self }) => {
+            // Cast self to use it (untyped version)
+            const typedSelf = self as {
+              getById: (input: {
+                id: string;
+              }) => Promise<{ ok: true; user: User } | Error>;
+            };
+            const result = await typedSelf.getById({ id: input.id });
+            if (!('ok' in result)) return result;
 
-    const error = new CustomError();
-    expect(error instanceof ServiceError).toBe(true);
-    expect(error.statusCode).toBe(418);
+            return {
+              ok: true as const,
+              user: result.user,
+              computed: `User: ${result.user.name}`
+            };
+          })
+      })
+    });
+
+    const service = userService({ db: mockDb });
+    const result = await service.getByIdWithDetails({ id: '1' });
+
+    assertSuccess(result);
+    expect(result.user.name).toBe('Alice');
+    expect(result.computed).toBe('User: Alice');
+  });
+});
+
+// ============================================================================
+// Self-Referential Method Calls Tests (Typed - using .typed<TSelf>())
+// ============================================================================
+
+describe('self-referential calls (typed)', () => {
+  test('should allow fully typed self-referential calls with .typed<TSelf>()', async () => {
+    const mockDb = createMockDb();
+
+    // Define the service interface for typed self
+    type IUserService = {
+      getById(input: { id: string }): Promise<{ ok: true; user: User } | Error>;
+      getByIdWithDetails(input: {
+        id: string;
+      }): Promise<{ computed: string; ok: true; user: User } | Error>;
+    };
+
+    const userService = defineService<{
+      db: typeof mockDb;
+    }>().typed<IUserService>()({
+      /**
+       * Defines service methods
+       */
+      methods: ({ method }) => ({
+        /**
+         * Gets a user by ID
+         */
+        getById: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ ctx, input }) => {
+            const user = await ctx.db.users.findById(input.id);
+            if (!user) return new NotFoundError();
+            return { ok: true as const, user };
+          }),
+        /**
+         * Gets a user with additional computed data by calling getById
+         */
+        getByIdWithDetails: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ input, self }) => {
+            // self is now typed as IUserService!
+            const result = await self.getById({ id: input.id });
+            if (!('ok' in result)) return result;
+
+            return {
+              ok: true as const,
+              user: result.user,
+              computed: `User: ${result.user.name}`
+            };
+          })
+      })
+    });
+
+    const service = userService({ db: mockDb });
+    const result = await service.getByIdWithDetails({ id: '1' });
+
+    assertSuccess(result);
+    expect(result.user.name).toBe('Alice');
+    expect(result.computed).toBe('User: Alice');
+  });
+
+  test('should propagate errors from typed self-referenced methods', async () => {
+    const mockDb = createMockDb();
+
+    type IUserService = {
+      getById(input: { id: string }): Promise<{ ok: true; user: User } | Error>;
+      getByIdWithDetails(input: {
+        id: string;
+      }): Promise<{ computed: string; ok: true; user: User } | Error>;
+    };
+
+    const userService = defineService<{
+      db: typeof mockDb;
+    }>().typed<IUserService>()({
+      /**
+       * Defines service methods
+       */
+      methods: ({ method }) => ({
+        /**
+         * Gets a user by ID
+         */
+        getById: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ ctx, input }) => {
+            const user = await ctx.db.users.findById(input.id);
+            if (!user) return new NotFoundError();
+            return { ok: true as const, user };
+          }),
+        /**
+         * Gets a user with details
+         */
+        getByIdWithDetails: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ input, self }) => {
+            const result = await self.getById({ id: input.id });
+            if (!('ok' in result)) return result;
+
+            return {
+              ok: true as const,
+              user: result.user,
+              computed: `User: ${result.user.name}`
+            };
+          })
+      })
+    });
+
+    const service = userService({ db: mockDb });
+    const result = await service.getByIdWithDetails({ id: '999' });
+
+    assertError(result, NotFoundError);
+    expect(result.statusCode).toBe(404);
+  });
+
+  test('should support chained typed self-referential calls', async () => {
+    const mockDb = createMockDb();
+
+    type IUserService = {
+      getById(input: { id: string }): Promise<{ ok: true; user: User } | Error>;
+      getByIdWithGreeting(input: {
+        id: string;
+      }): Promise<{ greeting: string; ok: true; user: User } | Error>;
+      getFullProfile(input: {
+        id: string;
+      }): Promise<
+        { fullName: string; greeting: string; ok: true; user: User } | Error
+      >;
+    };
+
+    const userService = defineService<{
+      db: typeof mockDb;
+    }>().typed<IUserService>()({
+      /**
+       * Defines service methods
+       */
+      methods: ({ method }) => ({
+        /**
+         * Gets a user by ID
+         */
+        getById: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ ctx, input }) => {
+            const user = await ctx.db.users.findById(input.id);
+            if (!user) return new NotFoundError();
+            return { ok: true as const, user };
+          }),
+        /**
+         * Adds greeting to user
+         */
+        getByIdWithGreeting: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ input, self }) => {
+            const result = await self.getById({ id: input.id });
+            if (!('ok' in result)) return result;
+
+            return {
+              ok: true as const,
+              user: result.user,
+              greeting: `Hello, ${result.user.name}!`
+            };
+          }),
+        /**
+         * Adds full profile by calling getByIdWithGreeting
+         */
+        getFullProfile: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ input, self }) => {
+            // Chain: getFullProfile -> getByIdWithGreeting -> getById
+            const result = await self.getByIdWithGreeting({ id: input.id });
+            if (!('ok' in result)) return result;
+
+            return {
+              ok: true as const,
+              user: result.user,
+              greeting: result.greeting,
+              fullName: `${result.user.name} (${result.user.email})`
+            };
+          })
+      })
+    });
+
+    const service = userService({ db: mockDb });
+    const result = await service.getFullProfile({ id: '2' });
+
+    assertSuccess(result);
+    expect(result.user.name).toBe('Bob');
+    expect(result.greeting).toBe('Hello, Bob!');
+    expect(result.fullName).toBe('Bob (bob@example.com)');
+  });
+
+  test('should work with deps and typed self together', async () => {
+    const mockDb = createMockDb();
+
+    const workspaceService = defineService<{ db: typeof mockDb }>()({
+      /**
+       * Defines service methods
+       */
+      methods: ({ method }) => ({
+        /**
+         * Gets the workspace
+         */
+        getWorkspace: method.input(z.object({})).handler(() => {
+          return Promise.resolve({
+            ok: true as const,
+            workspace: { id: '1', name: 'Test Workspace' }
+          });
+        })
+      })
+    });
+
+    type IUserService = {
+      getById(input: { id: string }): Promise<{ ok: true; user: User } | Error>;
+      getUserWithWorkspace(input: { id: string }): Promise<
+        | {
+            ok: true;
+            user: User;
+            workspace: { id: string; name: string };
+          }
+        | Error
+      >;
+    };
+
+    const userService = defineService<{
+      db: typeof mockDb;
+    }>().typed<IUserService>()({
+      /**
+       * Defines dependencies for the user service
+       */
+      deps: (ctx) => ({
+        workspace: workspaceService(ctx)
+      }),
+      /**
+       * Defines service methods
+       */
+      methods: ({ method }) => ({
+        /**
+         * Gets a user by ID
+         */
+        getById: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ ctx, input }) => {
+            const user = await ctx.db.users.findById(input.id);
+            if (!user) return new NotFoundError();
+            return { ok: true as const, user };
+          }),
+        /**
+         * Gets user with workspace using both self and deps
+         */
+        getUserWithWorkspace: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ deps, input, self }) => {
+            // Use typed self to call getById
+            const userResult = await self.getById({ id: input.id });
+            if (!('ok' in userResult)) return userResult;
+
+            // Use deps to call workspace service
+            const workspaceResult = await deps.workspace.getWorkspace({});
+            if (!('ok' in workspaceResult)) return workspaceResult;
+
+            return {
+              ok: true as const,
+              user: userResult.user,
+              workspace: workspaceResult.workspace
+            };
+          })
+      })
+    });
+
+    const service = userService({ db: mockDb });
+    const result = await service.getUserWithWorkspace({ id: '1' });
+
+    assertSuccess(result);
+    expect(result.user.name).toBe('Alice');
+    expect(result.workspace.name).toBe('Test Workspace');
   });
 });

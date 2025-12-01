@@ -5,17 +5,25 @@
     "@types/bun": "^1.1.16",
     "@types/node": "^22.10.2",
     "eslint": "^9.17.0",
+    "tsdown": "0.17.0-beta.4",
     "typescript": "^5.7.2",
     "zod": "^4.0.0"
   },
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts"
+      "import": {
+        "default": "./dist/index.mjs",
+        "types": "./dist/index.d.mts"
+      },
+      "require": {
+        "default": "./dist/index.cjs",
+        "types": "./dist/index.d.cts"
+      },
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [
-    "src",
+    "dist",
     "README.md"
   ],
   "keywords": [
@@ -27,7 +35,7 @@
     "type-safe"
   ],
   "license": "GPL-3.0",
-  "main": "./src/index.ts",
+  "main": "./dist/index.cjs",
   "name": "@perimetre/service-builder",
   "peerDependencies": {
     "zod": "^3.0.0 || ^4.0.0"
@@ -42,11 +50,11 @@
     "url": "https://github.com/perimetre/framework.git"
   },
   "scripts": {
-    "build": "bun test && tsc --project tsconfig.build.json",
+    "build": "bun test && tsdown",
     "lint": "eslint .",
     "test": "bun test",
     "typecheck": "tsc --project tsconfig.build.json --noEmit"
   },
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "version": "0.1.1"
 }
