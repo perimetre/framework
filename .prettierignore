@@ -3,3 +3,5 @@ dist
 build
 .idea
 .next
+**/__generated__/
+**/(payload)/**/*
