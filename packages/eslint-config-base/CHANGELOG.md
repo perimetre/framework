@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-base
 
+## 0.2.3
+
+### Patch Changes
+
+- 8ff19e0: Fix build script that would npm install in a loop
+
 ## 0.2.2
 
 ### Patch Changes
