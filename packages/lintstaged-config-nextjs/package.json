@@ -33,5 +33,5 @@
     "build": "tsc"
   },
   "types": "index.d.mts",
-  "version": "0.0.3"
+  "version": "0.0.4"
 }
