@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-nextjs
 
+## 0.1.2
+
+### Patch Changes
+
+- 94bf27b: Updates packages
+
 ## 0.1.1
 
 ### Patch Changes
