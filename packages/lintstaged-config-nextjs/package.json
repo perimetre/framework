@@ -1,7 +1,7 @@
 {
   "description": "Base lintstaged configuration for Perimetre next.js",
   "devDependencies": {
-    "lint-staged": "^16.2.6"
+    "lint-staged": "^16.2.7"
   },
   "exports": {
     ".": {
@@ -16,7 +16,7 @@
   "license": "GPL-3.0",
   "main": "index.mjs",
   "name": "@perimetre/lintstaged-config-nextjs",
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.24.0",
   "peerDependencies": {
     "lint-staged": ">= 16"
   },

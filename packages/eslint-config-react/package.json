@@ -22,7 +22,7 @@
   "license": "GPL-3.0",
   "main": "index.mjs",
   "name": "@perimetre/eslint-config-react",
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.24.0",
   "peerDependencies": {
     "eslint": ">= 9",
     "react": ">= 19"

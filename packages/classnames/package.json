@@ -19,7 +19,7 @@
   "license": "GPL-3.0",
   "main": "./dist/index.js",
   "name": "@perimetre/classnames",
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.24.0",
   "peerDependencies": {
     "class-variance-authority": ">=0.7.0"
   },

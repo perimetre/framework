@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@radix-ui/react-accessible-icon": "^1.1.1",
-    "@radix-ui/react-slot": "^1.1.1"
+    "@radix-ui/react-accessible-icon": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.4"
   },
   "description": "Accessible React icon wrapper component for Perimetre projects",
   "devDependencies": {
@@ -22,7 +22,7 @@
   "license": "GPL-3.0",
   "main": "./dist/index.js",
   "name": "@perimetre/icons",
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.24.0",
   "peerDependencies": {
     "react": ">=18.0.0"
   },

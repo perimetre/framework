@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "prettier-plugin-organize-imports": "^4.1.0",
-    "prettier-plugin-tailwindcss": "^0.6.10"
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-tailwindcss": "^0.7.2"
   },
   "description": "Prettier configuration for Perimetre projects",
   "exports": "./index.js",
@@ -11,7 +11,7 @@
   "license": "GPL-3.0",
   "main": "index.js",
   "name": "@perimetre/prettier-config",
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.24.0",
   "peerDependencies": {
     "prettier": ">=3.0.0"
   },
