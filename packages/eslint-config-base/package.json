@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@eslint/eslintrc": "github:eslint/eslintrc",
+    "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",

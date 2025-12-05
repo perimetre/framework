@@ -63,8 +63,8 @@ importers:
   packages/eslint-config-base:
     dependencies:
       '@eslint/eslintrc':
-        specifier: github:eslint/eslintrc
-        version: https://codeload.github.com/eslint/eslintrc/tar.gz/4c720aafc45ec570674fa5a3f4f46aeff06f8307
+        specifier: ^3.3.3
+        version: 3.3.3
       '@eslint/js':
         specifier: ^9.39.1
         version: 9.39.1
@@ -819,19 +819,11 @@ packages:
       }
     engines: { node: ^12.22.0 || ^14.17.0 || >=16.0.0 }
 
-  '@eslint/eslintrc@3.3.1':
+  '@eslint/eslintrc@3.3.3':
     resolution:
       {
-        integrity: sha512-gtF186CXhIl1p4pJNGZw8Yc6RlshoePRvE0X91oPGb3vZ8pM3qOS9W9NGPat9LziaBV7XrJWGylNQXkGcnM3IQ==
+        integrity: sha512-Kr+LPIUVKz2qkx1HAMH8q1q6azbqBAsXJUxBl/ODDuVPX45Z9DfwB8tPjTi6nNZ8BuM3nbJxC5zCAg5elnBUTQ==
       }
-    engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
-
-  '@eslint/eslintrc@https://codeload.github.com/eslint/eslintrc/tar.gz/4c720aafc45ec570674fa5a3f4f46aeff06f8307':
-    resolution:
-      {
-        tarball: https://codeload.github.com/eslint/eslintrc/tar.gz/4c720aafc45ec570674fa5a3f4f46aeff06f8307
-      }
-    version: 3.3.3
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
 
   '@eslint/js@8.57.1':
@@ -7118,21 +7110,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@eslint/eslintrc@3.3.1':
-    dependencies:
-      ajv: 6.12.6
-      debug: 4.4.3
-      espree: 10.4.0
-      globals: 14.0.0
-      ignore: 5.3.2
-      import-fresh: 3.3.1
-      js-yaml: 4.1.1
-      minimatch: 3.1.2
-      strip-json-comments: 3.1.1
-    transitivePeerDependencies:
-      - supports-color
-
-  '@eslint/eslintrc@https://codeload.github.com/eslint/eslintrc/tar.gz/4c720aafc45ec570674fa5a3f4f46aeff06f8307':
+  '@eslint/eslintrc@3.3.3':
     dependencies:
       ajv: 6.12.6
       debug: 4.4.3
@@ -8924,7 +8902,7 @@ snapshots:
       '@eslint/config-array': 0.21.1
       '@eslint/config-helpers': 0.4.2
       '@eslint/core': 0.17.0
-      '@eslint/eslintrc': 3.3.1
+      '@eslint/eslintrc': 3.3.3
       '@eslint/js': 9.39.1
       '@eslint/plugin-kit': 0.4.1
       '@humanfs/node': 0.16.7
