@@ -1,5 +1,11 @@
+import eslintPluginJsonc from 'eslint-plugin-jsonc';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import { defineConfig } from 'eslint/config';
+
+// Extract the JSONC parser from the plugin's config
+const jsoncParser =
+  eslintPluginJsonc.configs['flat/recommended-with-json'][1].languageOptions
+    .parser;
 
 /**
  * End configuration for ESLint
@@ -24,6 +30,15 @@ export default defineConfig(
         allowDefaultProject: ['*.config.mjs', '*.config.js', '*.config.ts'],
         projectService: true
       }
+    }
+  },
+
+  // Force JSONC parser for JSON files (fixes Next.js compat overriding the parser)
+  // This must come after all other configs to ensure JSON files use the correct parser
+  {
+    files: ['**/*.json', '**/*.jsonc', '**/*.json5'],
+    languageOptions: {
+      parser: jsoncParser
     }
   }
 );
