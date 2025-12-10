@@ -6,6 +6,7 @@ import { defineConfig } from 'eslint/config';
  * This should be added at the end of your ESLint config array to apply Prettier formatting rules
  */
 export default defineConfig(eslintPluginPrettierRecommended, {
+  files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
   languageOptions: {
     parserOptions: {
       allowDefaultProject: ['*.config.mjs', '*.config.js', '*.config.ts'],
