@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-base
 
+## 0.2.5
+
+### Patch Changes
+
+- 485ba17: Fixes json import
+
 ## 0.2.4
 
 ### Patch Changes
