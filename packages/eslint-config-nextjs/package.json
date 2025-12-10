@@ -1,6 +1,10 @@
 {
   "dependencies": {
-    "eslint-plugin-react-compiler": "19.1.0-rc.1-rc-af1b7da-20250421"
+    "@eslint/eslintrc": "^3.2.0",
+    "@next/eslint-plugin-next": "^15.5.7",
+    "eslint-config-next": "^15.5.7",
+    "eslint-plugin-react-compiler": "19.1.0-rc.1-rc-af1b7da-20250421",
+    "eslint-plugin-react-hooks": "^5.0.0"
   },
   "description": "ESLint configuration for Next.js projects",
   "devDependencies": {
