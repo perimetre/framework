@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-base
 
+## 0.2.6
+
+### Patch Changes
+
+- 6276838: Fix json parser override
+
 ## 0.2.5
 
 ### Patch Changes
