@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-base
 
+## 0.2.4
+
+### Patch Changes
+
+- 671fd20: Fixes json parsing on base eslint config
+
 ## 0.2.3
 
 ### Patch Changes
