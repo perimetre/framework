@@ -56,5 +56,5 @@
     "typecheck": "tsc --project tsconfig.build.json --noEmit"
   },
   "types": "./dist/index.d.ts",
-  "version": "0.2.1"
+  "version": "0.3.0"
 }
