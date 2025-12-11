@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-base
 
+## 0.2.7
+
+### Patch Changes
+
+- 4048674: Update ignores
+
 ## 0.2.6
 
 ### Patch Changes
