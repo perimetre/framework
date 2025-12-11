@@ -217,6 +217,112 @@ describe('defineService', () => {
 });
 
 // ============================================================================
+// Methods Without Input Tests
+// ============================================================================
+
+describe('methods without input', () => {
+  test('should create methods without input using handler directly', async () => {
+    const mockDb = createMockDb();
+
+    const userService = defineService<{ db: typeof mockDb }>()({
+      /**
+       * Defines service methods
+       */
+      methods: ({ method }) => ({
+        /**
+         * Gets all users without requiring input
+         */
+        getAll: method.handler(async ({ ctx }) => {
+          const users = await ctx.db.users.findAll();
+          return { ok: true as const, users };
+        })
+      })
+    });
+
+    const service = userService({ db: mockDb });
+    const result = await service.getAll();
+
+    assertSuccess(result);
+    expect(result.users).toHaveLength(2);
+    expect(result.users[0].name).toBe('Alice');
+  });
+
+  test('should support multiple methods with and without input', async () => {
+    const mockDb = createMockDb();
+
+    const userService = defineService<{ db: typeof mockDb }>()({
+      /**
+       * Defines service methods
+       */
+      methods: ({ method }) => ({
+        /**
+         * Gets all users (no input)
+         */
+        getAll: method.handler(async ({ ctx }) => {
+          const users = await ctx.db.users.findAll();
+          return { ok: true as const, users };
+        }),
+        /**
+         * Gets a user by ID (with input)
+         */
+        getById: method
+          .input(z.object({ id: z.string() }))
+          .handler(async ({ ctx, input }) => {
+            const user = await ctx.db.users.findById(input.id);
+            if (!user) return new NotFoundError();
+            return { ok: true as const, user };
+          })
+      })
+    });
+
+    const service = userService({ db: mockDb });
+
+    // Call method without input
+    const allResult = await service.getAll();
+    assertSuccess(allResult);
+    expect(allResult.users).toHaveLength(2);
+
+    // Call method with input
+    const byIdResult = await service.getById({ id: '1' });
+    assertSuccess(byIdResult);
+    expect(byIdResult.user.name).toBe('Alice');
+  });
+
+  test('should work with deps and methods without input', async () => {
+    const mockDb = createMockDb();
+
+    const userService = defineService<{ db: typeof mockDb }>()({
+      /**
+       * Defines dependencies
+       */
+      deps: () => ({ initialized: true }),
+      /**
+       * Defines service methods
+       */
+      methods: ({ method }) => ({
+        /**
+         * Gets status using deps but no input
+         */
+        getStatus: method.handler(({ deps }) => {
+          return Promise.resolve({
+            ok: true as const,
+            initialized: deps.initialized,
+            status: 'ready'
+          });
+        })
+      })
+    });
+
+    const service = userService({ db: mockDb });
+    const result = await service.getStatus();
+
+    assertSuccess(result);
+    expect(result.initialized).toBe(true);
+    expect(result.status).toBe('ready');
+  });
+});
+
+// ============================================================================
 // Dependencies Tests
 // ============================================================================
 
@@ -232,7 +338,7 @@ describe('dependencies', () => {
         /**
          * Gets the workspace
          */
-        getWorkspace: method.input(z.object({})).handler(() => {
+        getWorkspace: method.handler(() => {
           return Promise.resolve({
             ok: true as const,
             workspace: { id: '1', name: 'Test Workspace' }
@@ -261,7 +367,7 @@ describe('dependencies', () => {
             const user = await ctx.db.users.findById(input.id);
             if (!user) return new NotFoundError();
 
-            const workspaceResult = await deps.workspace.getWorkspace({});
+            const workspaceResult = await deps.workspace.getWorkspace();
             if (!('ok' in workspaceResult)) return workspaceResult;
 
             return {
@@ -299,7 +405,7 @@ describe('dependencies', () => {
         /**
          * Test method 1
          */
-        test1: method.input(z.object({})).handler(({ deps }) => {
+        test1: method.handler(({ deps }) => {
           return Promise.resolve({
             ok: true as const,
             initialized: deps.initialized
@@ -308,7 +414,7 @@ describe('dependencies', () => {
         /**
          * Test method 2
          */
-        test2: method.input(z.object({})).handler(({ deps }) => {
+        test2: method.handler(({ deps }) => {
           return Promise.resolve({
             ok: true as const,
             initialized: deps.initialized
@@ -319,8 +425,8 @@ describe('dependencies', () => {
 
     const service = userService({ value: 'test' });
 
-    await service.test1({});
-    await service.test2({});
+    await service.test1();
+    await service.test2();
 
     expect(depsInitCount).toBe(1);
   });
@@ -342,7 +448,7 @@ describe('multiple methods', () => {
         /**
          * Gets all users
          */
-        getAll: method.input(z.object({})).handler(async ({ ctx }) => {
+        getAll: method.handler(async ({ ctx }) => {
           const users = await ctx.db.users.findAll();
           return { ok: true as const, users };
         }),
@@ -370,7 +476,7 @@ describe('multiple methods', () => {
 
     const service = userService({ db: mockDb });
 
-    const getAllResult = await service.getAll({});
+    const getAllResult = await service.getAll();
     assertSuccess(getAllResult);
 
     const createResult = await service.create({
@@ -687,6 +793,51 @@ describe('self-referential calls (typed)', () => {
     expect(result.fullName).toBe('Bob (bob@example.com)');
   });
 
+  test('should support typed self with methods without input', async () => {
+    const mockDb = createMockDb();
+
+    type IUserService = {
+      getAll(): Promise<{ ok: true; users: User[] } | Error>;
+      getFirst(): Promise<{ ok: true; user: User } | Error>;
+    };
+
+    const userService = defineService<{
+      db: typeof mockDb;
+    }>().typed<IUserService>()({
+      /**
+       * Defines service methods
+       */
+      methods: ({ method }) => ({
+        /**
+         * Gets all users (no input)
+         */
+        getAll: method.handler(async ({ ctx }) => {
+          const users = await ctx.db.users.findAll();
+          return { ok: true as const, users };
+        }),
+        /**
+         * Gets first user by calling getAll
+         */
+        getFirst: method.handler(async ({ self }) => {
+          const result = await self.getAll();
+          if (!('ok' in result)) return result;
+          if (result.users.length === 0) return new NotFoundError();
+
+          return {
+            ok: true as const,
+            user: result.users[0]
+          };
+        })
+      })
+    });
+
+    const service = userService({ db: mockDb });
+    const result = await service.getFirst();
+
+    assertSuccess(result);
+    expect(result.user.name).toBe('Alice');
+  });
+
   test('should work with deps and typed self together', async () => {
     const mockDb = createMockDb();
 
@@ -698,7 +849,7 @@ describe('self-referential calls (typed)', () => {
         /**
          * Gets the workspace
          */
-        getWorkspace: method.input(z.object({})).handler(() => {
+        getWorkspace: method.handler(() => {
           return Promise.resolve({
             ok: true as const,
             workspace: { id: '1', name: 'Test Workspace' }
@@ -753,7 +904,7 @@ describe('self-referential calls (typed)', () => {
             if (!('ok' in userResult)) return userResult;
 
             // Use deps to call workspace service
-            const workspaceResult = await deps.workspace.getWorkspace({});
+            const workspaceResult = await deps.workspace.getWorkspace();
             if (!('ok' in workspaceResult)) return workspaceResult;
 
             return {

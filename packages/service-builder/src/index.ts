@@ -8,6 +8,20 @@ import type { z } from 'zod';
  */
 export type MethodBuilder<TContext, TDeps, TSelf = unknown> = {
   /**
+   * Define a handler function without input validation
+   * Use this when your method doesn't require any input arguments
+   * The generic $Output is inferred from the handler's return type
+   * @param handler - Async function that processes the request and returns a result
+   */
+  handler: <$Output>(
+    handler: (args: {
+      ctx: TContext;
+      deps: TDeps;
+      self: TSelf;
+    }) => Promise<$Output>
+  ) => MethodDefinition<TContext, TDeps, void, $Output>;
+
+  /**
    * Define the input schema for this method using Zod
    * @param schema - Zod schema for input validation
    */
@@ -36,9 +50,10 @@ export type Service<
   TDeps,
   TMethods extends ServiceMethods<TContext, TDeps>
 > = {
-  [K in keyof TMethods]: (
-    input: InferInput<TMethods[K]>
-  ) => Promise<InferOutput<TMethods[K]>>;
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- Conditional type for methods without input
+  [K in keyof TMethods]: InferInput<TMethods[K]> extends void
+    ? () => Promise<InferOutput<TMethods[K]>>
+    : (input: InferInput<TMethods[K]>) => Promise<InferOutput<TMethods[K]>>;
 };
 
 /**
@@ -93,7 +108,7 @@ type MethodDefinition<TContext, TDeps, TInput, TOutput> = {
     input: TInput;
     self: unknown;
   }) => Promise<TOutput>;
-  _input: z.ZodType<TInput>;
+  _input?: z.ZodType<TInput>;
 };
 
 /**
@@ -148,13 +163,19 @@ class ValidationError extends Error {
  * // Without typed self (self is unknown)
  * const userService = defineService<{ db: Database }>()({
  *   methods: ({ method }) => ({
+ *     // Method with input
  *     getById: method
  *       .input(z.object({ id: z.string() }))
  *       .handler(async ({ ctx, input }) => {
  *         const user = await ctx.db.user.findById(input.id);
  *         if (!user) return new NotFoundError();
  *         return { ok: true, user };
- *       })
+ *       }),
+ *     // Method without input
+ *     getAll: method.handler(async ({ ctx }) => {
+ *       const users = await ctx.db.user.findAll();
+ *       return { ok: true, users };
+ *     })
  *   })
  * });
  *
@@ -214,32 +235,56 @@ export function defineService<TContext>(): ServiceBuilder<TContext> {
       const service = {} as Service<TContext, TDeps, TMethods>;
 
       for (const [methodName, methodDef] of Object.entries(methods)) {
-        /**
-         * Validate input and execute method handler
-         */
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        service[methodName as keyof TMethods] = async (input: any) => {
-          // Validate input
-          const parseResult = methodDef._input.safeParse(input);
-          if (!parseResult.success) {
-            return new ValidationError(
-              `Validation failed: ${parseResult.error.message}`
-            );
-          }
-
-          // Get dependencies
-          const deps = await getDeps();
-
-          // Execute handler
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          return await methodDef._handler({
-            ctx,
-            deps,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            input: parseResult.data,
-            self: service
-          });
-        };
+        if (methodDef._input) {
+          // Method with input validation
+          const inputSchema = methodDef._input;
+          /**
+           * Service method with input validation
+           */
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Runtime implementation requires dynamic input types
+          const methodWithInput = async (input: any) => {
+            const parseResult = inputSchema.safeParse(input);
+            if (!parseResult.success) {
+              return new ValidationError(
+                `Validation failed: ${parseResult.error.message}`
+              );
+            }
+            const deps = await getDeps();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- Validated Zod input
+            return methodDef._handler({
+              ctx,
+              deps,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Validated Zod input
+              input: parseResult.data,
+              self: service
+            });
+          };
+          service[methodName as keyof TMethods] = methodWithInput as Service<
+            TContext,
+            TDeps,
+            TMethods
+          >[keyof TMethods];
+        } else {
+          // Method without input
+          /**
+           * Service method without input
+           */
+          const methodWithoutInput = async () => {
+            const deps = await getDeps();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- No input validation needed
+            return methodDef._handler({
+              ctx,
+              deps,
+              input: undefined,
+              self: service
+            });
+          };
+          service[methodName as keyof TMethods] = methodWithoutInput as Service<
+            TContext,
+            TDeps,
+            TMethods
+          >[keyof TMethods];
+        }
       }
 
       return service;
@@ -293,6 +338,20 @@ function createMethodBuilder<TContext, TDeps, TSelf>(): MethodBuilder<
         _handler: handler as any,
         _input: schema
       })
+    }),
+    /**
+     * Define handler function without input
+     */
+    handler: <$Output>(
+      handler: (args: {
+        ctx: TContext;
+        deps: TDeps;
+        self: TSelf;
+      }) => Promise<$Output>
+    ): MethodDefinition<TContext, TDeps, void, $Output> => ({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+      _handler: handler as any,
+      _input: undefined
     })
   };
 }
