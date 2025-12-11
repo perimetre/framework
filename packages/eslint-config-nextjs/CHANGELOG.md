@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-nextjs
 
+## 0.1.3
+
+### Patch Changes
+
+- de6a3aa: Fix next peer dependencies
+
 ## 0.1.2
 
 ### Patch Changes

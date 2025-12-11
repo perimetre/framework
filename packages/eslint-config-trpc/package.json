@@ -38,5 +38,5 @@
     "lint": "eslint . --max-warnings 0"
   },
   "types": "index.d.mts",
-  "version": "0.1.7"
+  "version": "0.1.8"
 }
