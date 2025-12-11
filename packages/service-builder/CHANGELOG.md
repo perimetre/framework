@@ -1,5 +1,11 @@
 # @perimetre/service-builder
 
+## 0.3.0
+
+### Minor Changes
+
+- 535533a: Added optional input
+
 ## 0.2.1
 
 ### Patch Changes
