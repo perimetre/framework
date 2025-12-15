@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-graphql
 
+## 0.1.3
+
+### Patch Changes
+
+- 7dc6b50: Fix: graphql processing on .ts files
+
 ## 0.1.2
 
 ### Patch Changes
