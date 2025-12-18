@@ -14,5 +14,13 @@ export default [
         tsconfigRootDir: import.meta.dirname
       }
     }
+  },
+  // Disable JSDoc requirements for story files (Storybook/Ladle documentation)
+  {
+    files: ['**/*.stories.ts', '**/*.stories.tsx'],
+    rules: {
+      'jsdoc/require-description': 'off',
+      'jsdoc/require-jsdoc': 'off'
+    }
   }
 ];
