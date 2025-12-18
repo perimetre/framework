@@ -1,5 +1,11 @@
 # @perimetre/lintstaged-config-nextjs
 
+## 0.0.5
+
+### Patch Changes
+
+- 6b4d7e9: Update package versions
+
 ## 0.0.4
 
 ### Patch Changes
