@@ -6,7 +6,7 @@
     "@commitlint/config-conventional": "^20.2.0",
     "@perimetre/eslint-config-base": "workspace:*",
     "@perimetre/prettier-config": "workspace:*",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "pls-changeset-me": "^0.0.11",
@@ -23,7 +23,7 @@
     ]
   },
   "name": "@perimetre/framework",
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.26.0",
   "prettier": "@perimetre/prettier-config",
   "private": true,
   "repository": {

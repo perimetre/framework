@@ -2,12 +2,12 @@
   "description": "A lightweight, type-safe service builder inspired by tRPC for creating dependency-injected services with validated inputs",
   "devDependencies": {
     "@perimetre/eslint-config-base": "workspace:*",
-    "@types/bun": "^1.3.3",
-    "@types/node": "^22.19.1",
-    "eslint": "^9.39.1",
-    "tsdown": "0.17.0",
+    "@types/bun": "^1.3.4",
+    "@types/node": "^22.19.3",
+    "eslint": "^9.39.2",
+    "tsdown": "0.18.1",
     "typescript": "^5.9.3",
-    "zod": "^4.1.13"
+    "zod": "^4.2.1"
   },
   "exports": {
     ".": {

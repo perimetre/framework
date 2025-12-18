@@ -1,14 +1,14 @@
 {
   "dependencies": {
-    "@eslint/eslintrc": "^3.2.0",
-    "@next/eslint-plugin-next": "^15.5.7",
-    "eslint-config-next": "^15.5.7",
-    "eslint-plugin-react-compiler": "19.1.0-rc.1-rc-af1b7da-20250421",
-    "eslint-plugin-react-hooks": "^5.0.0"
+    "@eslint/eslintrc": "^3.3.3",
+    "@next/eslint-plugin-next": "^15.5.9",
+    "eslint-config-next": "^15.5.9",
+    "eslint-plugin-react-compiler": "19.1.0-rc.2",
+    "eslint-plugin-react-hooks": "^5.2.0"
   },
   "description": "ESLint configuration for Next.js projects",
   "devDependencies": {
-    "eslint": "^9.39.1"
+    "eslint": "^9.39.2"
   },
   "exports": {
     ".": {
@@ -23,7 +23,7 @@
   "license": "GPL-3.0",
   "main": "index.mjs",
   "name": "@perimetre/eslint-config-nextjs",
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.26.0",
   "peerDependencies": {
     "eslint": ">= 9",
     "next": ">= 15"

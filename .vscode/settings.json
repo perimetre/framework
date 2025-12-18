@@ -6,6 +6,7 @@
     "windsurf": true
   },
   "css.customData": [".vscode/css_custom_data.json"], // Tailwind CSS IntelliSense custom data
+  "css.validate": false, // Disable built-in CSS validation (handled by Tailwind CSS IntelliSense)
   "editor.codeActionsOnSave": {
     // Ensure code is formatted on save
     "source.fixAll.eslint": "explicit"

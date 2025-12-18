@@ -7,7 +7,7 @@
   },
   "description": "React ESLint configuration for Perimetre projects",
   "devDependencies": {
-    "eslint": "^9.39.1"
+    "eslint": "^9.39.2"
   },
   "exports": {
     ".": {
@@ -22,7 +22,7 @@
   "license": "GPL-3.0",
   "main": "index.mjs",
   "name": "@perimetre/eslint-config-react",
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.26.0",
   "peerDependencies": {
     "eslint": ">= 9",
     "react": ">= 19"

@@ -1,11 +1,11 @@
 {
   "dependencies": {
     "@perimetre/eslint-config-base": "workspace:*",
-    "typescript-eslint": "^8.48.1"
+    "typescript-eslint": "^8.50.0"
   },
   "description": "tRPC-optimized ESLint configuration for Perimetre projects",
   "devDependencies": {
-    "eslint": "^9.39.1"
+    "eslint": "^9.39.2"
   },
   "exports": {
     ".": {
@@ -20,7 +20,7 @@
   "license": "GPL-3.0",
   "main": "index.mjs",
   "name": "@perimetre/eslint-config-trpc",
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.26.0",
   "peerDependencies": {
     "eslint": ">= 9"
   },
