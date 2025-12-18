@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-base
 
+## 0.2.8
+
+### Patch Changes
+
+- 6b4d7e9: Update package versions
+
 ## 0.2.7
 
 ### Patch Changes

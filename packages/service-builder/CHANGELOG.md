@@ -1,5 +1,11 @@
 # @perimetre/service-builder
 
+## 0.3.1
+
+### Patch Changes
+
+- 6b4d7e9: Update package versions
+
 ## 0.3.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @perimetre/prettier-config
 
+## 0.0.7
+
+### Patch Changes
+
+- 6b4d7e9: Update package versions
+
 ## 0.0.6
 
 ### Patch Changes

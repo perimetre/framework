@@ -1,5 +1,11 @@
 # @perimetre/icons
 
+## 0.0.3
+
+### Patch Changes
+
+- 6b4d7e9: Update package versions
+
 ## 0.0.2
 
 ### Patch Changes
