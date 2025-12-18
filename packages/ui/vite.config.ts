@@ -1,3 +1,6 @@
+ 
+ 
+ 
 import tailwindcss from '@tailwindcss/vite';
 import { glob } from 'glob';
 import { dirname, resolve } from 'node:path';
