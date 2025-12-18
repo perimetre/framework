@@ -1,5 +1,11 @@
 # @perimetre/helpers
 
+## 5.1.2
+
+### Patch Changes
+
+- 6b4d7e9: Update package versions
+
 ## 5.1.1
 
 ### Patch Changes
