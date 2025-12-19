@@ -1,7 +1,0 @@
-@import './styles/tailwind.css';
-
-@layer pui.theme {
-  [data-pui-brand] {
-    @apply pui:font-sans;
-  }
-}

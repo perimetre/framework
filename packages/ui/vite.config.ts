@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
+import { libInjectCss } from 'vite-plugin-lib-inject-css';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -14,7 +15,11 @@ const componentFiles = glob.sync('src/components/**/index.tsx', {
 });
 
 const entry: Record<string, string> = {
-  index: resolve(__dirname, 'src/index.ts')
+  index: resolve(__dirname, 'src/index.ts'),
+  // CSS entry points for each brand (these will generate separate CSS files)
+  'styles/acorn': resolve(__dirname, 'src/styles/acorn.css'),
+  'styles/sprig': resolve(__dirname, 'src/styles/sprig.css'),
+  'styles/stelpro': resolve(__dirname, 'src/styles/stelpro.css')
 };
 
 // Create entry points for each component
@@ -30,6 +35,7 @@ componentFiles.forEach((file: string) => {
 export default defineConfig({
   plugins: [
     tailwindcss(),
+    libInjectCss(),
     dts({
       tsconfigPath: './tsconfig.json',
       include: ['src'],
@@ -45,6 +51,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     copyPublicDir: false,
+    cssCodeSplit: true,
     lib: {
       entry,
       formats: ['es', 'cjs']
@@ -57,14 +64,34 @@ export default defineConfig({
           preserveModules: true,
           preserveModulesRoot: 'src',
           entryFileNames: 'es/[name].js',
-          chunkFileNames: 'es/[name].js'
+          chunkFileNames: 'es/[name].js',
+          /**
+           * Customize asset file names to keep CSS files organized
+           */
+          assetFileNames: (assetInfo) => {
+            // Keep CSS files with their original names in a styles folder
+            if (assetInfo.name?.endsWith('.css')) {
+              return 'styles/[name][extname]';
+            }
+            return 'assets/[name][extname]';
+          }
         },
         {
           format: 'cjs',
           preserveModules: true,
           preserveModulesRoot: 'src',
           entryFileNames: 'cjs/[name].js',
-          chunkFileNames: 'cjs/[name].js'
+          chunkFileNames: 'cjs/[name].js',
+          /**
+           * Customize asset file names to keep CSS files organized
+           */
+          assetFileNames: (assetInfo) => {
+            // Keep CSS files with their original names in a styles folder
+            if (assetInfo.name?.endsWith('.css')) {
+              return 'styles/[name][extname]';
+            }
+            return 'assets/[name][extname]';
+          }
         }
       ]
     }

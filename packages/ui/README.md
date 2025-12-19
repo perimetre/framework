@@ -19,20 +19,49 @@ pnpm add @perimetre/ui
 
 ## Quick Start
 
-### 1. Set Up Styles
+### 1. Import Brand-Specific Styles
 
-Import the UI styles in your app's entry point or layout:
-
-```css
-/* In your global CSS file */
-@import '@perimetre/ui/styles';
-```
-
-Or import directly in your layout component:
+Import **only one** brand CSS file in your app's entry point or layout. Each brand CSS file is self-contained and includes all necessary base styles.
 
 ```tsx
-import '@perimetre/ui/styles';
+// For Acorn brand (default)
+import '@perimetre/ui/styles/acorn.css';
+
+// OR for Sprig brand
+import '@perimetre/ui/styles/sprig.css';
+
+// OR for Stelpro brand
+import '@perimetre/ui/styles/stelpro.css';
 ```
+
+**Important:** Only import ONE brand CSS file. Each file contains only the styles for that specific brand, keeping your bundle size minimal.
+
+### Alternative: Compile with Your Own Tailwind (Advanced)
+
+If your project uses Tailwind CSS v4 and you want maximum tree-shaking (only include CSS for components you actually use), you can compile the styles yourself instead of using pre-built CSS.
+
+**Step 1:** Import the source CSS for your brand:
+
+```css
+/* In your app's main CSS file */
+@import 'tailwindcss';
+
+/* Import brand tokens (choose one) */
+@import '@perimetre/ui/src/styles/acorn.css';
+/* OR @import "@perimetre/ui/src/styles/sprig.css"; */
+/* OR @import "@perimetre/ui/src/styles/stelpro.css"; */
+```
+
+**Step 2:** Tailwind will automatically scan your app's bundled code and only generate CSS for the `pui:*` classes used by components you import.
+
+**Trade-offs:**
+
+| Approach         | Pros                          | Cons                                         |
+| ---------------- | ----------------------------- | -------------------------------------------- |
+| Pre-built CSS    | Zero config, works everywhere | Includes all utility classes (~14KB gzipped) |
+| Compile yourself | Only includes classes you use | Requires Tailwind v4, longer build times     |
+
+For most projects, the pre-built CSS is recommended. The compile-yourself approach is useful for large apps where every kilobyte matters.
 
 ### 2. Wrap Components with Brand Scope
 
@@ -104,15 +133,26 @@ The package uses [Ladle](https://ladle.dev/) for component development and docum
 ## Exports
 
 ```typescript
-// Main entry - includes CSS
-import '@perimetre/ui';
+// Brand utilities and types
+import { setActiveBrand, getActiveBrand, BRANDS } from '@perimetre/ui';
 
-// Individual components
+// Individual components (tree-shakeable)
 import Button from '@perimetre/ui/components/Button';
+import { FieldInput } from '@perimetre/ui/components/Field/FieldInput';
 
-// Styles only
-import '@perimetre/ui/styles';
+// Brand-specific CSS (import only ONE)
+import '@perimetre/ui/styles/acorn.css'; // ~14.7KB
+import '@perimetre/ui/styles/sprig.css'; // ~15.0KB
+import '@perimetre/ui/styles/stelpro.css'; // ~14.8KB
 ```
+
+### CSS Bundle Sizes (gzipped)
+
+| Brand   | Size    | Gzipped |
+| ------- | ------- | ------- |
+| Acorn   | 14.7 KB | 3.3 KB  |
+| Sprig   | 15.0 KB | 3.3 KB  |
+| Stelpro | 14.8 KB | 3.3 KB  |
 
 ## Peer Dependencies
 

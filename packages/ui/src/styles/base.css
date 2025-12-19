@@ -1,3 +1,4 @@
+/* Base Tailwind CSS - shared across all brands */
 /* Define layers explicitly */
 @layer pui.tw.theme, pui.tw.base;
 @layer pui.primitives, pui.semantic, pui.theme, pui.components;
@@ -23,4 +24,11 @@
 @plugin '@tailwindcss/typography';
 @plugin '@tailwindcss/forms' {
   strategy: 'class';
+}
+
+/* Base theme layer - applies font to all branded elements */
+@layer pui.theme {
+  [data-pui-brand] {
+    @apply pui:font-sans;
+  }
 }
