@@ -1,0 +1,68 @@
+/* Custom theme variables scoped to [data-pui-brand] */
+@theme inline {
+  /* Bridge semantic tokens to Tailwind utilities */
+
+  /* These custom curves are made by Benjamin De Cock */
+  /* REF: https://animations.dev/learn/easing-curves */
+  --ease-pui-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  --ease-pui-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-pui-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+  --ease-pui-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+  --ease-pui-in-expo: cubic-bezier(0.95, 0.05, 0.795, 0.035);
+  --ease-pui-in-circ: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+
+  --ease-pui-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-pui-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-pui-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-pui-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-pui-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-pui-out-circ: cubic-bezier(0.075, 0.82, 0.165, 1);
+
+  --ease-pui-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  --ease-pui-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-pui-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-pui-in-out-quint: cubic-bezier(0.86, 0, 0.07, 1);
+  --ease-pui-in-out-expo: cubic-bezier(1, 0, 0, 1);
+  --ease-pui-in-out-circ: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+
+  --font-pui-sans: var(--pui-primitive-font-sans);
+  --font-pui-mono: var(--pui-primitive-font-mono);
+
+  /* Understanding the scale https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale */
+  --color-pui-primary-1: var(--pui-primitive-color-primary-1); /* 50 */
+  --color-pui-primary-2: var(--pui-primitive-color-primary-2); /* 100 */
+  --color-pui-primary-3: var(--pui-primitive-color-primary-3); /* 200 */
+  --color-pui-primary-4: var(--pui-primitive-color-primary-4); /* 300 */
+  --color-pui-primary-5: var(--pui-primitive-color-primary-5); /* 400 */
+  --color-pui-primary-6: var(--pui-primitive-color-primary-6); /* 500 */
+  --color-pui-primary-7: var(--pui-primitive-color-primary-7); /* 600 */
+  --color-pui-primary-8: var(--pui-primitive-color-primary-8); /* 700 */
+  --color-pui-primary-9: var(--pui-primitive-color-primary-9); /* 800 */
+  --color-pui-primary-10: var(--pui-primitive-color-primary-10); /* 900 */
+  --color-pui-primary-11: var(--pui-primitive-color-primary-11);
+  --color-pui-primary-12: var(--pui-primitive-color-primary-12);
+
+  /* The gray scale, useful for texts and backgrounds */
+  --color-pui-overlay-1: var(--pui-primitive-color-overlay-1);
+  --color-pui-overlay-2: var(--pui-primitive-color-overlay-2);
+  --color-pui-overlay-3: var(--pui-primitive-color-overlay-3);
+  --color-pui-overlay-4: var(--pui-primitive-color-overlay-4);
+  --color-pui-overlay-5: var(--pui-primitive-color-overlay-5);
+  --color-pui-overlay-6: var(--pui-primitive-color-overlay-6);
+  --color-pui-overlay-7: var(--pui-primitive-color-overlay-7);
+  --color-pui-overlay-8: var(--pui-primitive-color-overlay-8);
+  --color-pui-overlay-9: var(--pui-primitive-color-overlay-9);
+  --color-pui-overlay-10: var(--pui-primitive-color-overlay-10);
+  --color-pui-overlay-11: var(--pui-primitive-color-overlay-11);
+  --color-pui-overlay-12: var(--pui-primitive-color-overlay-12);
+}
+
+/* ========================================
+ * CUSTOM VARIANTS FOR THEME-AWARE STYLES
+ *
+ * These allow you to write theme-specific overrides in markup:
+ * <div class="pui:acorn:rounded-full pui:sprig:rounded-none">
+ * ======================================== */
+@custom-variant pui-acorn (&:where([data-pui-brand=acorn], [data-pui-brand=acorn] *));
+@custom-variant pui-sprig (&:where([data-pui-brand=sprig], [data-pui-brand=sprig] *));
+@custom-variant pui-stelpro (&:where([data-pui-brand=stelpro], [data-pui-brand=stelpro] *));

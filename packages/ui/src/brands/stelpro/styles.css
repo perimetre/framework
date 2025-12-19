@@ -1,0 +1,18 @@
+@layer pui.primitive {
+  [data-pui-brand='stelpro'] {
+    --pui-primitive-color-primary-6: #fe322a;
+  }
+}
+
+@layer pui.semantic {
+  /* Acorn is the baseline theme */
+  [data-pui-brand='stelpro'] {
+    /**
+     **  SEMANTIC TOKENS
+     *
+     ** Purpose-based tokens that express design intent.
+     ** These are the PUBLIC API consumed by components.
+     ** Themes override these to create different visual styles.
+     */
+  }
+}

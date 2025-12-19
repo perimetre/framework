@@ -1,0 +1,26 @@
+/* Define layers explicitly */
+@layer pui.tw.theme, pui.tw.base;
+@layer pui.primitives, pui.semantic, pui.theme, pui.components;
+
+/* Import theme with layer assignment */
+@import 'tailwindcss/theme.css' layer(pui.tw.theme) prefix(pui);
+@import 'tw-animate-css';
+
+/* Scope utilities to [data-pui-brand] - unlayered but scoped via config important */
+@import 'tailwindcss/utilities.css' prefix(pui);
+
+@import '../brands/tailwind.css';
+
+/* Scope base/preflight to [data-pui-brand] */
+[data-pui-brand] {
+  @import 'tailwindcss/preflight.css' layer(pui.tw.base);
+}
+
+/* Tailwind configuration with scoping handled by tailwind.config.js */
+@config '../../tailwind.config.js';
+
+/* Tailwind plugins */
+@plugin '@tailwindcss/typography';
+@plugin '@tailwindcss/forms' {
+  strategy: 'class';
+}

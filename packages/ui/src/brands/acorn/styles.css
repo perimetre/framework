@@ -1,0 +1,45 @@
+@layer pui.primitive {
+  /* Acorn is the baseline theme */
+  [data-pui-brand] {
+    /**
+     ** PRIMITIVE TOKENS
+     *
+     ** Raw design values named by what they ARE, not what they're FOR.
+     ** These are NEVER directly consumed by components.
+     ** Only semantic tokens should reference these.
+     */
+
+    --pui-primitive-font-sans:
+      'Arial', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+      'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --pui-primitive-color-primary-6: hsl(172, 96%, 53%);
+
+    /* Sand */
+    --pui-primitive-color-overlay-1: #fdfdfc;
+    --pui-primitive-color-overlay-2: #f9f9f8;
+    --pui-primitive-color-overlay-3: #f1f0ef;
+    --pui-primitive-color-overlay-4: #e9e8e6;
+    --pui-primitive-color-overlay-5: #e2e1de;
+    --pui-primitive-color-overlay-6: #dad9d6;
+    --pui-primitive-color-overlay-7: #cfceca;
+    --pui-primitive-color-overlay-8: #bcbbb5;
+    --pui-primitive-color-overlay-9: #8d8d86;
+    --pui-primitive-color-overlay-10: #82827c;
+    --pui-primitive-color-overlay-11: #63635e;
+    --pui-primitive-color-overlay-12: #21201c;
+  }
+}
+
+@layer pui.semantic {
+  /* Acorn is the baseline theme */
+  [data-pui-brand] {
+    /**
+     **  SEMANTIC TOKENS
+     *
+     ** Purpose-based tokens that express design intent.
+     ** These are the PUBLIC API consumed by components.
+     ** Themes override these to create different visual styles.
+     */
+  }
+}

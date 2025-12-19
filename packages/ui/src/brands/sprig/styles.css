@@ -1,0 +1,33 @@
+@layer pui.primitive {
+  [data-pui-brand='sprig'] {
+    /**
+     ** PRIMITIVE TOKENS
+     *
+     ** Raw design values named by what they ARE, not what they're FOR.
+     ** These are NEVER directly consumed by components.
+     ** Only semantic tokens should reference these.
+     */
+
+    --pui-primitive-font-sans:
+      'Gotham', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+      'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Sprig green tint */
+    --pui-primitive-color-primary-4: #88db6d;
+    /* Sprig green */
+    --pui-primitive-color-primary-6: #69c14c;
+  }
+}
+
+@layer pui.semantic {
+  /* Acorn is the baseline theme */
+  [data-pui-brand='sprig'] {
+    /**
+     **  SEMANTIC TOKENS
+     *
+     ** Purpose-based tokens that express design intent.
+     ** These are the PUBLIC API consumed by components.
+     ** Themes override these to create different visual styles.
+     */
+  }
+}

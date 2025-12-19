@@ -1,19 +1,46 @@
-import type { GlobalProvider } from '@ladle/react';
-import { useEffect } from 'react';
+import { BRANDS, DEFAULT_BRAND, type Brand } from '@/brands';
+import { setActiveBrand } from '@/lib/brand-registry';
+import type { ArgTypes, GlobalProvider } from '@ladle/react';
+import { useEffect, useState } from 'react';
 
+import '@/brands/styles.css';
 import '@/index.css';
 
 /**
  * Global provider for Ladle that manages theme switching
- * Uses RSC-compatible theme registry (no React Context)
+ * Uses RSC-compatible brand registry (no React Context)
+ *
+ * Syncs:
+ * 1. data-pui-brand attribute (for CSS variables)
+ * 2. Brand registry (for component variant selection)
  */
 export const Provider: GlobalProvider = ({ children, globalState }) => {
-  const theme = (globalState.theme as string) || 'acorn';
+  const {
+    control: { brand: brandControl }
+  } = globalState;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  const brandValue = brandControl?.value as Brand | undefined;
 
+  const [brand, setBrand] = useState(() => setActiveBrand(brandValue));
+
+  // Sync brand registry with the selected brand
   useEffect(() => {
-    // Update the data-theme attribute on the root element
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+    setBrand(setActiveBrand(brandValue));
+  }, [brandValue]);
 
-  return <>{children}</>;
+  return (
+    <div key={brand} data-pui-brand={brand}>
+      {children}
+    </div>
+  );
 };
+
+export const argTypes = {
+  brand: {
+    name: 'Brand',
+    description: 'Branded theme for components',
+    options: BRANDS,
+    defaultValue: DEFAULT_BRAND,
+    control: { type: 'select' }
+  }
+} satisfies ArgTypes;

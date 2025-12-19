@@ -333,9 +333,6 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
-      vite-plugin-dts:
-        specifier: ^4.5.4
-        version: 4.5.4(@types/node@24.10.1)(rolldown-vite@7.3.0(@types/node@24.10.1)(jiti@2.6.1)(yaml@2.8.1))(rollup@4.53.5)(typescript@5.9.3)
     devDependencies:
       '@perimetre/eslint-config-base':
         specifier: workspace:*
@@ -382,6 +379,9 @@ importers:
       vite:
         specifier: npm:rolldown-vite@7.3.0
         version: rolldown-vite@7.3.0(@types/node@24.10.1)(jiti@2.6.1)(yaml@2.8.1)
+      vite-plugin-dts:
+        specifier: ^4.5.4
+        version: 4.5.4(@types/node@24.10.1)(rolldown-vite@7.3.0(@types/node@24.10.1)(jiti@2.6.1)(yaml@2.8.1))(rollup@4.53.5)(typescript@5.9.3)
 
 packages:
   '@alloc/quick-lru@5.2.0':

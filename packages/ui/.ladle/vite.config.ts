@@ -1,12 +1,13 @@
-import tailwindcss from '@tailwindcss/vite';
-import path from 'path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 export default defineConfig(() => ({
-  plugins: [tailwindcss()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '../src')
+      '@': resolve(__dirname, '../src')
     }
   }
 }));
