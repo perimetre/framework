@@ -3,8 +3,12 @@ import { type ForceRequiredProps } from '@perimetre/helpers/types';
 import { type VariantProps } from 'cva';
 import { Slot } from 'radix-ui';
 
+/**
+ * Field hint variants using semantic tokens:
+ * - text-pui-fg-muted: Hint text color
+ */
 const fieldHintVariants = cva({
-  base: 'pui:text-sm pui:text-background-11',
+  base: 'pui:text-sm pui:text-pui-fg-muted',
   variants: {
     error: {
       false: null,

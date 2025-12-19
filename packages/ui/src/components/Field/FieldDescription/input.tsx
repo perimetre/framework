@@ -8,6 +8,8 @@ export type FieldDescriptionProps = {
 
 /**
  * A description for a form field
+ * Uses semantic tokens for themeable colors:
+ * - text-pui-fg-muted: Description text color
  */
 const FieldDescription: React.FC<FieldDescriptionProps> = ({
   asChild,
@@ -19,7 +21,7 @@ const FieldDescription: React.FC<FieldDescriptionProps> = ({
   const Comp = asChild ? Slot.Root : 'p';
   return (
     <Comp
-      className={cn('pui:text-background-11 pui:text-sm', className)}
+      className={cn('pui:text-pui-fg-muted pui:text-sm', className)}
       id={id ?? `${name}-description`}
       {...props}
     />

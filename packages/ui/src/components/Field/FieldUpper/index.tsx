@@ -10,6 +10,8 @@ export type FieldUpperProps = {
 
 /**
  * The upper part of a form field, including the label, corner content, and description
+ * Uses semantic tokens for themeable colors:
+ * - text-pui-fg-muted: Corner text color
  */
 const FieldUpper: React.FC<FieldUpperProps> = ({
   corner,
@@ -35,7 +37,7 @@ const FieldUpper: React.FC<FieldUpperProps> = ({
           )}
 
           {corner && (
-            <span className="pui:text-background-11 pui:justify-self-end pui:text-sm/6">
+            <span className="pui:text-pui-fg-muted pui:justify-self-end pui:text-sm/6">
               {corner}
             </span>
           )}

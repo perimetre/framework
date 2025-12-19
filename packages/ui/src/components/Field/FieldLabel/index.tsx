@@ -10,6 +10,9 @@ export type FieldLabelProps = {
 
 /**
  * A label for a form field
+ * Uses semantic tokens for themeable colors:
+ * - text-pui-fg-default: Label text color
+ * - text-pui-feedback-error-strong: Required indicator
  */
 const FieldLabel: React.FC<PropsWithChildren<FieldLabelProps>> = ({
   asChild,
@@ -27,14 +30,14 @@ const FieldLabel: React.FC<PropsWithChildren<FieldLabelProps>> = ({
       htmlFor={htmlFor ?? `${name}-input`}
       id={id ?? `${name}-label`}
       className={cn(
-        'pui:text-background-12 pui:block pui:text-sm/6 pui:font-medium',
+        'pui:text-pui-fg-default pui:block pui:text-sm/6 pui:font-medium',
         className
       )}
       {...props}
     >
       <Slot.Slottable>{children}</Slot.Slottable>
       {required && (
-        <span className="pui:text-error-strong pui:not-sr-only pui:ml-1">
+        <span className="pui:text-pui-feedback-error-strong pui:not-sr-only pui:ml-1">
           *
         </span>
       )}

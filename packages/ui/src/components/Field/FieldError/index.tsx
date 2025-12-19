@@ -8,6 +8,8 @@ export type FieldErrorProps = {
 
 /**
  * An error message for a form field
+ * Uses semantic tokens for themeable colors:
+ * - text-pui-feedback-error: Error message text color
  */
 const FieldError: React.FC<FieldErrorProps> = ({
   asChild,
@@ -23,7 +25,7 @@ const FieldError: React.FC<FieldErrorProps> = ({
       id={id ?? `${name}-error`}
       role="alert"
       className={cn(
-        'pui:animate-in pui:fade-in pui:slide-in-from-bottom-25 pui:text-error pui:text-sm',
+        'pui:animate-in pui:fade-in pui:slide-in-from-bottom-25 pui:text-pui-feedback-error pui:text-sm',
         className
       )}
       {...props}

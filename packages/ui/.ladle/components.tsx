@@ -3,8 +3,7 @@ import { setActiveBrand } from '@/lib/brand-registry';
 import type { ArgTypes, GlobalProvider } from '@ladle/react';
 import { useEffect, useState } from 'react';
 
-import '@/brands/styles.css';
-import '@/index.css';
+import '@/styles/ladle.css';
 
 /**
  * Global provider for Ladle that manages theme switching

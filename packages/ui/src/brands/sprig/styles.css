@@ -20,7 +20,6 @@
 }
 
 @layer pui.semantic {
-  /* Acorn is the baseline theme */
   [data-pui-brand='sprig'] {
     /**
      **  SEMANTIC TOKENS
@@ -29,5 +28,8 @@
      ** These are the PUBLIC API consumed by components.
      ** Themes override these to create different visual styles.
      */
+
+    /* Sprig uses light text on primary (green is dark enough) */
+    --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
   }
 }

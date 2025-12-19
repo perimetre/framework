@@ -28,7 +28,10 @@
   --font-pui-sans: var(--pui-primitive-font-sans);
   --font-pui-mono: var(--pui-primitive-font-mono);
 
-  /* Understanding the scale https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale */
+  /* ========================================
+   * PRIMITIVE COLOR SCALES (for direct use when needed)
+   * Understanding the scale: https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale
+   * ======================================== */
   --color-pui-primary-1: var(--pui-primitive-color-primary-1); /* 50 */
   --color-pui-primary-2: var(--pui-primitive-color-primary-2); /* 100 */
   --color-pui-primary-3: var(--pui-primitive-color-primary-3); /* 200 */
@@ -55,6 +58,49 @@
   --color-pui-overlay-10: var(--pui-primitive-color-overlay-10);
   --color-pui-overlay-11: var(--pui-primitive-color-overlay-11);
   --color-pui-overlay-12: var(--pui-primitive-color-overlay-12);
+
+  /* ========================================
+   * SEMANTIC COLOR TOKENS
+   * All prefixed with 'pui-' to avoid conflicts with consumer projects
+   * that may define their own tokens with similar names.
+   * ======================================== */
+
+  /* Background colors */
+  --color-pui-bg-default: var(--pui-color-bg-default);
+  --color-pui-bg-subtle: var(--pui-color-bg-subtle);
+  --color-pui-bg-muted: var(--pui-color-bg-muted);
+
+  /* Foreground colors (text, icons) */
+  --color-pui-fg-default: var(--pui-color-fg-default);
+  --color-pui-fg-muted: var(--pui-color-fg-muted);
+  --color-pui-fg-subtle: var(--pui-color-fg-subtle);
+
+  /* Border colors */
+  --color-pui-border-default: var(--pui-color-border-default);
+  --color-pui-border-focus: var(--pui-color-border-focus);
+
+  /* Interactive colors */
+  --color-pui-interactive-primary: var(--pui-color-interactive-primary);
+  --color-pui-interactive-on-primary: var(--pui-color-interactive-on-primary);
+
+  /* Feedback colors */
+  --color-pui-feedback-error: var(--pui-color-feedback-error);
+  --color-pui-feedback-error-strong: var(--pui-color-feedback-error-strong);
+  --color-pui-feedback-error-light: var(--pui-color-feedback-error-light);
+
+  /* ========================================
+   * SEMANTIC SHAPE TOKENS
+   * ======================================== */
+  --radius-pui-button: var(--pui-radius-button);
+  --radius-pui-input: var(--pui-radius-input);
+
+  /* ========================================
+   * SEMANTIC SHADOW TOKENS
+   * ======================================== */
+  --shadow-pui-button: var(--pui-shadow-button);
+  --shadow-pui-button-hover: var(--pui-shadow-button-hover);
+  --shadow-pui-input: var(--pui-shadow-input);
+  --shadow-pui-input-focus: var(--pui-shadow-input-focus);
 }
 
 /* ========================================

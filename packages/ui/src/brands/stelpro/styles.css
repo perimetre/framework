@@ -5,7 +5,6 @@
 }
 
 @layer pui.semantic {
-  /* Acorn is the baseline theme */
   [data-pui-brand='stelpro'] {
     /**
      **  SEMANTIC TOKENS
@@ -14,5 +13,8 @@
      ** These are the PUBLIC API consumed by components.
      ** Themes override these to create different visual styles.
      */
+
+    /* Stelpro uses muted text on primary for better contrast with red */
+    --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-5);
   }
 }
