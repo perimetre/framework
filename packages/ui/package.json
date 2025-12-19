@@ -49,7 +49,10 @@
     "./*": {
       "import": "./dist/es/*.js",
       "require": "./dist/cjs/*.js",
-      "types": "./dist/*.d.ts"
+      "types": [
+        "./dist/*.d.ts",
+        "./dist/*/index.d.ts"
+      ]
     },
     "./package.json": "./package.json",
     "./src/*": "./src/*",

@@ -40,7 +40,8 @@ export default defineConfig({
       tsconfigPath: './tsconfig.json',
       include: ['src'],
       rollupTypes: false,
-      outDir: 'dist'
+      outDir: 'dist',
+      entryRoot: 'src'
     })
   ],
   resolve: {
