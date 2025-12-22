@@ -12,10 +12,12 @@
 
 @import '../brands/tailwind.css';
 
-/* Scope base/preflight to [data-pui-brand] */
-[data-pui-brand] {
-  @import 'tailwindcss/preflight.css' layer(pui.tw.base);
-}
+/**
+ * NOTE: Preflight is NOT included in base.css
+ * - Consuming apps (like Next.js) should import their own Tailwind CSS with preflight
+ * - Ladle (our dev environment) imports base-with-preflight.css instead
+ * This prevents double-reset issues when data-pui-brand is added to the app
+ */
 
 /* Tailwind configuration with scoping handled by tailwind.config.js */
 @config '../../tailwind.config.js';

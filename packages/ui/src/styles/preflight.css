@@ -1,0 +1,22 @@
+/**
+ * Preflight (CSS Reset) - Optional
+ *
+ * Tailwind's preflight CSS scoped to [data-pui-brand].
+ *
+ * Usage:
+ * - Import this if your project doesn't already have Tailwind CSS with preflight
+ * - Ladle imports this for component development
+ * - Most apps using Tailwind v4 can skip this (they have their own preflight)
+ *
+ * Example:
+ * @import '@perimetre/ui/styles/preflight.css';
+ * @import '@perimetre/ui/styles/sprig.css';
+ */
+
+/* Define layers to ensure proper ordering */
+@layer pui.tw.base;
+
+/* Scope preflight to [data-pui-brand] */
+[data-pui-brand] {
+  @import 'tailwindcss/preflight.css' layer(pui.tw.base);
+}

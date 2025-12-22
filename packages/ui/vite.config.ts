@@ -14,12 +14,14 @@ const componentFiles = glob.sync('src/components/**/index.tsx', {
   absolute: false
 });
 
+// Dynamically generate entry points for all CSS files in src/styles
+const cssFiles = glob.sync('src/styles/*.css', {
+  cwd: __dirname,
+  absolute: false
+});
+
 const entry: Record<string, string> = {
-  index: resolve(__dirname, 'src/index.ts'),
-  // CSS entry points for each brand (these will generate separate CSS files)
-  'styles/acorn': resolve(__dirname, 'src/styles/acorn.css'),
-  'styles/sprig': resolve(__dirname, 'src/styles/sprig.css'),
-  'styles/stelpro': resolve(__dirname, 'src/styles/stelpro.css')
+  index: resolve(__dirname, 'src/index.ts')
 };
 
 // Create entry points for each component
@@ -28,6 +30,12 @@ componentFiles.forEach((file: string) => {
     .replace('src/', '')
     .replace('/index.tsx', '')
     .replace('.tsx', '');
+  entry[entryName] = resolve(__dirname, file);
+});
+
+// Create entry points for each CSS file
+cssFiles.forEach((file: string) => {
+  const entryName = file.replace('src/', '').replace('.css', '');
   entry[entryName] = resolve(__dirname, file);
 });
 

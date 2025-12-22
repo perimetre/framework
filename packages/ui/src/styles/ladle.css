@@ -1,11 +1,12 @@
 /**
- * Stelpro Brand CSS
+ * Ladle Development Environment CSS
  *
- * Import this file in your project to use the Stelpro brand theme.
- * Usage: import '@perimetre/ui/styles/stelpro.css'
+ * This file is used exclusively by Ladle for component development.
+ * It includes preflight (CSS reset) to ensure components display correctly.
  *
- * Note: Stelpro extends Acorn (the base theme), so Acorn tokens are included.
+ * Note: This imports ALL brand styles for switching between them in Ladle.
  */
+@import './preflight.css';
 @import './base.css';
 @import '../brands/acorn/styles.css';
 @import '../brands/stelpro/styles.css';

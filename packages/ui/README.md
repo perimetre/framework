@@ -34,7 +34,18 @@ import '@perimetre/ui/styles/sprig.css';
 import '@perimetre/ui/styles/stelpro.css';
 ```
 
-**Important:** Only import ONE brand CSS file. Each file contains only the styles for that specific brand, keeping your bundle size minimal.
+**Important:**
+
+- Only import ONE brand CSS file. Each file contains only the styles for that specific brand, keeping your bundle size minimal.
+- The brand CSS files do NOT include Tailwind's preflight (CSS reset). If your app doesn't already use Tailwind CSS, you should import the optional preflight file first:
+
+```tsx
+// Optional: Only if your app doesn't already have Tailwind CSS
+import '@perimetre/ui/styles/preflight.css';
+
+// Then import your brand CSS
+import '@perimetre/ui/styles/sprig.css';
+```
 
 ### Alternative: Compile with Your Own Tailwind (Advanced)
 
@@ -144,15 +155,19 @@ import { FieldInput } from '@perimetre/ui/components/Field/FieldInput';
 import '@perimetre/ui/styles/acorn.css'; // ~14.7KB
 import '@perimetre/ui/styles/sprig.css'; // ~15.0KB
 import '@perimetre/ui/styles/stelpro.css'; // ~14.8KB
+
+// Optional preflight (CSS reset) - only if your app doesn't have Tailwind CSS
+import '@perimetre/ui/styles/preflight.css'; // ~4.8KB
 ```
 
 ### CSS Bundle Sizes (gzipped)
 
-| Brand   | Size    | Gzipped |
-| ------- | ------- | ------- |
-| Acorn   | 14.7 KB | 3.3 KB  |
-| Sprig   | 15.0 KB | 3.3 KB  |
-| Stelpro | 14.8 KB | 3.3 KB  |
+| File      | Size    | Gzipped |
+| --------- | ------- | ------- |
+| Preflight | 4.8 KB  | 1.3 KB  |
+| Acorn     | 14.7 KB | 3.3 KB  |
+| Sprig     | 15.0 KB | 3.3 KB  |
+| Stelpro   | 14.8 KB | 3.3 KB  |
 
 ## Peer Dependencies
 
