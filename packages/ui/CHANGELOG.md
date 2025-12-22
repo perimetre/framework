@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.1.2
+
+### Patch Changes
+
+- 87f1246: Updates preflight declaration
+
 ## 13.1.1
 
 ### Patch Changes
