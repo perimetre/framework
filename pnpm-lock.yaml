@@ -20,8 +20,8 @@ importers:
         specifier: workspace:*
         version: link:packages/eslint-config-base
       '@perimetre/eslint-config-react':
-        specifier: ^0.1.3
-        version: 0.1.3(eslint@9.39.2(jiti@2.6.1))(react@19.2.3)(typescript@5.9.3)
+        specifier: workspace:*
+        version: link:packages/eslint-config-react
       '@perimetre/prettier-config':
         specifier: workspace:*
         version: link:packages/prettier-config
@@ -2306,16 +2306,6 @@ packages:
         integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==
       }
     engines: { node: '>= 10.0.0' }
-
-  '@perimetre/eslint-config-react@0.1.3':
-    resolution:
-      {
-        integrity: sha512-Y4MKXXOhSdPhPuG2iU5XttwSR7Mi5+LA9TvHLhVjs678QWvKrA4HzTnfE1BGcO/V59+eE9pKvWIwkhxnavgiCg==,
-        tarball: https://npm.pkg.github.com/download/@perimetre/eslint-config-react/0.1.3/c0f48d23911f70d59f82214907ea5bb6b2987a90
-      }
-    peerDependencies:
-      eslint: '>= 9'
-      react: '>= 19'
 
   '@pkgr/core@0.2.9':
     resolution:
@@ -12945,18 +12935,6 @@ snapshots:
       '@parcel/watcher-win32-arm64': 2.5.1
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
-
-  '@perimetre/eslint-config-react@0.1.3(eslint@9.39.2(jiti@2.6.1))(react@19.2.3)(typescript@5.9.3)':
-    dependencies:
-      '@tanstack/eslint-plugin-query': 5.91.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
-      eslint: 9.39.2(jiti@2.6.1)
-      eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-react: 7.37.5(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-react-hooks: 7.0.1(eslint@9.39.2(jiti@2.6.1))
-      react: 19.2.3
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
 
   '@pkgr/core@0.2.9': {}
 
