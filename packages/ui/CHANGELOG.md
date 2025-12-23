@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.1.3
+
+### Patch Changes
+
+- 0d163f1: Splitting tailwind utilities
+
 ## 13.1.2
 
 ### Patch Changes
