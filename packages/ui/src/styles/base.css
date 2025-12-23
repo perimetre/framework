@@ -1,14 +1,16 @@
 /* Base Tailwind CSS - shared across all brands */
 /* Define layers explicitly */
-@layer pui.tw.theme, pui.tw.base;
+@layer pui.tw.theme, pui.tw.base, pui.tw.utilities;
 @layer pui.primitives, pui.semantic, pui.theme, pui.components;
 
 /* Import theme with layer assignment */
 @import 'tailwindcss/theme.css' layer(pui.tw.theme) prefix(pui);
 @import 'tw-animate-css';
 
-/* Scope utilities to [data-pui-brand] - unlayered but scoped via config important */
-@import 'tailwindcss/utilities.css' prefix(pui);
+/* Scope utilities via CSS nesting (unlayered to preserve ::before variants) */
+[data-pui-brand] {
+  @import 'tailwindcss/utilities.css' prefix(pui);
+}
 
 @import '../brands/tailwind.css';
 
@@ -18,9 +20,6 @@
  * - Ladle (our dev environment) imports base-with-preflight.css instead
  * This prevents double-reset issues when data-pui-brand is added to the app
  */
-
-/* Tailwind configuration with scoping handled by tailwind.config.js */
-@config '../../tailwind.config.js';
 
 /* Tailwind plugins */
 @plugin '@tailwindcss/typography';

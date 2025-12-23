@@ -1,4 +1,6 @@
 import baseConfig from '@perimetre/eslint-config-base';
+import reactConfig from '@perimetre/eslint-config-react';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 import { globalIgnores } from 'eslint/config';
 
 /**
@@ -15,6 +17,23 @@ export default [
       }
     }
   },
+  // Apply React config to UI package
+  ...reactConfig.map((config) => {
+    // Explicitly register jsx-a11y plugin for monorepo compatibility
+    if (config.plugins && Object.keys(config.plugins).length === 0) {
+      return {
+        ...config,
+        files: ['packages/ui/**/*.{jsx,tsx}'],
+        plugins: {
+          'jsx-a11y': jsxA11y
+        }
+      };
+    }
+    return {
+      ...config,
+      files: ['packages/ui/**/*.{jsx,tsx}']
+    };
+  }),
   // Disable JSDoc requirements for story files (Storybook/Ladle documentation)
   {
     files: ['**/*.stories.ts', '**/*.stories.tsx'],

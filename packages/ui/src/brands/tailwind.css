@@ -112,3 +112,29 @@
 @custom-variant pui-acorn (&:where([data-pui-brand=acorn], [data-pui-brand=acorn] *));
 @custom-variant pui-sprig (&:where([data-pui-brand=sprig], [data-pui-brand=sprig] *));
 @custom-variant pui-stelpro (&:where([data-pui-brand=stelpro], [data-pui-brand=stelpro] *));
+
+/* ========================================
+ * CUSTOM VARIANTS FOR FORM ELEMENT STATES (using native group-has)
+ * ======================================== */
+@custom-variant group-has-checked (&:is(:where(.pui\:group):has(:checked) *));
+@custom-variant group-has-indeterminate (&:is(:where(.pui\:group):has(:indeterminate) *));
+@custom-variant group-has-disabled (&:is(:where(.pui\:group):has(:disabled) *));
+
+/* ========================================
+ * CUSTOM UTILITIES FOR RADIO BUTTON ::before PSEUDO-ELEMENT
+ *
+ * Only :checked:before combinations need custom utilities since
+ * Tailwind v4 doesn't support that specific combination.
+ * ======================================== */
+@layer pui.tw.utilities {
+  /* Show radio dot when checked */
+  [data-pui-brand] .pui\:checked\:before\:block:checked::before {
+    display: block;
+  }
+
+  /* Disabled checked state for radio dots */
+  [data-pui-brand]
+    .pui\:disabled\:checked\:before\:bg-pui-fg-subtle:disabled:checked::before {
+    background-color: var(--pui-color-fg-subtle);
+  }
+}

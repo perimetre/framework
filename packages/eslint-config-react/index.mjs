@@ -46,7 +46,7 @@ export default defineConfig(
   {
     files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
     plugins: {
-      react
+      react: react
     },
     rules: {
       // Make sure booleans are named consistently
