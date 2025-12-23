@@ -7,12 +7,13 @@
 @import 'tailwindcss/theme.css' layer(pui.tw.theme) prefix(pui);
 @import 'tw-animate-css';
 
-/* Scope utilities via CSS nesting (unlayered to preserve ::before variants) */
+/* Import custom theme and variants first */
+@import '../brands/tailwind.css';
+
+/* Then scope utilities - must be after custom variants are defined */
 [data-pui-brand] {
   @import 'tailwindcss/utilities.css' prefix(pui);
 }
-
-@import '../brands/tailwind.css';
 
 /**
  * NOTE: Preflight is NOT included in base.css

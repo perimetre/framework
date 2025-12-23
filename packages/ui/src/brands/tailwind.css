@@ -121,20 +121,56 @@
 @custom-variant group-has-disabled (&:is(:where(.pui\:group):has(:disabled) *));
 
 /* ========================================
- * CUSTOM UTILITIES FOR RADIO BUTTON ::before PSEUDO-ELEMENT
+ * CUSTOM UTILITIES FOR PSEUDO-ELEMENT VARIANTS
  *
- * Only :checked:before combinations need custom utilities since
- * Tailwind v4 doesn't support that specific combination.
+ * CSS nesting with @import breaks pseudo-element variant generation,
+ * so we need to manually define these utilities.
  * ======================================== */
 @layer pui.tw.utilities {
-  /* Show radio dot when checked */
-  [data-pui-brand] .pui\:checked\:before\:block:checked::before {
+  /* Base ::before pseudo-element styles */
+  [data-pui-brand] .before\:pui\:content-\[\"\"\]:before {
+    content: '';
+  }
+
+  [data-pui-brand] .before\:pui\:absolute:before {
+    position: absolute;
+  }
+
+  [data-pui-brand] .before\:pui\:rounded-full:before {
+    border-radius: 9999px;
+  }
+
+  [data-pui-brand] .before\:pui\:hidden:before {
+    display: none;
+  }
+
+  [data-pui-brand] .before\:pui\:block:before {
     display: block;
   }
 
-  /* Disabled checked state for radio dots */
+  [data-pui-brand] .before\:pui\:inset-\[3px\]:before {
+    inset: 3px;
+  }
+
+  [data-pui-brand] .before\:pui\:bg-pui-interactive-primary:before {
+    background-color: var(--pui-color-interactive-primary);
+  }
+
+  [data-pui-brand] .before\:pui\:bg-white:before {
+    background-color: var(--pui-color-white);
+  }
+
+  [data-pui-brand] .before\:pui\:bg-pui-fg-subtle:before {
+    background-color: var(--pui-color-fg-subtle);
+  }
+
+  /* Pseudo-element + pseudoclass combinations */
+  [data-pui-brand] .pui\:checked\:before\:block:checked:before {
+    display: block;
+  }
+
   [data-pui-brand]
-    .pui\:disabled\:checked\:before\:bg-pui-fg-subtle:disabled:checked::before {
+    .pui\:disabled\:checked\:before\:bg-pui-fg-subtle:disabled:checked:before {
     background-color: var(--pui-color-fg-subtle);
   }
 }
