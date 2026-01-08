@@ -102,6 +102,7 @@
      * ======================================== */
     --pui-radius-button: var(--pui-primitive-radius-full);
     --pui-radius-input: var(--pui-primitive-radius-md);
+    --pui-radius-badge: var(--pui-primitive-radius-full);
 
     /* ========================================
      * SHAPE - Border width

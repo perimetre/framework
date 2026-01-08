@@ -93,6 +93,7 @@
    * ======================================== */
   --radius-pui-button: var(--pui-radius-button);
   --radius-pui-input: var(--pui-radius-input);
+  --radius-pui-badge: var(--pui-radius-badge);
 
   /* ========================================
    * SEMANTIC SHADOW TOKENS

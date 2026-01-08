@@ -31,5 +31,8 @@
 
     /* Sprig uses light text on primary (green is dark enough) */
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
+
+    /* Sprig uses small rounded corners for badges */
+    --pui-radius-badge: var(--pui-primitive-radius-sm);
   }
 }
