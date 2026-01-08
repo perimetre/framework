@@ -37,7 +37,7 @@ const eslintConfig = defineConfig([
           ],
           patterns: [
             {
-              group: ['@radix-ui/*'],
+              group: ['@radix-ui/*', '!@radix-ui/react-icons'],
               message: 'Import Radix UI components from "radix-ui" instead'
             }
           ]

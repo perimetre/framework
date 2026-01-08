@@ -45,7 +45,7 @@ importers:
         version: 3.7.4
       turbo:
         specifier: latest
-        version: 2.7.1
+        version: 2.7.3
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -312,6 +312,18 @@ importers:
       cva:
         specifier: 1.0.0-beta.4
         version: 1.0.0-beta.4(typescript@5.9.3)
+      embla-carousel:
+        specifier: ^8.6.0
+        version: 8.6.0
+      embla-carousel-class-names:
+        specifier: ^8.6.0
+        version: 8.6.0(embla-carousel@8.6.0)
+      embla-carousel-react:
+        specifier: ^8.6.0
+        version: 8.6.0(react@19.2.3)
+      embla-carousel-wheel-gestures:
+        specifier: ^8.1.0
+        version: 8.1.0(embla-carousel@8.6.0)
       lucide-react:
         specifier: ^0.562.0
         version: 0.562.0(react@19.2.3)
@@ -6072,6 +6084,45 @@ packages:
         integrity: sha512-/5UMj9IiGDMOFBnN4i7/Ry5onJrAGSbOGo3s9FEKmwobGq6xw832ccET0CE3CkkMBZ8GJSlUIesZofpyurqDXw==
       }
 
+  embla-carousel-class-names@8.6.0:
+    resolution:
+      {
+        integrity: sha512-l1hm1+7GxQ+zwdU2sea/LhD946on7XO2qk3Xq2XWSwBaWfdgchXdK567yzLtYSHn4sWYdiX+x4nnaj+saKnJkw==
+      }
+    peerDependencies:
+      embla-carousel: 8.6.0
+
+  embla-carousel-react@8.6.0:
+    resolution:
+      {
+        integrity: sha512-0/PjqU7geVmo6F734pmPqpyHqiM99olvyecY7zdweCw+6tKEXnrE90pBiBbMMU8s5tICemzpQ3hi5EpxzGW+JA==
+      }
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.1 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+
+  embla-carousel-reactive-utils@8.6.0:
+    resolution:
+      {
+        integrity: sha512-fMVUDUEx0/uIEDM0Mz3dHznDhfX+znCCDCeIophYb1QGVM7YThSWX+wz11zlYwWFOr74b4QLGg0hrGPJeG2s4A==
+      }
+    peerDependencies:
+      embla-carousel: 8.6.0
+
+  embla-carousel-wheel-gestures@8.1.0:
+    resolution:
+      {
+        integrity: sha512-J68jkYrxbWDmXOm2n2YHl+uMEXzkGSKjWmjaEgL9xVvPb3HqVmg6rJSKfI3sqIDVvm7mkeTy87wtG/5263XqHQ==
+      }
+    engines: { node: '>=10' }
+    peerDependencies:
+      embla-carousel: ^8.0.0 || ~8.0.0-rc03
+
+  embla-carousel@8.6.0:
+    resolution:
+      {
+        integrity: sha512-SjWyZBHJPbqxHOzckOfo8lHisEaJWmwd23XppYFYVh10bU66/Pn5tkVkbkCMZVdbUE5eTCI2nD8OyIP4Z+uwkA==
+      }
+
   emoji-regex@10.6.0:
     resolution:
       {
@@ -10796,58 +10847,58 @@ packages:
       }
     engines: { node: '>=0.6.x' }
 
-  turbo-darwin-64@2.7.1:
+  turbo-darwin-64@2.7.3:
     resolution:
       {
-        integrity: sha512-EaA7UfYujbY9/Ku0WqPpvfctxm91h9LF7zo8vjielz+omfAPB54Si+ADmUoBczBDC6RoLgbURC3GmUW2alnjJg==
+        integrity: sha512-aZHhvRiRHXbJw1EcEAq4aws1hsVVUZ9DPuSFaq9VVFAKCup7niIEwc22glxb7240yYEr1vLafdQ2U294Vcwz+w==
       }
     cpu: [x64]
     os: [darwin]
 
-  turbo-darwin-arm64@2.7.1:
+  turbo-darwin-arm64@2.7.3:
     resolution:
       {
-        integrity: sha512-/pWGSygtBugd7sKQOeMm+jKY3qN1vyB0RiHBM6bN/6qUOo2VHo8IQwBTIaSgINN4Ue6fzEU+WfePNvonSU9yXw==
+        integrity: sha512-CkVrHSq+Bnhl9sX2LQgqQYVfLTWC2gvI74C4758OmU0djfrssDKU9d4YQF0AYXXhIIRZipSXfxClQziIMD+EAg==
       }
     cpu: [arm64]
     os: [darwin]
 
-  turbo-linux-64@2.7.1:
+  turbo-linux-64@2.7.3:
     resolution:
       {
-        integrity: sha512-Y5H11mdhASw/dJuRFyGtTCDFX5/MPT73EKsVEiHbw5MkFc77lx3nMc5L/Q7bKEhef/vYJAsAb61QuHsB6qdP8Q==
+        integrity: sha512-GqDsCNnzzr89kMaLGpRALyigUklzgxIrSy2pHZVXyifgczvYPnLglex78Aj3T2gu+T3trPPH2iJ+pWucVOCC2Q==
       }
     cpu: [x64]
     os: [linux]
 
-  turbo-linux-arm64@2.7.1:
+  turbo-linux-arm64@2.7.3:
     resolution:
       {
-        integrity: sha512-L/r77jD7cqIEXoyu2LGBUrTY5GJSi/XcGLsQ2nZ/fefk6x3MpljTvwsXUVG1BUkiBPc4zaKRj6yGyWMo5MbLxQ==
+        integrity: sha512-NdCDTfIcIo3dWjsiaAHlxu5gW61Ed/8maah1IAF/9E3EtX0aAHNiBMbuYLZaR4vRJ7BeVkYB6xKWRtdFLZ0y3g==
       }
     cpu: [arm64]
     os: [linux]
 
-  turbo-windows-64@2.7.1:
+  turbo-windows-64@2.7.3:
     resolution:
       {
-        integrity: sha512-rkeuviXZ/1F7lCare7TNKvYtT/SH9dZR55FAMrxrFRh88b+ZKwlXEBfq5/1OctEzRUo/VLIm+s5LJMOEy+QshA==
+        integrity: sha512-7bVvO987daXGSJVYBoG8R4Q+csT1pKIgLJYZevXRQ0Hqw0Vv4mKme/TOjYXs9Qb1xMKh51Tb3bXKDbd8/4G08g==
       }
     cpu: [x64]
     os: [win32]
 
-  turbo-windows-arm64@2.7.1:
+  turbo-windows-arm64@2.7.3:
     resolution:
       {
-        integrity: sha512-1rZk9htm3+iP/rWCf/h4/DFQey9sMs2TJPC4T5QQfwqAdMWsphgrxBuFqHdxczlbBCgbWNhVw0CH2bTxe1/GFg==
+        integrity: sha512-nTodweTbPmkvwMu/a55XvjMsPtuyUSC+sV7f/SR57K36rB2I0YG21qNETN+00LOTUW9B3omd8XkiXJkt4kx/cw==
       }
     cpu: [arm64]
     os: [win32]
 
-  turbo@2.7.1:
+  turbo@2.7.3:
     resolution:
       {
-        integrity: sha512-zAj9jGc7VDvuAo/5Jbos4QTtWz9uUpkMhMKGyTjDJkx//hdL2bM31qQoJSAbU+7JyK5vb0LPzpwf6DUt3zayqg==
+        integrity: sha512-+HjKlP4OfYk+qzvWNETA3cUO5UuK6b5MSc2UJOKyvBceKucQoQGb2g7HlC2H1GHdkfKrk4YF1VPvROkhVZDDLQ==
       }
     hasBin: true
 
@@ -11290,6 +11341,13 @@ packages:
     resolution:
       {
         integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==
+      }
+    engines: { node: '>=18' }
+
+  wheel-gestures@2.2.48:
+    resolution:
+      {
+        integrity: sha512-f+Gy33Oa5Z14XY9679Zze+7VFhbsQfBFXodnU2x589l4kxGM9L5Y8zETTmcMR5pWOPQyRv4Z0lNax6xCO0NSlA==
       }
     engines: { node: '>=18' }
 
@@ -15313,6 +15371,27 @@ snapshots:
 
   electron-to-chromium@1.5.250: {}
 
+  embla-carousel-class-names@8.6.0(embla-carousel@8.6.0):
+    dependencies:
+      embla-carousel: 8.6.0
+
+  embla-carousel-react@8.6.0(react@19.2.3):
+    dependencies:
+      embla-carousel: 8.6.0
+      embla-carousel-reactive-utils: 8.6.0(embla-carousel@8.6.0)
+      react: 19.2.3
+
+  embla-carousel-reactive-utils@8.6.0(embla-carousel@8.6.0):
+    dependencies:
+      embla-carousel: 8.6.0
+
+  embla-carousel-wheel-gestures@8.1.0(embla-carousel@8.6.0):
+    dependencies:
+      embla-carousel: 8.6.0
+      wheel-gestures: 2.2.48
+
+  embla-carousel@8.6.0: {}
+
   emoji-regex@10.6.0: {}
 
   emoji-regex@8.0.0: {}
@@ -18774,32 +18853,32 @@ snapshots:
 
   tsscmp@1.0.6: {}
 
-  turbo-darwin-64@2.7.1:
+  turbo-darwin-64@2.7.3:
     optional: true
 
-  turbo-darwin-arm64@2.7.1:
+  turbo-darwin-arm64@2.7.3:
     optional: true
 
-  turbo-linux-64@2.7.1:
+  turbo-linux-64@2.7.3:
     optional: true
 
-  turbo-linux-arm64@2.7.1:
+  turbo-linux-arm64@2.7.3:
     optional: true
 
-  turbo-windows-64@2.7.1:
+  turbo-windows-64@2.7.3:
     optional: true
 
-  turbo-windows-arm64@2.7.1:
+  turbo-windows-arm64@2.7.3:
     optional: true
 
-  turbo@2.7.1:
+  turbo@2.7.3:
     optionalDependencies:
-      turbo-darwin-64: 2.7.1
-      turbo-darwin-arm64: 2.7.1
-      turbo-linux-64: 2.7.1
-      turbo-linux-arm64: 2.7.1
-      turbo-windows-64: 2.7.1
-      turbo-windows-arm64: 2.7.1
+      turbo-darwin-64: 2.7.3
+      turbo-darwin-arm64: 2.7.3
+      turbo-linux-64: 2.7.3
+      turbo-linux-arm64: 2.7.3
+      turbo-windows-64: 2.7.3
+      turbo-windows-arm64: 2.7.3
 
   tw-animate-css@1.4.0: {}
 
@@ -19099,6 +19178,8 @@ snapshots:
   web-streams-polyfill@3.3.3: {}
 
   whatwg-mimetype@4.0.0: {}
+
+  wheel-gestures@2.2.48: {}
 
   which-boxed-primitive@1.1.1:
     dependencies:
