@@ -4,5 +4,5 @@ import { cva } from '@/lib/cva';
  * Acorn brand ImageCarouselRoot variant
  */
 export const imageCarouselRootAcornVariants = cva({
-  base: ['pui:relative']
+  base: ['pui:relative', 'pui:h-full']
 });

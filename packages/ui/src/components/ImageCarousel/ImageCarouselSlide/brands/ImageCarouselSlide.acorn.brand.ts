@@ -9,6 +9,7 @@ export const imageCarouselSlideAcornVariants = cva({
     'pui:flex-[0_0_100%]',
     'pui:min-w-0',
     'pui:pl-4',
-    'pui:relative'
+    'pui:relative',
+    'pui:h-full'
   ]
 });

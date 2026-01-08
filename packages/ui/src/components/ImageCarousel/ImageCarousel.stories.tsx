@@ -44,7 +44,7 @@ type Props = {
 } & Omit<ImageCarouselProps<ImageSlide>, 'options' | 'renderImage' | 'slides'>;
 
 export default {
-  title: 'Components/ImageCarousel',
+  title: 'ImageCarousel',
   argTypes: {
     showNavigation: {
       control: { type: 'boolean' },
