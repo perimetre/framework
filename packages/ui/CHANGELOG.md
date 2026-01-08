@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.3.1
+
+### Patch Changes
+
+- ac3fdf0: Fixes image carousel height for centralization
+
 ## 13.3.0
 
 ### Minor Changes
