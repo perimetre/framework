@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.3.2
+
+### Patch Changes
+
+- 0ae3b1b: Fix image wrapper height
+
 ## 13.3.1
 
 ### Patch Changes
