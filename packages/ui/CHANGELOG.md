@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.3.3
+
+### Patch Changes
+
+- a203567: Fix image wrapper flex container
+
 ## 13.3.2
 
 ### Patch Changes
