@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.3.0
+
+### Minor Changes
+
+- bbba3e2: Added image carousel component
+
 ## 13.2.0
 
 ### Minor Changes
