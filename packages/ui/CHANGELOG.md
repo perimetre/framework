@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.2.0
+
+### Minor Changes
+
+- 5fb0425: Added badge component
+
 ## 13.1.4
 
 ### Patch Changes
