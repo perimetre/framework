@@ -1,3 +1,4 @@
+import { cn } from '@perimetre/classnames';
 import {
   type EmblaCarouselType,
   type EmblaOptionsType,
@@ -23,6 +24,10 @@ import {
 } from './ImageCarouselNavigation';
 import ImageCarouselRoot from './ImageCarouselRoot';
 import ImageCarouselSlide from './ImageCarouselSlide';
+import {
+  ImageCarouselThumbnail,
+  ImageCarouselThumbnailsContainer
+} from './ImageCarouselThumbnails';
 import ImageCarouselViewport from './ImageCarouselViewport';
 
 export type ImageCarouselProps<T = unknown> = {
@@ -66,6 +71,17 @@ export type ImageCarouselProps<T = unknown> = {
     onLoad: () => void
   ) => React.ReactNode;
   /**
+   * Render function for each thumbnail. If not provided, the main renderImage function will be used.
+   * @param slide - The slide data from the slides array
+   * @param index - The index of the current slide
+   * @returns The rendered thumbnail element
+   * @example
+   * renderThumbnail={(slide, index) => (
+   *   <img src={slide.thumbnailSrc || slide.src} alt={slide.alt} className="w-full h-full object-cover" />
+   * )}
+   */
+  renderThumbnail?: (slide: T, index: number) => React.ReactNode;
+  /**
    * Whether to show dot indicators. Defaults to true.
    */
   showDots?: boolean;
@@ -74,9 +90,21 @@ export type ImageCarouselProps<T = unknown> = {
    */
   showNavigation?: boolean;
   /**
+   * Whether to show thumbnails. Defaults to false.
+   */
+  showThumbnails?: boolean;
+  /**
    * Array of slide data. Each item will be passed to the renderImage function.
    */
   slides: T[];
+  /**
+   * Position of the thumbnails. Either 'bottom' or 'left'. Defaults to 'bottom'.
+   */
+  thumbnailPosition?: 'bottom' | 'left';
+  /**
+   * Additional className for the viewport element.
+   */
+  viewportClassName?: string;
 };
 
 /**
@@ -98,9 +126,13 @@ const ImageCarousel = <T,>({
   options,
   plugins,
   renderImage,
+  renderThumbnail,
   showDots = true,
   showNavigation = true,
-  slides
+  showThumbnails = false,
+  slides,
+  thumbnailPosition = 'bottom',
+  viewportClassName
 }: ImageCarouselProps<T>) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, ...options }, [
     ...(plugins ?? []),
@@ -186,65 +218,124 @@ const ImageCarousel = <T,>({
     setLoadedSlides((prev) => new Set(prev).add(index));
   }, []);
 
+  // Determine layout based on thumbnails
+  const layout = showThumbnails
+    ? thumbnailPosition === 'bottom'
+      ? 'with-thumbnails-bottom'
+      : 'with-thumbnails-left'
+    : 'default';
+
+  // Render thumbnails component
+  const thumbnailsComponent = showThumbnails && (
+    <ImageCarouselThumbnailsContainer
+      data-pui-component="ThumbnailsContainer"
+      orientation={thumbnailPosition === 'bottom' ? 'horizontal' : 'vertical'}
+    >
+      {slides.map((slide, index) => (
+        <ImageCarouselThumbnail
+          key={index}
+          data-pui-component="Thumbnail"
+          index={index}
+          isSelected={index === selectedIndex}
+          orientation={
+            thumbnailPosition === 'bottom' ? 'horizontal' : 'vertical'
+          }
+          renderThumbnail={() =>
+            renderThumbnail ? renderThumbnail(slide, index) : null
+          }
+          onClick={() => {
+            scrollTo(index);
+          }}
+        />
+      ))}
+    </ImageCarouselThumbnailsContainer>
+  );
+
   return (
-    <ImageCarouselRoot className={className}>
-      <ImageCarouselViewport ref={emblaRef}>
-        <ImageCarouselContainer>
-          {slides.map((slide, index) => {
-            const inView = slidesInView.includes(index);
-            const hasLoaded = loadedSlides.has(index);
-            /** Handle image load callback */
-            const onLoad = () => {
-              handleImageLoad(index);
-            };
+    <ImageCarouselRoot
+      className={className}
+      data-pui-component="ImageCarousel"
+      layout={layout}
+    >
+      {/* Thumbnails on left - render before viewport */}
+      {showThumbnails && thumbnailPosition === 'left' && thumbnailsComponent}
 
-            return (
-              <ImageCarouselSlide key={index}>
-                <ImageCarouselLazyLoadContainer>
-                  {!hasLoaded && (
-                    <ImageCarouselLazyLoadSpinner isHidden={hasLoaded} />
-                  )}
-                  <ImageCarouselImageWrapper isLoaded={hasLoaded}>
-                    {renderImage(slide, index, inView, hasLoaded, onLoad)}
-                  </ImageCarouselImageWrapper>
-                </ImageCarouselLazyLoadContainer>
-              </ImageCarouselSlide>
-            );
-          })}
-        </ImageCarouselContainer>
-      </ImageCarouselViewport>
+      {/* Viewport wrapper - contains viewport and navigation controls */}
+      <div
+        className={cn('pui:relative pui:h-full pui:grow', viewportClassName)}
+        data-pui-component="ViewportWrapper"
+      >
+        <ImageCarouselViewport ref={emblaRef}>
+          <ImageCarouselContainer data-pui-component="Container">
+            {slides.map((slide, index) => {
+              const inView = slidesInView.includes(index);
+              const hasLoaded = loadedSlides.has(index);
+              /** Handle image load callback */
+              const onLoad = () => {
+                handleImageLoad(index);
+              };
 
-      {/* Navigation Controls */}
-      {showNavigation && (
-        <ImageCarouselControls>
-          <ImageCarouselNavButton
-            direction="prev"
-            disabled={prevBtnDisabled}
-            onClick={scrollPrev}
-          />
-          <ImageCarouselNavButton
-            direction="next"
-            disabled={nextBtnDisabled}
-            onClick={scrollNext}
-          />
-        </ImageCarouselControls>
-      )}
+              return (
+                <ImageCarouselSlide key={index} data-pui-component="Slide">
+                  <ImageCarouselLazyLoadContainer>
+                    {!hasLoaded && (
+                      <ImageCarouselLazyLoadSpinner
+                        data-pui-component="Spinner"
+                        isHidden={hasLoaded}
+                      />
+                    )}
+                    <ImageCarouselImageWrapper
+                      data-pui-component="ImageWrapper"
+                      isLoaded={hasLoaded}
+                    >
+                      {renderImage(slide, index, inView, hasLoaded, onLoad)}
+                    </ImageCarouselImageWrapper>
+                  </ImageCarouselLazyLoadContainer>
+                </ImageCarouselSlide>
+              );
+            })}
+          </ImageCarouselContainer>
+        </ImageCarouselViewport>
 
-      {/* Dot Indicators */}
-      {showDots && (
-        <ImageCarouselDotsContainer>
-          {slides.map((_, index) => (
-            <ImageCarouselDot
-              key={index}
-              index={index}
-              isSelected={index === selectedIndex}
-              onClick={() => {
-                scrollTo(index);
-              }}
+        {/* Navigation Controls */}
+        {showNavigation && (
+          <ImageCarouselControls data-pui-component="Controls">
+            <ImageCarouselNavButton
+              data-pui-component="NavButton"
+              direction="prev"
+              disabled={prevBtnDisabled}
+              onClick={scrollPrev}
             />
-          ))}
-        </ImageCarouselDotsContainer>
-      )}
+            <ImageCarouselNavButton
+              data-pui-component="NavButton"
+              direction="next"
+              disabled={nextBtnDisabled}
+              onClick={scrollNext}
+            />
+          </ImageCarouselControls>
+        )}
+
+        {/* Dot Indicators */}
+        {showDots && !showThumbnails && (
+          <ImageCarouselDotsContainer data-pui-component="DotsContainer">
+            {slides.map((_, index) => (
+              <ImageCarouselDot
+                key={index}
+                data-pui-component="CarouselDot"
+                data-pui-isSelected={index === selectedIndex}
+                index={index}
+                isSelected={index === selectedIndex}
+                onClick={() => {
+                  scrollTo(index);
+                }}
+              />
+            ))}
+          </ImageCarouselDotsContainer>
+        )}
+      </div>
+
+      {/* Thumbnails on bottom - render after viewport */}
+      {showThumbnails && thumbnailPosition === 'bottom' && thumbnailsComponent}
     </ImageCarouselRoot>
   );
 };

@@ -41,7 +41,12 @@ type Props = {
   isLoop?: boolean;
   showDots?: boolean;
   showNavigation?: boolean;
-} & Omit<ImageCarouselProps<ImageSlide>, 'options' | 'renderImage' | 'slides'>;
+  showThumbnails?: boolean;
+  thumbnailPosition?: 'bottom' | 'left';
+} & Omit<
+  ImageCarouselProps<ImageSlide>,
+  'options' | 'renderImage' | 'renderThumbnail' | 'slides'
+>;
 
 export default {
   title: 'ImageCarousel',
@@ -53,6 +58,15 @@ export default {
     showDots: {
       control: { type: 'boolean' },
       defaultValue: true
+    },
+    showThumbnails: {
+      control: { type: 'boolean' },
+      defaultValue: false
+    },
+    thumbnailPosition: {
+      control: { type: 'select' },
+      options: ['bottom', 'left'],
+      defaultValue: 'bottom'
     },
     isLoop: {
       control: { type: 'boolean' },
@@ -284,6 +298,100 @@ export const CustomStyling: Story<Props> = () => (
           loading="lazy"
           src={inView ? slide.src : undefined}
           onLoad={onLoad}
+        />
+      )}
+    />
+  </div>
+);
+
+/**
+ * With thumbnails at bottom - demonstrates thumbnail navigation
+ */
+export const WithThumbnailsBottom: Story<Props> = () => (
+  <div className="pui:max-w-4xl pui:mx-auto pui:p-8">
+    <ImageCarousel
+      showThumbnails
+      options={{ loop: true }}
+      slides={sampleImages}
+      thumbnailPosition="bottom"
+      renderImage={(slide, index, inView, hasLoaded, onLoad) => (
+        <img
+          alt={slide.alt}
+          className="pui:w-full pui:h-100 pui:object-cover pui:rounded-lg"
+          loading="lazy"
+          src={inView ? slide.src : undefined}
+          onLoad={onLoad}
+        />
+      )}
+      renderThumbnail={(slide) => (
+        <img
+          alt={slide.alt}
+          className="pui:w-full pui:h-full pui:object-cover"
+          loading="lazy"
+          src={slide.src}
+        />
+      )}
+    />
+  </div>
+);
+
+/**
+ * With thumbnails on left - demonstrates vertical thumbnail navigation
+ */
+export const WithThumbnailsLeft: Story<Props> = () => (
+  <div className="pui:max-w-6xl pui:mx-auto pui:p-8">
+    <ImageCarousel
+      showThumbnails
+      options={{ loop: true }}
+      slides={sampleImages}
+      thumbnailPosition="left"
+      renderImage={(slide, index, inView, hasLoaded, onLoad) => (
+        <img
+          alt={slide.alt}
+          className="pui:w-full pui:h-100 pui:object-cover pui:rounded-lg"
+          loading="lazy"
+          src={inView ? slide.src : undefined}
+          onLoad={onLoad}
+        />
+      )}
+      renderThumbnail={(slide) => (
+        <img
+          alt={slide.alt}
+          className="pui:w-full pui:h-full pui:object-cover"
+          loading="lazy"
+          src={slide.src}
+        />
+      )}
+    />
+  </div>
+);
+
+/**
+ * Thumbnails with navigation - combines thumbnails and arrow navigation
+ */
+export const ThumbnailsWithNavigation: Story<Props> = () => (
+  <div className="pui:max-w-4xl pui:mx-auto pui:p-8">
+    <ImageCarousel
+      showNavigation
+      showThumbnails
+      options={{ loop: true }}
+      slides={sampleImages}
+      thumbnailPosition="bottom"
+      renderImage={(slide, index, inView, hasLoaded, onLoad) => (
+        <img
+          alt={slide.alt}
+          className="pui:w-full pui:h-100 pui:object-cover pui:rounded-lg"
+          loading="lazy"
+          src={inView ? slide.src : undefined}
+          onLoad={onLoad}
+        />
+      )}
+      renderThumbnail={(slide) => (
+        <img
+          alt={slide.alt}
+          className="pui:w-full pui:h-full pui:object-cover"
+          loading="lazy"
+          src={slide.src}
         />
       )}
     />

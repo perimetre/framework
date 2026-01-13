@@ -12,14 +12,17 @@ export type ImageCarouselRootProps = {
  */
 const ImageCarouselRoot: React.FC<ImageCarouselRootProps> = ({
   children,
-  className
+  className,
+  layout
 }) => {
   const imageCarouselRootVariants = getBrandVariant(
     imageCarouselRootBrandVariants
   );
 
   return (
-    <div className={imageCarouselRootVariants({ className })}>{children}</div>
+    <div className={imageCarouselRootVariants({ className, layout })}>
+      {children}
+    </div>
   );
 };
 

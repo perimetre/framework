@@ -1,4 +1,7 @@
 {
+  "dependencies": {
+    "@perimetre/ui": "^13.3.3"
+  },
   "description": "Shared configurations and tooling for Perimetre projects",
   "devDependencies": {
     "@changesets/cli": "^2.29.8",

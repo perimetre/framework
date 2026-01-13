@@ -5,8 +5,9 @@ import { cva } from '@/lib/cva';
  */
 export const imageCarouselNavButtonSprigVariants = cva({
   base: [
-    'pui:bg-pui-interactive-primary',
-    'pui:text-pui-interactive-on-primary',
-    'hover:pui:bg-pui-interactive-primary'
+    'pui:bg-white',
+    'pui:text-pui-interactive-primary',
+    'hover:pui:bg-gray-50',
+    'disabled:hover:pui:bg-white'
   ]
 });
