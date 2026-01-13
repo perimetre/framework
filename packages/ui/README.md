@@ -76,34 +76,60 @@ For most projects, the pre-built CSS is recommended. The compile-yourself approa
 
 ### 2. Initialize Brand at App Startup
 
-Set the active brand at module load time in your root layout. This must be done **before** any components render:
+Set the active brand at module load time. In Next.js App Router, server and client bundles are separate, so you need to initialize the brand in **both**:
+
+**Step 1:** Create a client-side brand initializer component:
+
+```tsx
+// src/components/BrandInitializer.tsx
+'use client';
+
+import { setActiveBrand } from '@perimetre/ui';
+
+// Runs at module load time on the client
+setActiveBrand('sprig');
+
+// Empty component - just needs to be imported to trigger the module load
+export default function BrandInitializer() {
+  return null;
+}
+```
+
+**Step 2:** Use it in your root layout alongside server-side initialization:
 
 ```tsx
 // app/layout.tsx (Next.js App Router)
 import { setActiveBrand } from '@perimetre/ui';
 import '@perimetre/ui/styles/sprig.css';
+import BrandInitializer from '@/components/BrandInitializer';
 
-// Initialize brand at module load time (runs once when this module loads)
+// Initialize brand on server (for Server Components)
 setActiveBrand('sprig');
 
 export default function RootLayout({ children }) {
   return (
     <html>
-      <body>
-        {/* data-pui-brand provides CSS scoping */}
-        <div data-pui-brand="sprig">{children}</div>
+      <body data-pui-brand="sprig">
+        {/* Initialize brand on client (for Client Components) */}
+        <BrandInitializer />
+        {children}
       </body>
     </html>
   );
 }
 ```
 
+**Why both?**
+
+- **Server-side `setActiveBrand()`**: Sets the brand for Server Components rendered on the server
+- **Client-side `BrandInitializer`**: Sets the brand for Client Components (like `ImageCarousel`) which run in a separate client bundle
+- **`data-pui-brand` attribute**: Provides CSS scoping for design tokens
+
 **Important:**
 
-- Call `setActiveBrand()` at the top level of your layout module (not inside a component)
-- Also set the `data-pui-brand` attribute for CSS scoping
-- Both must use the same brand value
-- Components will automatically use the correct brand variants via `getBrandVariant()`
+- All three (server init, client init, data attribute) must use the same brand value
+- The `BrandInitializer` component renders nothing - it only triggers the module-level `setActiveBrand()` call
+- Components automatically use the correct brand variants via `getBrandVariant()`
 
 ## Design Token Architecture
 

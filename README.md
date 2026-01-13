@@ -21,6 +21,10 @@ Shared packages, configurations, and architectural patterns for Perimetre projec
 - `@perimetre/icons` - Accessible React icon wrapper with TypeScript enforcement
 - `@perimetre/classnames` - Classname utility combining clsx and tailwind-merge
 
+### Component Libraries
+
+- `@perimetre/ui` - Reusable React component library with brand-aware theming built on Tailwind CSS v4 and Radix UI primitives
+
 ## Documentation
 
 ### LLMs Directory

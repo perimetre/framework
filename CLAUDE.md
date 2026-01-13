@@ -53,7 +53,8 @@ framework/
 │   ├── service-builder/                 # Type-safe service layer builder
 │   ├── helpers/                         # Shared TypeScript utilities
 │   ├── icons/                           # Accessible React icon wrapper
-│   └── classnames/                      # Classname utility (clsx + tailwind-merge)
+│   ├── classnames/                      # Classname utility (clsx + tailwind-merge)
+│   └── ui/                              # React component library (brand-aware)
 ├── package.json                         # Root package (private)
 ├── pnpm-workspace.yaml                  # Workspace configuration
 ├── turbo.json                           # Turborepo pipeline config
@@ -134,6 +135,10 @@ Each package has:
 - **@perimetre/helpers** - Shared TypeScript utilities (Faker, CSV parsing)
 - **@perimetre/icons** - Accessible React icon wrapper with TypeScript enforcement
 - **@perimetre/classnames** - Utility combining clsx + tailwind-merge
+
+### Component Libraries
+
+- **@perimetre/ui** - React component library with brand-aware theming built on Tailwind CSS v4 and Radix UI primitives. Supports visual polymorphism across multiple brands (Acorn, Sprig, Stelpro) with three-tier design token system
 
 ### Package Relationships
 
@@ -225,7 +230,7 @@ pnpm release              # Build + publish (usually in CI)
 
 ## Current State
 
-- 12 published packages (configs + utilities)
+- 13 published packages (7 configs + 4 utilities + 1 component library)
 - CI/CD pipelines with automated releases
 - Comprehensive LLMs documentation for AI assistants
 - Working examples for tRPC and GraphQL patterns
