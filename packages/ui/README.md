@@ -74,21 +74,36 @@ If your project uses Tailwind CSS v4 and you want maximum tree-shaking (only inc
 
 For most projects, the pre-built CSS is recommended. The compile-yourself approach is useful for large apps where every kilobyte matters.
 
-### 2. Wrap Components with Brand Scope
+### 2. Initialize Brand at App Startup
 
-Components must be rendered within an element that has the `data-pui-brand` attribute:
+Set the active brand at module load time in your root layout. This must be done **before** any components render:
 
 ```tsx
-import Button from '@perimetre/ui/components/Button';
+// app/layout.tsx (Next.js App Router)
+import { setActiveBrand } from '@perimetre/ui';
+import '@perimetre/ui/styles/sprig.css';
 
-function App() {
+// Initialize brand at module load time (runs once when this module loads)
+setActiveBrand('sprig');
+
+export default function RootLayout({ children }) {
   return (
-    <div data-pui-brand="acorn">
-      <Button size="default">Click me</Button>
-    </div>
+    <html>
+      <body>
+        {/* data-pui-brand provides CSS scoping */}
+        <div data-pui-brand="sprig">{children}</div>
+      </body>
+    </html>
   );
 }
 ```
+
+**Important:**
+
+- Call `setActiveBrand()` at the top level of your layout module (not inside a component)
+- Also set the `data-pui-brand` attribute for CSS scoping
+- Both must use the same brand value
+- Components will automatically use the correct brand variants via `getBrandVariant()`
 
 ## Design Token Architecture
 
@@ -143,11 +158,16 @@ The package uses [Ladle](https://ladle.dev/) for component development and docum
 
 ## Exports
 
-```typescript
-// Brand utilities and types
-import { setActiveBrand, getActiveBrand, BRANDS } from '@perimetre/ui';
+The package avoids barrel exports for optimal tree-shaking. Import exactly what you need:
 
-// Individual components (tree-shakeable)
+```typescript
+// Brand initialization (call at module load time in root layout)
+import { setActiveBrand } from '@perimetre/ui';
+
+// Brand utilities (rarely needed - components use these internally)
+import { getActiveBrand, getBrandVariant, BRANDS } from '@perimetre/ui';
+
+// Individual components (tree-shakeable - import from specific paths)
 import Button from '@perimetre/ui/components/Button';
 import { FieldInput } from '@perimetre/ui/components/Field/FieldInput';
 

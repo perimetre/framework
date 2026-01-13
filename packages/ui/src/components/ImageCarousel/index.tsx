@@ -1,3 +1,5 @@
+'use client';
+
 import { cn } from '@perimetre/classnames';
 import {
   type EmblaCarouselType,
