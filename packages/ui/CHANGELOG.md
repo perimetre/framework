@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.4.0
+
+### Minor Changes
+
+- 957e6e5: Added thumbnails option to ImageCarousel
+
 ## 13.3.3
 
 ### Patch Changes
