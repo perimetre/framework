@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.4.2
+
+### Patch Changes
+
+- 59e5eb6: Updated docs
+
 ## 13.4.1
 
 ### Patch Changes
