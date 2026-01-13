@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.4.1
+
+### Patch Changes
+
+- 3e7a22d: Fix module load brand configuration
+
 ## 13.4.0
 
 ### Minor Changes
