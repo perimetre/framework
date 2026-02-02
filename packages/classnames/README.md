@@ -36,3 +36,39 @@ function Button({ className, ...props }) {
   );
 }
 ```
+
+## Custom Class Groups
+
+`tailwind-merge` doesn't recognize custom utility classes defined via Tailwind's `@utility` directive. Use `createCn` to extend the merge behavior with custom class groups.
+
+```ts
+// src/lib/cn.ts
+import { createCn } from '@perimetre/classnames';
+
+export const cn = createCn({
+  extend: {
+    classGroups: {
+      typography: [
+        'typo-heading-1',
+        'typo-heading-2',
+        'typo-heading-3',
+        'typo-small',
+        'typo-base'
+        // ... other custom typography classes
+      ]
+    }
+  }
+});
+```
+
+Now conflicting custom classes merge correctly:
+
+```ts
+cn('typo-small', 'typo-heading-1');
+// Result: 'typo-heading-1'
+
+// Without createCn, both classes would remain:
+// 'typo-small typo-heading-1'
+```
+
+Call `createCn` once at module level, not inside components.
