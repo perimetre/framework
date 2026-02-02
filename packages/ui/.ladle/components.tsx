@@ -1,7 +1,8 @@
 import { BRANDS, DEFAULT_BRAND, type Brand } from '@/brands';
 import { setActiveBrand } from '@/lib/brand-registry';
 import type { ArgTypes, GlobalProvider } from '@ladle/react';
-import { useEffect, useState } from 'react';
+import { domAnimation, LazyMotion } from 'motion/react';
+import { useEffect } from 'react';
 
 import '@/styles/ladle.css';
 
@@ -9,9 +10,11 @@ import '@/styles/ladle.css';
  * Global provider for Ladle that manages theme switching
  * Uses RSC-compatible brand registry (no React Context)
  *
- * Syncs:
- * 1. data-pui-brand attribute (for CSS variables)
- * 2. Brand registry (for component variant selection)
+ * Provides:
+ * 1. LazyMotion for motion/react-m components (Drawer, etc.)
+ * 2. data-pui-brand attribute (for CSS variables)
+ * 3. Brand registry (for component variant selection)
+ * 4. document.body brand attribute (for Radix Portal content)
  */
 export const Provider: GlobalProvider = ({ children, globalState }) => {
   const {
@@ -20,17 +23,21 @@ export const Provider: GlobalProvider = ({ children, globalState }) => {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const brandValue = brandControl?.value as Brand | undefined;
 
-  const [brand, setBrand] = useState(() => setActiveBrand(brandValue));
+  // Derive the brand directly - no state needed
+  const brand = brandValue ?? DEFAULT_BRAND;
 
-  // Sync brand registry with the selected brand
+  // Sync external systems: brand registry and document.body attribute
   useEffect(() => {
-    setBrand(setActiveBrand(brandValue));
-  }, [brandValue]);
+    setActiveBrand(brand);
+    document.body.setAttribute('data-pui-brand', brand);
+  }, [brand]);
 
   return (
-    <div key={brand} data-pui-brand={brand}>
-      {children}
-    </div>
+    <LazyMotion features={domAnimation}>
+      <div key={brand} data-pui-brand={brand}>
+        {children}
+      </div>
+    </LazyMotion>
   );
 };
 
