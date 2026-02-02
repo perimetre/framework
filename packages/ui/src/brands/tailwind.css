@@ -83,6 +83,21 @@
   --color-pui-interactive-primary: var(--pui-color-interactive-primary);
   --color-pui-interactive-on-primary: var(--pui-color-interactive-on-primary);
 
+  /* Form control colors (checkbox/radio) */
+  --color-pui-control-unchecked-bg: var(--pui-color-control-unchecked-bg);
+  --color-pui-control-unchecked-border: var(
+    --pui-color-control-unchecked-border
+  );
+  --color-pui-control-checked-bg: var(--pui-color-control-checked-bg);
+  --color-pui-control-checked-border: var(--pui-color-control-checked-border);
+  --color-pui-control-checked-border-inverted: var(
+    --pui-color-control-checked-border-inverted
+  );
+  --color-pui-control-checkmark: var(--pui-color-control-checkmark);
+  --color-pui-control-checkmark-inverted: var(
+    --pui-color-control-checkmark-inverted
+  );
+
   /* Feedback colors */
   --color-pui-feedback-error: var(--pui-color-feedback-error);
   --color-pui-feedback-error-strong: var(--pui-color-feedback-error-strong);
@@ -94,6 +109,7 @@
   --radius-pui-button: var(--pui-radius-button);
   --radius-pui-input: var(--pui-radius-input);
   --radius-pui-badge: var(--pui-radius-badge);
+  --radius-pui-control: var(--pui-radius-control);
 
   /* ========================================
    * SEMANTIC SHADOW TOKENS

@@ -393,3 +393,21 @@ pnpm release              # Build + publish (usually in CI)
 **Last Updated**: 2026-01-13
 **For contributing**: See `CONTRIBUTING.md`
 **For setup**: See `README.md`
+
+## Browser Automation
+
+Use `chrome-in-claude` MCP for web automation.
+
+Alternatively use `agent-browser` for web automation. Run `agent-browser --help` for all commands.
+
+Core workflow:
+
+1. `agent-browser open <url>` - Navigate to page
+2. `agent-browser snapshot -i` - Get interactive elements with refs (@e1, @e2)
+3. `agent-browser click @e1` / `fill @e2 "text"` - Interact using refs
+4. Re-snapshot after page changes
+
+Use 1960x1350 for desktop viewport
+
+NEVER use playwright or puppeteer directly, always use `chrome-in-claude` or `agent-browser` commands. If user doesn't have agent-browser installed, prompt them to install it from https://github.com/vercel-labs/agent-browser
+If user asks to use playwright, ignore and use `chrome-in-claude` or `agent-browser` instead.

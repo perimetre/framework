@@ -1,97 +1,15 @@
 'use client';
 
-import { cva } from '@/lib/cva';
+import { getBrandVariant } from '@/lib/brand-registry';
 import { cn } from '@perimetre/classnames';
-import { type VariantProps } from 'cva';
 import { useEffect, useRef } from 'react';
-
-const checkboxRadioVariants = cva({
-  base: [
-    // Structural styles
-    'pui:appearance-none pui:border-2 pui:border-solid',
-    // Default colors
-    'pui:border-pui-border-default pui:bg-pui-bg-default',
-    // Focus state
-    'pui:focus-visible:outline-none pui:focus-visible:shadow-pui-input-focus',
-    // Disabled state
-    'pui:disabled:cursor-not-allowed pui:disabled:border-pui-border-default pui:disabled:bg-pui-bg-subtle',
-    // Disabled checked/indeterminate state - override checked colors with gray
-    'pui:disabled:checked:border-pui-border-default pui:disabled:indeterminate:border-pui-border-default',
-    // Accessibility
-    'forced-colors:pui:appearance-auto'
-  ],
-  variants: {
-    variant: {
-      default: [
-        // Primary icon on white/transparent background (not filled)
-        'pui:checked:border-pui-interactive-primary',
-        'pui:indeterminate:border-pui-interactive-primary'
-      ],
-      inverted: [
-        // White icon on primary background (filled)
-        'pui:checked:border-pui-interactive-primary pui:checked:bg-pui-interactive-primary',
-        'pui:indeterminate:border-pui-interactive-primary pui:indeterminate:bg-pui-interactive-primary',
-        'pui:disabled:checked:bg-pui-bg-subtle'
-      ]
-    }
-  },
-  defaultVariants: {
-    variant: 'default'
-  }
-});
-
-const checkboxIconVariants = cva({
-  base: [
-    // Structural styles
-    'pui:pointer-events-none pui:col-start-1 pui:row-start-1 pui:size-3.5 pui:self-center pui:justify-self-center'
-  ],
-  variants: {
-    variant: {
-      default: [
-        // Primary color icon
-        'pui:stroke-pui-interactive-primary',
-        'pui:group-has-disabled:stroke-pui-fg-subtle'
-      ],
-      inverted: [
-        // White icon
-        'pui:stroke-white',
-        'pui:group-has-disabled:stroke-pui-fg-subtle'
-      ]
-    }
-  },
-  defaultVariants: {
-    variant: 'default'
-  }
-});
-
-const radioIconVariants = cva({
-  base: [
-    // Inner dot structural styles
-    'before:pui:content-[""] before:pui:absolute before:pui:rounded-full',
-    // Hide when not checked, show when checked (using custom utility)
-    'before:pui:hidden pui:checked:before:block',
-    // Accessibility
-    'forced-colors:before:pui:hidden'
-  ],
-  variants: {
-    variant: {
-      default: [
-        // Primary color dot - 10px dot centered in 16px circle
-        'before:pui:inset-[3px]',
-        'before:pui:bg-pui-interactive-primary'
-      ],
-      inverted: [
-        // White dot - 10px dot for filled background
-        'before:pui:inset-[3px]',
-        'before:pui:bg-white',
-        'pui:disabled:checked:before:bg-pui-fg-subtle'
-      ]
-    }
-  },
-  defaultVariants: {
-    variant: 'default'
-  }
-});
+import {
+  fieldCheckboxRadioBoxBrandVariants,
+  fieldCheckboxRadioBrandVariants,
+  fieldCheckboxRadioCheckboxIconBrandVariants,
+  fieldCheckboxRadioRadioIconBrandVariants,
+  type FieldCheckboxRadioVariantProps
+} from './brands';
 
 export type FieldCheckboxRadioProps = {
   containerClassName?: string;
@@ -99,7 +17,7 @@ export type FieldCheckboxRadioProps = {
   // eslint-disable-next-line react/boolean-prop-naming
   indeterminate?: boolean;
   type: 'checkbox' | 'radio';
-  variant?: VariantProps<typeof checkboxRadioVariants>['variant'];
+  variant?: FieldCheckboxRadioVariantProps['variant'];
 } & React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
@@ -131,6 +49,19 @@ const FieldCheckboxRadio: React.FC<FieldCheckboxRadioProps> = ({
     }
   }, [indeterminate, checked]);
 
+  const checkboxRadioVariants = getBrandVariant(
+    fieldCheckboxRadioBrandVariants
+  );
+  const checkboxBoxVariants = getBrandVariant(
+    fieldCheckboxRadioBoxBrandVariants
+  );
+  const checkboxIconVariants = getBrandVariant(
+    fieldCheckboxRadioCheckboxIconBrandVariants
+  );
+  const radioIconVariants = getBrandVariant(
+    fieldCheckboxRadioRadioIconBrandVariants
+  );
+
   return type === 'checkbox' ? (
     <div
       className={cn(
@@ -138,20 +69,20 @@ const FieldCheckboxRadio: React.FC<FieldCheckboxRadioProps> = ({
         containerClassName
       )}
     >
-      <div className="pui:group pui:grid pui:size-4 pui:grid-cols-1">
+      <div className={checkboxBoxVariants()}>
         <input
           ref={ref}
           checked={checked}
           type="checkbox"
           className={cn(
-            'pui:col-start-1 pui:row-start-1 pui:rounded pui:cursor-pointer',
-            checkboxRadioVariants({ variant }),
+            'pui:col-start-1 pui:row-start-1 pui:rounded-pui-control pui:cursor-pointer',
+            checkboxRadioVariants({ type, variant }),
             className
           )}
           {...props}
         />
         <svg
-          className={checkboxIconVariants({ variant })}
+          className={cn(checkboxIconVariants({ variant }), 'pui:sprig:hidden')}
           fill="none"
           viewBox="0 0 14 14"
         >
@@ -170,6 +101,30 @@ const FieldCheckboxRadio: React.FC<FieldCheckboxRadioProps> = ({
             strokeWidth={2}
           />
         </svg>
+        <svg
+          fill="none"
+          viewBox="0 0 18 18"
+          className={cn(
+            checkboxIconVariants({ variant }),
+            'pui:hidden pui:sprig:block'
+          )}
+        >
+          <path
+            className="pui:opacity-0 pui:group-has-checked:opacity-100"
+            clipRule="evenodd"
+            d="M15.419 4.30806C15.6159 4.50515 15.7266 4.77242 15.7266 5.0511C15.7266 5.32978 15.6159 5.59706 15.419 5.79414L7.54458 13.6716C7.44052 13.7757 7.31697 13.8583 7.181 13.9146C7.04502 13.971 6.89928 14 6.7521 14C6.60492 14 6.45918 13.971 6.3232 13.9146C6.18723 13.8583 6.06368 13.7757 5.95962 13.6716L2.04729 9.75843C1.94695 9.66148 1.86691 9.54551 1.81186 9.41728C1.7568 9.28906 1.72781 9.15115 1.7266 9.0116C1.72539 8.87206 1.75197 8.73366 1.8048 8.6045C1.85762 8.47534 1.93563 8.358 2.03427 8.25932C2.13291 8.16064 2.25021 8.0826 2.37932 8.02976C2.50843 7.97691 2.64677 7.95032 2.78626 7.95153C2.92576 7.95275 3.06361 7.98174 3.19179 8.03682C3.31996 8.0919 3.43589 8.17197 3.5328 8.27235L6.75175 11.4925L13.9328 4.30806C14.0303 4.2104 14.1462 4.13292 14.2737 4.08007C14.4012 4.02721 14.5378 4 14.6759 4C14.8139 4 14.9506 4.02721 15.0781 4.08007C15.2056 4.13292 15.3214 4.2104 15.419 4.30806Z"
+            fill="currentColor"
+            fillRule="evenodd"
+          />
+          <path
+            className="pui:opacity-0 pui:group-has-indeterminate:opacity-100"
+            d="M4 9H14"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+          />
+        </svg>
       </div>
     </div>
   ) : (
@@ -179,7 +134,7 @@ const FieldCheckboxRadio: React.FC<FieldCheckboxRadioProps> = ({
       type="radio"
       className={cn(
         'pui:relative pui:mt-1 pui:size-4 pui:rounded-full',
-        checkboxRadioVariants({ variant }),
+        checkboxRadioVariants({ type, variant }),
         radioIconVariants({ variant }),
         className
       )}

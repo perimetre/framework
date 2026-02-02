@@ -32,7 +32,17 @@
     /* Sprig uses light text on primary (green is dark enough) */
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
 
+    /* Sprig checkbox/radio tokens */
+    --pui-color-control-unchecked-bg: #f5f5f5;
+    --pui-color-control-unchecked-border: #d4d4d4;
+    --pui-color-control-checked-bg: #69c14c;
+    --pui-color-control-checked-border: #427d2e;
+    --pui-color-control-checked-border-inverted: #69c14c;
+    --pui-color-control-checkmark: #ffffff;
+    --pui-color-control-checkmark-inverted: #69c14c;
+
     /* Sprig uses small rounded corners for badges */
-    --pui-radius-badge: var(--pui-primitive-radius-sm);
+    --pui-radius-badge: 0;
+    --pui-radius-control: 0;
   }
 }

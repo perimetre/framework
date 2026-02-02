@@ -91,6 +91,19 @@
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-12);
 
     /* ========================================
+     * COLOR - Form Controls (checkbox/radio)
+     * ======================================== */
+    --pui-color-control-unchecked-bg: var(--pui-color-bg-default);
+    --pui-color-control-unchecked-border: var(--pui-color-border-default);
+    --pui-color-control-checked-bg: var(--pui-color-interactive-primary);
+    --pui-color-control-checked-border: var(--pui-color-interactive-primary);
+    --pui-color-control-checked-border-inverted: var(
+      --pui-color-control-checked-border
+    );
+    --pui-color-control-checkmark: var(--pui-color-interactive-primary);
+    --pui-color-control-checkmark-inverted: var(--pui-color-bg-default);
+
+    /* ========================================
      * COLOR - Feedback
      * ======================================== */
     --pui-color-feedback-error: var(--pui-primitive-color-error);
@@ -103,6 +116,7 @@
     --pui-radius-button: var(--pui-primitive-radius-full);
     --pui-radius-input: var(--pui-primitive-radius-md);
     --pui-radius-badge: var(--pui-primitive-radius-full);
+    --pui-radius-control: var(--pui-primitive-radius-sm);
 
     /* ========================================
      * SHAPE - Border width
