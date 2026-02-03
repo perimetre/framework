@@ -133,7 +133,7 @@ export const DrawerContent: React.FC<PropsWithChildren<DrawerContentProps>> = ({
             className="pui:fixed pui:inset-0 pui:z-99998"
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent) => {
               e.preventDefault();
               e.stopPropagation();
               setIsOpen(false);
@@ -152,7 +152,7 @@ export const DrawerContent: React.FC<PropsWithChildren<DrawerContentProps>> = ({
               duration: 0.37,
               ease: cubicBezier(0.215, 0.61, 0.355, 1)
             }}
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent) => {
               e.preventDefault();
               e.stopPropagation();
             }}
