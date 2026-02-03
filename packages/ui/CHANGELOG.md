@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.5.1
+
+### Patch Changes
+
+- ceccf05: Makes motion a peer deps package
+
 ## 13.5.0
 
 ### Minor Changes
