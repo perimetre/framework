@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.6.0
+
+### Minor Changes
+
+- 228eee3: Updated sprig brand
+
 ## 13.5.1
 
 ### Patch Changes
