@@ -32,7 +32,7 @@
     "@perimetre/eslint-config-base": "^0.2.1",
     "@perimetre/eslint-config-nextjs": "^0.1.1",
     "@perimetre/eslint-config-react": "^0.1.1",
-    "@perimetre/eslint-config-trpc": "workspace:*",
+    "@perimetre/eslint-config-trpc": "^0.0.1",
     "@perimetre/prettier-config": "^0.0.5",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

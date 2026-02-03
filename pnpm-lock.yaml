@@ -6,10 +6,6 @@ settings:
 
 importers:
   .:
-    dependencies:
-      '@perimetre/ui':
-        specifier: ^13.3.3
-        version: 13.3.3(@types/node@24.10.1)(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(class-variance-authority@0.7.1)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vite@6.4.1(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.1))(yaml@2.8.1)
     devDependencies:
       '@changesets/cli':
         specifier: ^2.29.8
@@ -2325,41 +2321,6 @@ packages:
         integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==
       }
     engines: { node: '>= 10.0.0' }
-
-  '@perimetre/classnames@0.0.4':
-    resolution:
-      {
-        integrity: sha512-FF1jHWTzU6/gwAhebcCxNVXGPS2QYl0qDFxBmZypNIED+eMX7WpjA4fdrgIc4FQcPprsl1jOHi1loG/KXK5hIg==,
-        tarball: https://npm.pkg.github.com/download/@perimetre/classnames/0.0.4/99e6cadf19692a76facfdf0a13dfc8262174c94a
-      }
-    peerDependencies:
-      class-variance-authority: '>=0.7.0'
-
-  '@perimetre/helpers@5.1.2':
-    resolution:
-      {
-        integrity: sha512-EPxWUexYC62BX6xu/hzLuxo2LxVusQaBpVTcwNWp41nsRzVDSwiAbjTzyU43cqc/fxfSYjooqaIf9ojpDRxRJA==,
-        tarball: https://npm.pkg.github.com/download/@perimetre/helpers/5.1.2/c2536111908c625183bc14f64d695f4f2520d2e5
-      }
-
-  '@perimetre/icons@0.0.3':
-    resolution:
-      {
-        integrity: sha512-VwHKR+HwgGiR6ndIyzUhinpvQ7ln8jMQMwDG36kVAcVg6C8P44jnmJwgErJe0KjnbSCVkHd3Th99ibUYxhDYbg==,
-        tarball: https://npm.pkg.github.com/download/@perimetre/icons/0.0.3/d7f2d8f35c736d7f0b0b54cf4c3a189f33985a37
-      }
-    peerDependencies:
-      react: '>=18.0.0'
-
-  '@perimetre/ui@13.3.3':
-    resolution:
-      {
-        integrity: sha512-9YJZf8cwYpWF3/YXKD7StQsFHFc8tAt6Bd7WKyTJGSPuaThB48H6kqBEfS4ELGA4HWJSINs9L2PkybEqe91/kw==,
-        tarball: https://npm.pkg.github.com/download/@perimetre/ui/13.3.3/7b207609b5c7680f94aad0df0b4dc4f650ffd150
-      }
-    peerDependencies:
-      react: '>= 19.0'
-      react-dom: '>= 19.0'
 
   '@pkgr/core@0.2.9':
     resolution:
@@ -13082,73 +13043,6 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
 
-  '@perimetre/classnames@0.0.4(class-variance-authority@0.7.1)':
-    dependencies:
-      class-variance-authority: 0.7.1
-      clsx: 2.1.1
-      tailwind-merge: 3.4.0
-
-  '@perimetre/helpers@5.1.2':
-    dependencies:
-      '@faker-js/faker': 8.4.1
-      csv: 6.4.1
-      csv-parse: 6.1.0
-      csv-stringify: 6.6.0
-
-  '@perimetre/icons@0.0.3(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
-    dependencies:
-      '@radix-ui/react-accessible-icon': 1.1.8(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@radix-ui/react-slot': 1.2.4(@types/react@18.3.27)(react@19.2.3)
-      react: 19.2.3
-    transitivePeerDependencies:
-      - '@types/react'
-      - '@types/react-dom'
-      - react-dom
-
-  '@perimetre/ui@13.3.3(@types/node@24.10.1)(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(class-variance-authority@0.7.1)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vite@6.4.1(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.1))(yaml@2.8.1)':
-    dependencies:
-      '@ladle/react': 5.1.1(@types/node@24.10.1)(@types/react@18.3.27)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)(yaml@2.8.1)
-      '@perimetre/classnames': 0.0.4(class-variance-authority@0.7.1)
-      '@perimetre/helpers': 5.1.2
-      '@perimetre/icons': 0.0.3(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@radix-ui/react-icons': 1.3.2(react@19.2.3)
-      '@tailwindcss/forms': 0.5.11(tailwindcss@4.1.18)
-      '@tailwindcss/postcss': 4.1.18
-      '@tailwindcss/typography': 0.5.19(tailwindcss@4.1.18)
-      '@tailwindcss/vite': 4.1.18(vite@6.4.1(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.1))
-      cva: 1.0.0-beta.4(typescript@5.9.3)
-      embla-carousel: 8.6.0
-      embla-carousel-class-names: 8.6.0(embla-carousel@8.6.0)
-      embla-carousel-react: 8.6.0(react@19.2.3)
-      embla-carousel-wheel-gestures: 8.1.0(embla-carousel@8.6.0)
-      lucide-react: 0.562.0(react@19.2.3)
-      postcss: 8.5.6
-      radix-ui: 1.4.3(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
-      tailwind-merge: 3.4.0
-      tailwindcss: 4.1.18
-      tw-animate-css: 1.4.0
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - '@swc/helpers'
-      - '@types/node'
-      - '@types/react'
-      - '@types/react-dom'
-      - class-variance-authority
-      - jiti
-      - less
-      - lightningcss
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-      - tsx
-      - vite
-      - yaml
-
   '@pkgr/core@0.2.9': {}
 
   '@quansync/fs@1.0.0':
@@ -13173,15 +13067,6 @@ snapshots:
       '@radix-ui/react-visually-hidden': 1.2.4(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.0))(react@19.2.0)
       react: 19.2.0
       react-dom: 19.2.3(react@19.2.0)
-    optionalDependencies:
-      '@types/react': 18.3.27
-      '@types/react-dom': 19.2.3(@types/react@18.3.27)
-
-  '@radix-ui/react-accessible-icon@1.1.8(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
-    dependencies:
-      '@radix-ui/react-visually-hidden': 1.2.4(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
     optionalDependencies:
       '@types/react': 18.3.27
       '@types/react-dom': 19.2.3(@types/react@18.3.27)
@@ -13629,15 +13514,6 @@ snapshots:
       '@types/react': 18.3.27
       '@types/react-dom': 19.2.3(@types/react@18.3.27)
 
-  '@radix-ui/react-primitive@2.1.4(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
-    dependencies:
-      '@radix-ui/react-slot': 1.2.4(@types/react@18.3.27)(react@19.2.3)
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
-    optionalDependencies:
-      '@types/react': 18.3.27
-      '@types/react-dom': 19.2.3(@types/react@18.3.27)
-
   '@radix-ui/react-progress@1.1.7(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
       '@radix-ui/react-context': 1.1.2(@types/react@18.3.27)(react@19.2.3)
@@ -13768,13 +13644,6 @@ snapshots:
     dependencies:
       '@radix-ui/react-compose-refs': 1.1.2(@types/react@18.3.27)(react@19.2.0)
       react: 19.2.0
-    optionalDependencies:
-      '@types/react': 18.3.27
-
-  '@radix-ui/react-slot@1.2.4(@types/react@18.3.27)(react@19.2.3)':
-    dependencies:
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@18.3.27)(react@19.2.3)
-      react: 19.2.3
     optionalDependencies:
       '@types/react': 18.3.27
 
@@ -13965,15 +13834,6 @@ snapshots:
       '@radix-ui/react-primitive': 2.1.4(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.0))(react@19.2.0)
       react: 19.2.0
       react-dom: 19.2.3(react@19.2.0)
-    optionalDependencies:
-      '@types/react': 18.3.27
-      '@types/react-dom': 19.2.3(@types/react@18.3.27)
-
-  '@radix-ui/react-visually-hidden@1.2.4(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
-    dependencies:
-      '@radix-ui/react-primitive': 2.1.4(@types/react-dom@19.2.3(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
     optionalDependencies:
       '@types/react': 18.3.27
       '@types/react-dom': 19.2.3(@types/react@18.3.27)
@@ -14344,13 +14204,6 @@ snapshots:
       '@tailwindcss/oxide': 4.1.18
       tailwindcss: 4.1.18
       vite: rolldown-vite@7.3.0(@types/node@24.10.1)(jiti@2.6.1)(yaml@2.8.1)
-
-  '@tailwindcss/vite@4.1.18(vite@6.4.1(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.1))':
-    dependencies:
-      '@tailwindcss/node': 4.1.18
-      '@tailwindcss/oxide': 4.1.18
-      tailwindcss: 4.1.18
-      vite: 6.4.1(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.1)
 
   '@tanstack/eslint-plugin-query@5.91.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
