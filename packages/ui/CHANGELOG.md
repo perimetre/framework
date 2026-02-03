@@ -1,5 +1,16 @@
 # @perimetre/ui
 
+## 13.5.0
+
+### Minor Changes
+
+- 297178a: Updated sprig design. New Drawer component
+
+### Patch Changes
+
+- Updated dependencies [8649398]
+  - @perimetre/classnames@0.1.0
+
 ## 13.4.2
 
 ### Patch Changes

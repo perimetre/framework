@@ -1,5 +1,11 @@
 # @perimetre/classnames
 
+## 0.1.0
+
+### Minor Changes
+
+- 8649398: Added option of having a createCn method
+
 ## 0.0.4
 
 ### Patch Changes
