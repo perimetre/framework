@@ -41,6 +41,13 @@
     --pui-color-control-checkmark: #ffffff;
     --pui-color-control-checkmark-inverted: #69c14c;
 
+    /* Sprig input field tokens - squared with subtle styling */
+    --pui-color-input-bg: #f9f9f9;
+    --pui-color-input-border: #f5f5f5;
+    --pui-color-input-border-focus: #69c14c;
+    --pui-radius-input: 0;
+    --pui-shadow-input-focus: none;
+
     /* Sprig uses small rounded corners for badges */
     --pui-radius-badge: 0;
     --pui-radius-control: 0;

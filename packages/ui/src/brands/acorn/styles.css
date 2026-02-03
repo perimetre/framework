@@ -91,6 +91,13 @@
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-12);
 
     /* ========================================
+     * COLOR - Input Fields
+     * ======================================== */
+    --pui-color-input-bg: var(--pui-color-bg-default);
+    --pui-color-input-border: var(--pui-color-border-default);
+    --pui-color-input-border-focus: var(--pui-color-border-focus);
+
+    /* ========================================
      * COLOR - Form Controls (checkbox/radio)
      * ======================================== */
     --pui-color-control-unchecked-bg: var(--pui-color-bg-default);

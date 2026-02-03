@@ -83,6 +83,11 @@
   --color-pui-interactive-primary: var(--pui-color-interactive-primary);
   --color-pui-interactive-on-primary: var(--pui-color-interactive-on-primary);
 
+  /* Input field colors */
+  --color-pui-input-bg: var(--pui-color-input-bg);
+  --color-pui-input-border: var(--pui-color-input-border);
+  --color-pui-input-border-focus: var(--pui-color-input-border-focus);
+
   /* Form control colors (checkbox/radio) */
   --color-pui-control-unchecked-bg: var(--pui-color-control-unchecked-bg);
   --color-pui-control-unchecked-border: var(
