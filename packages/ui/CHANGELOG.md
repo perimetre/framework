@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.7.0
+
+### Minor Changes
+
+- 62c1856: Added <FieldSelect input
+
 ## 13.6.0
 
 ### Minor Changes
