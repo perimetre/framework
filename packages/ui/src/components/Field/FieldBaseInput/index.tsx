@@ -6,7 +6,7 @@ import { Slot } from 'radix-ui';
 /**
  * Input variants using semantic tokens for themeable properties:
  * - bg-pui-input-bg: Input background (--pui-color-input-bg)
- * - text-pui-fg-default: Input text (--pui-color-fg-default)
+ * - text-pui-input-text: Input text (--pui-color-input-text)
  * - border-pui-input-border: Input border (--pui-color-input-border)
  * - rounded-pui-input: Input radius (--pui-radius-input)
  * - shadow-pui-input-focus: Input focus ring (--pui-shadow-input-focus)
@@ -16,11 +16,11 @@ const inputVariants = cva({
     // Structural styles - hardcoded
     'pui:col-start-1 pui:row-start-1 pui:block pui:w-full pui:px-3 pui:py-1.5 pui:text-base pui:border pui:border-solid pui:sm:text-sm/6',
     // Semantic color tokens - themeable
-    'pui:bg-pui-input-bg pui:text-pui-fg-default pui:border-pui-input-border',
+    'pui:bg-pui-input-bg pui:text-pui-input-text pui:border-pui-input-border',
     // Semantic shape tokens - themeable
     'pui:rounded-pui-input',
-    // Placeholder uses semantic muted token
-    'pui:placeholder:text-pui-fg-subtle',
+    // Placeholder uses semantic input placeholder token
+    'pui:placeholder:text-pui-input-placeholder',
     // Focus uses semantic tokens
     'pui:focus:outline-none pui:focus:shadow-pui-input-focus pui:focus:border-pui-input-border-focus',
     // Semantic motion tokens - themeable

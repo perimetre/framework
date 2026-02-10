@@ -58,6 +58,13 @@ Default.args = {
   placeholder: 'Select an option…'
 };
 
+export const Placeholder: Story<Props> = (props) => <Default {...props} />;
+Placeholder.args = {
+  ...Default.args,
+  description: 'Shows placeholder text when no value is selected.',
+  value: ''
+};
+
 export const Description: Story<Props> = (props) => <Default {...props} />;
 Description.args = {
   ...Default.args,

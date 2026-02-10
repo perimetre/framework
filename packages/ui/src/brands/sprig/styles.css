@@ -32,6 +32,10 @@
     /* Sprig uses light text on primary (green is dark enough) */
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
 
+    /* Sprig input text and placeholder */
+    --pui-color-input-text: #2c2826;
+    --pui-color-input-placeholder: #a7a8aa;
+
     /* Sprig checkbox/radio tokens */
     --pui-color-control-unchecked-bg: #f5f5f5;
     --pui-color-control-unchecked-border: #d4d4d4;

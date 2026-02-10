@@ -96,6 +96,8 @@
     --pui-color-input-bg: var(--pui-color-bg-default);
     --pui-color-input-border: var(--pui-color-border-default);
     --pui-color-input-border-focus: var(--pui-color-border-focus);
+    --pui-color-input-text: var(--pui-color-fg-default);
+    --pui-color-input-placeholder: var(--pui-color-fg-subtle);
 
     /* ========================================
      * COLOR - Form Controls (checkbox/radio)

@@ -6,7 +6,7 @@ import FieldContainer from '../FieldContainer';
 import FieldLower, { type FieldLowerProps } from '../FieldLower';
 import FieldUpper, { type FieldUpperProps } from '../FieldUpper';
 
-export type FieldSelectOption = { label: string; value: string; };
+export type FieldSelectOption = { label: string; value: string };
 
 export type FieldSelectProps = {
   containerClassName?: string;
@@ -16,7 +16,10 @@ export type FieldSelectProps = {
   placeholder?: string;
   trailing?: React.ReactNode;
 } & ForceRequiredProps<Partial<FieldLowerProps>, 'error'> &
-  Omit<React.ComponentPropsWithRef<'select'>, 'children' | 'multiple' | 'name'> &
+  Omit<
+    React.ComponentPropsWithRef<'select'>,
+    'children' | 'multiple' | 'name'
+  > &
   Partial<FieldUpperProps>;
 
 /**
@@ -66,6 +69,7 @@ const FieldSelect: React.FC<FieldSelectProps> = ({
           id={id}
           leading={!!leading}
           name={name}
+          placeholder={value === ''}
           required={!!required}
           value={value}
           aria-describedby={

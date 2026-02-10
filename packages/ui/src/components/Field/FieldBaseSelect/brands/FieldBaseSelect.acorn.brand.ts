@@ -10,7 +10,8 @@ import { cva } from '@/lib/cva';
  * trailing chevron addon can be shown consistently.
  *
  * Semantic tokens used (same as FieldBaseInput; do not add select-only tokens):
- * - bg-pui-input-bg, text-pui-fg-default, border-pui-input-border (--pui-color-*)
+ * - bg-pui-input-bg, text-pui-input-text, border-pui-input-border (--pui-color-*)
+ * - text-pui-input-placeholder when placeholder variant (empty value)
  * - rounded-pui-input (--pui-radius-input)
  * - shadow-pui-input-focus, border-pui-input-border-focus (focus)
  * - duration-pui-normal (--pui-duration-normal)
@@ -22,7 +23,7 @@ export const fieldBaseSelectAcornVariants = cva({
     // Structural styles - hardcoded (grid, layout, padding, typography, border)
     'pui:col-start-1 pui:row-start-1 pui:block pui:w-full pui:px-3 pui:py-1.5 pui:text-base pui:border pui:border-solid pui:sm:text-sm/6',
     // Semantic: input field colors (reused from FieldBaseInput – same purpose)
-    'pui:bg-pui-input-bg pui:text-pui-fg-default pui:border-pui-input-border',
+    'pui:bg-pui-input-bg pui:text-pui-input-text pui:border-pui-input-border',
     // Semantic: input radius (reused)
     'pui:rounded-pui-input',
     // Semantic: focus ring and border (reused)
@@ -35,6 +36,11 @@ export const fieldBaseSelectAcornVariants = cva({
     'pui:appearance-none pui:cursor-pointer'
   ],
   variants: {
+    // Semantic: show placeholder color when no value selected (same as text input)
+    placeholder: {
+      false: null,
+      true: 'pui:text-pui-input-placeholder'
+    },
     // Semantic: feedback error (reused)
     error: {
       false: null,

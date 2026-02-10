@@ -6,13 +6,10 @@ import {
 } from './brands';
 
 export type FieldBaseSelectProps = ForceRequiredProps<
-    FieldBaseSelectVariantProps,
-    'error' | 'leading' | 'trailing'
-  > &
-  ForceRequiredProps<
-  React.ComponentPropsWithRef<'select'>,
-  'name'
->;
+  FieldBaseSelectVariantProps,
+  'error' | 'leading' | 'placeholder' | 'trailing'
+> &
+  ForceRequiredProps<React.ComponentPropsWithRef<'select'>, 'name'>;
 
 /**
  * Base native select for a Field. Styled like FieldBaseInput via the same tokens.
@@ -24,15 +21,22 @@ const FieldBaseSelect: React.FC<FieldBaseSelectProps> = ({
   id,
   leading,
   name,
+  placeholder: isPlaceholder,
   trailing,
   ...props
 }) => {
   const selectVariants = getBrandVariant(fieldBaseSelectBrandVariants);
   return (
     <select
-      className={selectVariants({ className, error, leading, trailing })}
       id={id ?? (name ? `${name}-input` : undefined)}
       name={name}
+      className={selectVariants({
+        className,
+        error,
+        leading,
+        placeholder: isPlaceholder,
+        trailing
+      })}
       {...props}
     />
   );
