@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.7.1
+
+### Patch Changes
+
+- 99ecdcb: Fixed sprig input color tokens
+
 ## 13.7.0
 
 ### Minor Changes
