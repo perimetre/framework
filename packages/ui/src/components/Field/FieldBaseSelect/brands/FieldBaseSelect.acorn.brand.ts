@@ -11,7 +11,7 @@ import { cva } from '@/lib/cva';
  *
  * Semantic tokens used (same as FieldBaseInput; do not add select-only tokens):
  * - bg-pui-input-bg, text-pui-input-text, border-pui-input-border (--pui-color-*)
- * - text-pui-input-placeholder when placeholder variant (empty value)
+ * - text-pui-input-placeholder via CSS :has(option[value=""]:checked) (works with uncontrolled inputs)
  * - rounded-pui-input (--pui-radius-input)
  * - shadow-pui-input-focus, border-pui-input-border-focus (focus)
  * - duration-pui-normal (--pui-duration-normal)
@@ -33,7 +33,9 @@ export const fieldBaseSelectAcornVariants = cva({
     // Semantic: disabled state (reused bg-subtle, fg-subtle)
     'pui:disabled:cursor-not-allowed pui:disabled:bg-pui-bg-subtle pui:disabled:text-pui-fg-subtle pui:disabled:border-pui-bg-subtle',
     // Structural: native select arrow hidden for addon chevron; pointer cursor
-    'pui:appearance-none pui:cursor-pointer'
+    'pui:appearance-none pui:cursor-pointer',
+    // Placeholder color when the empty-value option is selected (works with uncontrolled inputs)
+    'pui:has-[option[value=""]:checked]:text-pui-input-placeholder'
   ],
   variants: {
     // Semantic: show placeholder color when no value selected (same as text input)

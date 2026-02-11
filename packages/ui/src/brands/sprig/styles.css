@@ -55,5 +55,10 @@
     /* Sprig uses small rounded corners for badges */
     --pui-radius-badge: 0;
     --pui-radius-control: 0;
+
+    /* Sprig field labels: smaller, normal weight (matches typo-tiny text-typo-primary) */
+    --pui-field-label-font-size: var(--text-xs);
+    --pui-field-label-line-height: 150%;
+    --pui-field-label-font-weight: 400;
   }
 }

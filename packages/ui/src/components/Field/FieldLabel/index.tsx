@@ -30,7 +30,7 @@ const FieldLabel: React.FC<PropsWithChildren<FieldLabelProps>> = ({
       htmlFor={htmlFor ?? `${name}-input`}
       id={id ?? `${name}-label`}
       className={cn(
-        'pui:text-pui-fg-default pui:block pui:text-sm/6 pui:font-medium',
+        'pui:block pui:text-[length:var(--pui-field-label-font-size)] pui:leading-[var(--pui-field-label-line-height)] pui:font-[number:var(--pui-field-label-font-weight)] pui:text-[color:var(--pui-field-label-color)]',
         className
       )}
       {...props}

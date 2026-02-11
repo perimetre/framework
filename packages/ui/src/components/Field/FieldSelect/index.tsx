@@ -69,7 +69,7 @@ const FieldSelect: React.FC<FieldSelectProps> = ({
           id={id}
           leading={!!leading}
           name={name}
-          placeholder={value === ''}
+          placeholder={false}
           required={!!required}
           value={value}
           aria-describedby={

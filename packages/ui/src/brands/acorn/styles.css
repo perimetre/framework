@@ -148,6 +148,14 @@
     --pui-text-transform-label: uppercase;
 
     /* ========================================
+     * TYPOGRAPHY - Field Label
+     * ======================================== */
+    --pui-field-label-font-size: var(--text-sm);
+    --pui-field-label-line-height: var(--text-sm--line-height);
+    --pui-field-label-font-weight: 500;
+    --pui-field-label-color: var(--pui-color-fg-default);
+
+    /* ========================================
      * MOTION
      * ======================================== */
     --pui-duration-normal: var(--pui-primitive-duration-normal);

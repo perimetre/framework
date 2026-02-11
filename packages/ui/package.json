@@ -59,6 +59,11 @@
         "./dist/*/index.d.ts"
       ]
     },
+    "./*/index": {
+      "import": "./dist/es/*.js",
+      "require": "./dist/cjs/*.js",
+      "types": "./dist/*/index.d.ts"
+    },
     "./package.json": "./package.json",
     "./src/*": "./src/*",
     "./styles/*.css": "./dist/styles/*.css"
