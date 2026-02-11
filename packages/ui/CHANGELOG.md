@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.7.2
+
+### Patch Changes
+
+- 04b381c: Fixes <FieldSelect /> placeholder, and update SPRIG branded colors
+
 ## 13.7.1
 
 ### Patch Changes
