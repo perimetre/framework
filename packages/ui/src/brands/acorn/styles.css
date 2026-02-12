@@ -156,6 +156,33 @@
     --pui-field-label-color: var(--pui-color-fg-default);
 
     /* ========================================
+     * COLOR - Dropdown/Overlay
+     * ======================================== */
+    --pui-color-dropdown-bg: var(--pui-color-bg-default);
+    --pui-color-dropdown-border: var(--pui-color-border-default);
+    --pui-color-dropdown-text: var(--pui-color-fg-default);
+    --pui-color-dropdown-text-secondary: var(--pui-color-fg-muted);
+    --pui-color-dropdown-text-matched: var(--pui-color-interactive-primary);
+    --pui-color-dropdown-text-active: var(--pui-color-fg-default);
+    --pui-color-dropdown-text-secondary-active: var(--pui-color-fg-muted);
+    --pui-color-dropdown-text-matched-active: var(
+      --pui-color-interactive-primary
+    );
+    --pui-color-dropdown-item-bg: var(--pui-color-bg-default);
+    --pui-color-dropdown-item-hover-bg: var(--pui-primitive-color-overlay-3);
+    --pui-color-dropdown-separator: var(--pui-primitive-color-overlay-4);
+
+    /* ========================================
+     * ELEVATION - Dropdown
+     * ======================================== */
+    --pui-shadow-dropdown: var(--pui-primitive-shadow-md);
+
+    /* ========================================
+     * SHAPE - Dropdown
+     * ======================================== */
+    --pui-radius-dropdown: var(--pui-radius-input);
+
+    /* ========================================
      * MOTION
      * ======================================== */
     --pui-duration-normal: var(--pui-primitive-duration-normal);

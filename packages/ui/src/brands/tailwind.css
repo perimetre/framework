@@ -125,6 +125,27 @@
   --shadow-pui-button-hover: var(--pui-shadow-button-hover);
   --shadow-pui-input: var(--pui-shadow-input);
   --shadow-pui-input-focus: var(--pui-shadow-input-focus);
+  --shadow-pui-dropdown: var(--pui-shadow-dropdown);
+
+  /* ========================================
+   * DROPDOWN/OVERLAY TOKENS
+   * ======================================== */
+  --color-pui-dropdown-bg: var(--pui-color-dropdown-bg);
+  --color-pui-dropdown-border: var(--pui-color-dropdown-border);
+  --color-pui-dropdown-text: var(--pui-color-dropdown-text);
+  --color-pui-dropdown-text-secondary: var(--pui-color-dropdown-text-secondary);
+  --color-pui-dropdown-text-matched: var(--pui-color-dropdown-text-matched);
+  --color-pui-dropdown-text-active: var(--pui-color-dropdown-text-active);
+  --color-pui-dropdown-text-secondary-active: var(
+    --pui-color-dropdown-text-secondary-active
+  );
+  --color-pui-dropdown-text-matched-active: var(
+    --pui-color-dropdown-text-matched-active
+  );
+  --color-pui-dropdown-item-bg: var(--pui-color-dropdown-item-bg);
+  --color-pui-dropdown-item-hover-bg: var(--pui-color-dropdown-item-hover-bg);
+  --color-pui-dropdown-separator: var(--pui-color-dropdown-separator);
+  --radius-pui-dropdown: var(--pui-radius-dropdown);
 }
 
 /* ========================================

@@ -60,5 +60,14 @@
     --pui-field-label-font-size: var(--text-xs);
     --pui-field-label-line-height: 150%;
     --pui-field-label-font-weight: 400;
+
+    /* Sprig dropdown - matches squared input styling */
+    --pui-color-dropdown-bg: #f9f9f9;
+    --pui-color-dropdown-border: #f5f5f5;
+    --pui-color-dropdown-item-bg: #fff;
+    --pui-color-dropdown-item-hover-bg: #f9f9f9;
+    --pui-color-dropdown-separator: #f5f5f5;
+    --pui-shadow-dropdown: none;
+    --pui-radius-dropdown: 0;
   }
 }

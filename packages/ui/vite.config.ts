@@ -67,6 +67,7 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
+        '@googlemaps/js-api-loader',
         'react',
         'react-dom',
         'react/jsx-runtime',

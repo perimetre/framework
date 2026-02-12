@@ -11,7 +11,7 @@ import { Slot } from 'radix-ui';
  * - rounded-pui-input: Input radius (--pui-radius-input)
  * - shadow-pui-input-focus: Input focus ring (--pui-shadow-input-focus)
  */
-const inputVariants = cva({
+export const inputVariants = cva({
   base: [
     // Structural styles - hardcoded
     'pui:col-start-1 pui:row-start-1 pui:block pui:w-full pui:px-3 pui:py-1.5 pui:text-base pui:border pui:border-solid pui:sm:text-sm/6',

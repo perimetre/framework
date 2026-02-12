@@ -18,6 +18,7 @@ pnpm-debug.log*
 .DS_Store
 
 # Environment
+.env
 .env.local
 
 .npmrc.local
