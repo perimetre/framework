@@ -1,5 +1,12 @@
 # @perimetre/ui
 
+## 13.8.0
+
+### Minor Changes
+
+- 1a546de: Added <FieldAutocomplete /> component
+- 1a546de: Added <FieldGooglePlacesAutocomplete /> component
+
 ## 13.7.2
 
 ### Patch Changes
