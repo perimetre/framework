@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@headlessui/react": "^2.2.9",
     "@ladle/react": "^5.1.1",
     "@perimetre/classnames": "workspace:*",
     "@perimetre/helpers": "workspace:*",
