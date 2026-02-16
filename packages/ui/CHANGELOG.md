@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.8.2
+
+### Patch Changes
+
+- 056ea1e: Fixes controlled input behavior
+
 ## 13.8.1
 
 ### Patch Changes
