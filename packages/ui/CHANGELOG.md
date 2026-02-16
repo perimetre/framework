@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.8.3
+
+### Patch Changes
+
+- 275ddd2: Fixes <FieldAutocomplete immediate mode
+
 ## 13.8.2
 
 ### Patch Changes
