@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.8.7
+
+### Patch Changes
+
+- 8d35b6a: Fixes google input event
+
 ## 13.8.6
 
 ### Patch Changes
