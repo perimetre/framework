@@ -110,9 +110,11 @@ function FieldBaseAutocomplete<T extends AutocompleteItem>({
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onChange: isReadOnly ? () => {} : (onChange as (value: null | T) => void),
     onClose,
-    ...(value !== undefined ? { value: value ?? undefined } : {}),
+    // Headless UI uses `value !== undefined` to determine controlled vs uncontrolled mode.
+    // We preserve null (controlled, no selection) instead of coercing to undefined (uncontrolled).
+    ...(value !== undefined ? { value: value as T | undefined } : {}),
     ...(defaultValue !== undefined
-      ? { defaultValue: defaultValue ?? undefined }
+      ? { defaultValue: defaultValue as T | undefined }
       : {}),
     ...(isVirtual ? { virtual: { options: items } } : {})
   };

@@ -24,8 +24,111 @@ export type FieldAutocompleteProps<T extends AutocompleteItem> = {
  * label, addons, description, error, hint. Uses `\@headlessui/react` Combobox
  * for accessible autocomplete with keyboard navigation.
  *
- * Filtering is NOT done internally — consumers pass filtered `items` and
+ * Filtering is **not** done internally — consumers pass filtered `items` and
  * use `onQueryChange` to drive their own filter/fetch logic.
+ * @example
+ * **Basic usage (uncontrolled with client-side filtering):**
+ * ```tsx
+ * const allItems = [
+ *   { id: 1, label: 'Apple' },
+ *   { id: 2, label: 'Banana' },
+ *   { id: 3, label: 'Cherry' },
+ * ];
+ *
+ * const [query, setQuery] = useState('');
+ * const filtered = useMemo(
+ *   () =>
+ *     query === ''
+ *       ? allItems
+ *       : allItems.filter((item) =>
+ *           item.label.toLowerCase().includes(query.toLowerCase())
+ *         ),
+ *   [allItems, query]
+ * );
+ *
+ * <FieldAutocomplete
+ *   name="fruit"
+ *   label="Favorite Fruit"
+ *   error={errors.fruit?.message}
+ *   items={filtered}
+ *   onQueryChange={setQuery}
+ *   onClose={() => setQuery('')}
+ * />
+ * ```
+ * @example
+ * **Controlled with react-hook-form (`Controller`):**
+ *
+ * Use `Controller` when the form value differs from the autocomplete item
+ * (e.g. storing a country code string instead of the full item object).
+ * ```tsx
+ * <Controller
+ *   control={control}
+ *   name="countryCode"
+ *   render={({ field, fieldState }) => {
+ *     const selected =
+ *       countries.find((c) => c.id === field.value) ?? null;
+ *     return (
+ *       <FieldAutocomplete
+ *         name={field.name}
+ *         label="Country"
+ *         error={fieldState.error?.message}
+ *         items={filteredCountries}
+ *         value={selected}
+ *         onChange={(item) => {
+ *           if (item && 'id' in item) {
+ *             field.onChange(item.id);
+ *           } else {
+ *             field.onChange('');
+ *           }
+ *         }}
+ *         onClose={() => {
+ *           field.onBlur();
+ *           setQuery('');
+ *         }}
+ *         onQueryChange={setQuery}
+ *       />
+ *     );
+ *   }}
+ * />
+ * ```
+ * @example
+ * **Virtual scrolling for large lists:**
+ * ```tsx
+ * <FieldAutocomplete
+ *   isVirtual
+ *   name="item"
+ *   label="Select Item"
+ *   error={errors.item?.message}
+ *   items={filteredItems}
+ *   onQueryChange={setQuery}
+ *   onClose={() => setQuery('')}
+ * />
+ * ```
+ * @example
+ * **Async loading:**
+ * ```tsx
+ * const [isLoading, setIsLoading] = useState(false);
+ * const [items, setItems] = useState<AutocompleteItem[]>([]);
+ *
+ * const handleQueryChange = (q: string) => {
+ *   if (!q) { setItems([]); return; }
+ *   setIsLoading(true);
+ *   fetchItems(q).then((results) => {
+ *     setItems(results);
+ *     setIsLoading(false);
+ *   });
+ * };
+ *
+ * <FieldAutocomplete
+ *   name="search"
+ *   label="Search"
+ *   error={errors.search?.message}
+ *   isLoading={isLoading}
+ *   items={items}
+ *   onQueryChange={handleQueryChange}
+ *   onClose={() => setItems([])}
+ * />
+ * ```
  */
 function FieldAutocomplete<T extends AutocompleteItem>({
   containerClassName,
