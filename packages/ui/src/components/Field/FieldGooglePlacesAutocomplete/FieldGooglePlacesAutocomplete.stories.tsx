@@ -348,17 +348,16 @@ export const AddressForm: Story<Props> = ({ ...props }) => {
           {...props}
           fields={['formattedAddress', 'addressComponents']}
           name="street-address"
-          formatDisplayValue={(place) => {
-            const components = place.addressComponents;
+          formatDisplayValue={(place: google.maps.places.Place) => {
             const street = [
-              getAddressComponent(components, 'street_number'),
-              getAddressComponent(components, 'route')
+              getAddressComponent(place.addressComponents, 'street_number'),
+              getAddressComponent(place.addressComponents, 'route')
             ]
               .filter(Boolean)
               .join(' ');
             return street || undefined;
           }}
-          onPlaceSelect={(place) => {
+          onPlaceSelect={(place: google.maps.places.Place) => {
             const components = place.addressComponents;
             setFields({
               city:
@@ -384,30 +383,38 @@ export const AddressForm: Story<Props> = ({ ...props }) => {
         >
           <FieldInput
             disabled
+            error={undefined}
             label="City"
             name="city"
             placeholder="Filled automatically"
+            required={false}
             value={fields.city}
           />
           <FieldInput
             disabled
+            error={undefined}
             label="State / Province"
             name="state"
             placeholder="Filled automatically"
+            required={false}
             value={fields.state}
           />
           <FieldInput
             disabled
+            error={undefined}
             label="Country"
             name="country"
             placeholder="Filled automatically"
+            required={false}
             value={fields.country}
           />
           <FieldInput
             disabled
+            error={undefined}
             label="Postal Code"
             name="postal-code"
             placeholder="Filled automatically"
+            required={false}
             value={fields.postalCode}
           />
         </div>
