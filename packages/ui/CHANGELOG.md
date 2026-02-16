@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.8.5
+
+### Patch Changes
+
+- fd86533: Fixes more inheritance on google
+
 ## 13.8.4
 
 ### Patch Changes
