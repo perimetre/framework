@@ -97,6 +97,7 @@ function getShadowStyles(): string {
 /* ──────────── HOST ──────────── */
 
 :host {
+  font-family: inherit !important;
   line-height: inherit !important;
   overflow: visible !important;
   position: relative !important;
