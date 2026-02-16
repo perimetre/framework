@@ -97,10 +97,16 @@ function getShadowStyles(): string {
 /* ──────────── HOST ──────────── */
 
 :host {
-  font-family: inherit !important;
+  color: inherit !important;
+  font: inherit !important;
+  letter-spacing: inherit !important;
   line-height: inherit !important;
   overflow: visible !important;
   position: relative !important;
+  text-transform: inherit !important;
+  word-spacing: inherit !important;
+  -webkit-font-smoothing: inherit !important;
+  -moz-osx-font-smoothing: inherit !important;
 }
 
 /* ──────────── INPUT AREA ──────────── */
