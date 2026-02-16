@@ -1,8 +1,10 @@
 import type { Story, StoryDefault } from '@ladle/react';
 import { AlertTriangle, MapPin, Utensils } from 'lucide-react';
+import { useState } from 'react';
 import FieldGooglePlacesAutocomplete, {
   type FieldGooglePlacesAutocompleteProps
 } from '.';
+import FieldInput from '../FieldInput';
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -303,4 +305,118 @@ WithAddressComponents.args = {
   placeholder: 'Search for an address...',
   hint: 'Fetches address components for parsing.',
   fields: ['formattedAddress', 'location', 'addressComponents', 'plusCode']
+};
+
+/** Helper to extract a specific address component by type. */
+function getAddressComponent(
+  components: google.maps.places.AddressComponent[] | undefined,
+  type: string
+): string {
+  return components?.find((c) => c.types.includes(type))?.longText ?? '';
+}
+
+/**
+ * Address form - demonstrates `formatDisplayValue` and `onPlaceSelect`
+ * to fill a multi-field address form from a single autocomplete.
+ *
+ * When the user selects a place:
+ * - The autocomplete input shows only the street address
+ * - City, state, country, and postal code fields are filled automatically
+ *
+ * Requires `addressComponents` in the `fields` prop.
+ */
+export const AddressForm: Story<Props> = ({ ...props }) => {
+  const [fields, setFields] = useState({
+    city: '',
+    country: '',
+    postalCode: '',
+    state: ''
+  });
+
+  return (
+    <>
+      <MissingKeyBanner />
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+          maxWidth: 480
+        }}
+      >
+        <FieldGooglePlacesAutocomplete
+          {...props}
+          fields={['formattedAddress', 'addressComponents']}
+          name="street-address"
+          formatDisplayValue={(place) => {
+            const components = place.addressComponents;
+            const street = [
+              getAddressComponent(components, 'street_number'),
+              getAddressComponent(components, 'route')
+            ]
+              .filter(Boolean)
+              .join(' ');
+            return street || undefined;
+          }}
+          onPlaceSelect={(place) => {
+            const components = place.addressComponents;
+            setFields({
+              city:
+                getAddressComponent(components, 'locality') ||
+                getAddressComponent(components, 'sublocality_level_1') ||
+                getAddressComponent(components, 'administrative_area_level_2'),
+              country: getAddressComponent(components, 'country'),
+              postalCode: getAddressComponent(components, 'postal_code'),
+              state: getAddressComponent(
+                components,
+                'administrative_area_level_1'
+              )
+            });
+          }}
+        />
+
+        <div
+          style={{
+            display: 'grid',
+            gap: 16,
+            gridTemplateColumns: '1fr 1fr'
+          }}
+        >
+          <FieldInput
+            disabled
+            label="City"
+            name="city"
+            placeholder="Filled automatically"
+            value={fields.city}
+          />
+          <FieldInput
+            disabled
+            label="State / Province"
+            name="state"
+            placeholder="Filled automatically"
+            value={fields.state}
+          />
+          <FieldInput
+            disabled
+            label="Country"
+            name="country"
+            placeholder="Filled automatically"
+            value={fields.country}
+          />
+          <FieldInput
+            disabled
+            label="Postal Code"
+            name="postal-code"
+            placeholder="Filled automatically"
+            value={fields.postalCode}
+          />
+        </div>
+      </div>
+    </>
+  );
+};
+AddressForm.args = {
+  hint: 'Select an address to auto-fill city, state, country, and postal code.',
+  label: 'Street Address',
+  placeholder: 'Search for an address...'
 };

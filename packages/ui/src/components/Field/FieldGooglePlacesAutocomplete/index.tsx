@@ -22,6 +22,24 @@ export type FieldGooglePlacesAutocompleteProps = {
    */
   fields?: string[];
   /**
+   * When provided, called after a place is selected to determine what text
+   * to display in the input field. Useful for showing only the street address
+   * when other address fields (city, state, etc.) are filled separately via
+   * `onPlaceSelect`.
+   *
+   * Requires `addressComponents` in the `fields` prop for component-based parsing.
+   *
+   * If not provided or returns `undefined`, the input keeps Google's default
+   * behavior (showing the full formatted address).
+   * @example
+   * formatDisplayValue={(place) => {
+   *   const get = (type: string) =>
+   *     place.addressComponents?.find(c => c.types.includes(type))?.longText ?? '';
+   *   return [get('street_number'), get('route')].filter(Boolean).join(' ') || undefined;
+   * }}
+   */
+  formatDisplayValue?: (place: google.maps.places.Place) => string | undefined;
+  /**
    * Filter autocomplete results by primary place types.
    * @see https://developers.google.com/maps/documentation/javascript/place-types
    * @example ['restaurant', 'cafe', 'bar']
@@ -449,6 +467,7 @@ const FieldGooglePlacesAutocomplete: React.FC<
   disabled,
   error,
   fields = ['formattedAddress', 'location'],
+  formatDisplayValue,
   hint,
   includedPrimaryTypes,
   includedRegionCodes,
@@ -475,6 +494,8 @@ const FieldGooglePlacesAutocomplete: React.FC<
     null | typeof Element.prototype.attachShadow
   >(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const formatDisplayValueRef = useRef(formatDisplayValue);
+  formatDisplayValueRef.current = formatDisplayValue;
   const onPlaceSelectRef = useRef(onPlaceSelect);
   onPlaceSelectRef.current = onPlaceSelect;
   const onGeolocationResultRef = useRef(onGeolocationResult);
@@ -598,6 +619,18 @@ const FieldGooglePlacesAutocomplete: React.FC<
 
           // Pass the native Place object with the requested fields populated
           onPlaceSelect?.(place);
+
+          // Override the input display value if formatDisplayValue is provided
+          if (formatDisplayValueRef.current) {
+            const displayValue = formatDisplayValueRef.current(place);
+            if (displayValue !== undefined) {
+              const shadowInput =
+                autocompleteRef.current?.shadowRoot?.querySelector('input');
+              if (shadowInput) {
+                shadowInput.value = displayValue;
+              }
+            }
+          }
         } catch (err) {
           console.error('Error fetching place details:', err);
         }
