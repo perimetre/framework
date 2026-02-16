@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.8.4
+
+### Patch Changes
+
+- 88c4c11: Fixes font inheritance on PlacesAutocomplete
+
 ## 13.8.3
 
 ### Patch Changes
