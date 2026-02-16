@@ -6,16 +6,73 @@
      ** Raw design values named by what they ARE, not what they're FOR.
      ** These are NEVER directly consumed by components.
      ** Only semantic tokens should reference these.
+     **
+     ** Color scales follow Radix's 12-step philosophy:
+     ** 1-2: Backgrounds  |  3-5: Component backgrounds
+     ** 6-8: Borders      |  9-10: Solid/accent
+     ** 11-12: Text
+     **
+     ** For Sprig-specific app concerns (Tray, Discount, Nav Store Logo, etc.)
+     ** that don't map to shared components, consumers reference these
+     ** primitives directly (e.g. pui:bg-pui-primary-7 for discount green).
      */
 
     --pui-primitive-font-sans:
       'Gotham', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
       'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-    /* Sprig green tint */
-    --pui-primitive-color-primary-4: #88db6d;
-    /* Sprig green */
-    --pui-primitive-color-primary-6: #69c14c;
+    /* ========================================
+     * Sprig Green — 12-step primary scale
+     * Mapped from consumer's Medium Sea Green 50-950 palette
+     * Step 9 = hero/accent (Medium Sea Green/400 #69c14c)
+     * ======================================== */
+    --pui-primitive-color-primary-1: #dbfdd4;
+    --pui-primitive-color-primary-2: #bcfbad;
+    --pui-primitive-color-primary-3: #82ed5f;
+    --pui-primitive-color-primary-4: #76d756;
+    --pui-primitive-color-primary-5: #69c14c;
+    --pui-primitive-color-primary-6: #53a03e;
+    --pui-primitive-color-primary-7: #427d2e;
+    --pui-primitive-color-primary-8: #1f4114;
+    --pui-primitive-color-primary-9: #69c14c;
+    --pui-primitive-color-primary-10: #53a03e;
+    --pui-primitive-color-primary-11: #2f5d20;
+    --pui-primitive-color-primary-12: #0f2408;
+
+    /* ========================================
+     * Overlay (Neutral gray) — 12-step scale
+     * Consumer values: 50=#fff, 100=#f9f9f9, 200=#f5f5f5,
+     *   400=#a7a8aa, 500=#545454, 900=#2c2826
+     * Steps 4-7 and 9-10 are interpolated to complete the scale.
+     *
+     * Corporate site mapping:
+     *   super light grey = step 2 (#f9f9f9)
+     *   light grey       = step 3 (#f5f5f5)
+     *   lg-med grey      = step 8 (#a7a8aa)
+     *   mid grey         = step 11 (#545454)
+     *   dark grey        = step 12 (#2c2826)
+     * ======================================== */
+    --pui-primitive-color-overlay-1: #ffffff;
+    --pui-primitive-color-overlay-2: #f9f9f9;
+    --pui-primitive-color-overlay-3: #f5f5f5;
+    --pui-primitive-color-overlay-4: #e8e8e8;
+    --pui-primitive-color-overlay-5: #d4d4d4;
+    --pui-primitive-color-overlay-6: #c0c0c0;
+    --pui-primitive-color-overlay-7: #b3b3b3;
+    --pui-primitive-color-overlay-8: #a7a8aa;
+    --pui-primitive-color-overlay-9: #7a7a7a;
+    --pui-primitive-color-overlay-10: #666666;
+    --pui-primitive-color-overlay-11: #545454;
+    --pui-primitive-color-overlay-12: #2c2826;
+
+    /* ========================================
+     * Feedback — Red (error)
+     * Mapped from Tailwind Red palette per Figma spec
+     * ======================================== */
+    --pui-primitive-color-red-2: #fef2f2;
+    --pui-primitive-color-red-6: #fecaca;
+    --pui-primitive-color-red-9: #ef4444;
+    --pui-primitive-color-red-11: #ef4444;
   }
 }
 
@@ -24,49 +81,110 @@
     /**
      **  SEMANTIC TOKENS
      *
-     ** Purpose-based tokens that express design intent.
-     ** These are the PUBLIC API consumed by components.
-     ** Themes override these to create different visual styles.
+     ** Only values that DIFFER from Acorn base (different Radix step
+     ** or reference) are defined here. Everything else is inherited —
+     ** the primitive overrides above handle value changes automatically.
      */
 
-    /* Sprig uses light text on primary (green is dark enough) */
+    /* ========================================
+     * COLOR - Interactive
+     * Sprig uses light text on primary (green bg)
+     * Acorn: overlay-12 → Sprig: overlay-1
+     * ======================================== */
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
 
-    /* Sprig input text and placeholder */
-    --pui-color-input-text: #2c2826;
-    --pui-color-input-placeholder: #a7a8aa;
+    /* ========================================
+     * COLOR - Foreground (icons only — text inherits via primitives)
+     * Figma: "Icon (Gray)" = lg-med grey = overlay-8
+     * Figma: "Icon (Chevron)" = mid grey = overlay-11
+     * Acorn: both overlay-9
+     * ======================================== */
+    --pui-color-fg-icon: var(--pui-primitive-color-overlay-8);
+    --pui-color-fg-icon-chevron: var(--pui-primitive-color-overlay-11);
 
-    /* Sprig checkbox/radio tokens */
-    --pui-color-control-unchecked-bg: #f5f5f5;
-    --pui-color-control-unchecked-border: #d4d4d4;
-    --pui-color-control-checked-bg: #69c14c;
-    --pui-color-control-checked-border: #427d2e;
-    --pui-color-control-checked-border-inverted: #69c14c;
-    --pui-color-control-checkmark: #ffffff;
-    --pui-color-control-checkmark-inverted: #69c14c;
+    /* ========================================
+     * COLOR - Border
+     * Figma: "Border/Rule - Primary" = mid grey = overlay-11 (Acorn: overlay-9)
+     * Figma: "Border/Rule - Secondary" = light grey = overlay-3 (Acorn: overlay-5)
+     * ======================================== */
+    --pui-color-border-rule-primary: var(--pui-primitive-color-overlay-11);
+    --pui-color-border-rule-secondary: var(--pui-primitive-color-overlay-3);
 
-    /* Sprig input field tokens - squared with subtle styling */
-    --pui-color-input-bg: #f9f9f9;
-    --pui-color-input-border: #f5f5f5;
-    --pui-color-input-border-focus: #69c14c;
+    /* ========================================
+     * COLOR - Button
+     * Figma: "Button Primary Fill" = mid grey (overlay-11), NOT primary green
+     * Figma: "Button Hover" / "Active Button" = Medium Sea Green/400 (primary-9)
+     * Acorn: primary-fill=interactive-primary, hover/active=primary-10
+     * ======================================== */
+    --pui-color-button-primary-fill: var(--pui-primitive-color-overlay-11);
+    --pui-color-button-hover: var(--pui-primitive-color-primary-9);
+    --pui-color-button-active: var(--pui-primitive-color-primary-9);
+
+    /* ========================================
+     * COLOR - Input Fields
+     * Figma: "Input Box" = super light grey = overlay-2 (Acorn: overlay-1)
+     * Figma: "Input Outline" = light grey = overlay-3 (Acorn: overlay-5)
+     * ======================================== */
+    --pui-color-input-bg: var(--pui-primitive-color-overlay-2);
+    --pui-color-input-border: var(--pui-primitive-color-overlay-3);
+    --pui-color-input-outline: var(--pui-primitive-color-overlay-3);
+
+    /* ========================================
+     * COLOR - Form Controls (checkbox/radio)
+     * Acorn: unchecked-bg=overlay-1 → Sprig: overlay-3
+     * Acorn: checked-border=primary-9 → Sprig: primary-7 (#427d2e)
+     * Acorn: checkmark=primary-9 → Sprig: overlay-1 (white)
+     * Acorn: checkmark-inverted=overlay-1 → Sprig: primary-9
+     * ======================================== */
+    --pui-color-control-unchecked-bg: var(--pui-primitive-color-overlay-3);
+    --pui-color-control-checked-border: var(--pui-primitive-color-primary-7);
+    --pui-color-control-checked-border-inverted: var(
+      --pui-primitive-color-primary-9
+    );
+    --pui-color-control-checkmark: var(--pui-primitive-color-overlay-1);
+    --pui-color-control-checkmark-inverted: var(
+      --pui-primitive-color-primary-9
+    );
+
+    /* ========================================
+     * COLOR - Table
+     * Figma: "Table/Inactive Item" = lg-med grey = overlay-8 (Acorn: overlay-6)
+     * ======================================== */
+    --pui-color-table-inactive-item: var(--pui-primitive-color-overlay-8);
+
+    /* ========================================
+     * SHAPE - Sprig uses squared corners
+     * ======================================== */
     --pui-radius-input: 0;
-    --pui-shadow-input-focus: none;
-
-    /* Sprig uses small rounded corners for badges */
     --pui-radius-badge: 0;
     --pui-radius-control: 0;
 
-    /* Sprig field labels: smaller, normal weight (matches typo-tiny text-typo-primary) */
+    /* ========================================
+     * ELEVATION
+     * ======================================== */
+    --pui-shadow-card: 7px 5px 30px 0 rgba(72, 73, 121, 0.15);
+    --pui-shadow-input-focus: none;
+
+    /* ========================================
+     * TYPOGRAPHY - Field Label
+     * Sprig uses smaller, lighter field labels
+     * ======================================== */
     --pui-field-label-font-size: var(--text-xs);
     --pui-field-label-line-height: 150%;
     --pui-field-label-font-weight: 400;
 
-    /* Sprig dropdown - matches squared input styling */
-    --pui-color-dropdown-bg: #f9f9f9;
-    --pui-color-dropdown-border: #f5f5f5;
-    --pui-color-dropdown-item-bg: #fff;
-    --pui-color-dropdown-item-hover-bg: #f9f9f9;
-    --pui-color-dropdown-separator: #f5f5f5;
+    /* ========================================
+     * COLOR - Dropdown
+     * Sprig: squared, subtle styling
+     * Acorn: dropdown-bg=overlay-1 → Sprig: overlay-2
+     * Acorn: dropdown-border=overlay-5 → Sprig: overlay-3
+     * Acorn: item-hover-bg=overlay-3 → Sprig: overlay-2
+     * Acorn: separator=overlay-4 → Sprig: overlay-3
+     * ======================================== */
+    --pui-color-dropdown-bg: var(--pui-primitive-color-overlay-2);
+    --pui-color-dropdown-border: var(--pui-primitive-color-overlay-3);
+    --pui-color-dropdown-item-hover-bg: var(--pui-primitive-color-overlay-2);
+    --pui-color-dropdown-separator: var(--pui-primitive-color-overlay-3);
     --pui-shadow-dropdown: none;
     --pui-radius-dropdown: 0;
   }

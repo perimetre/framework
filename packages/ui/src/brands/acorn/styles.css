@@ -7,15 +7,38 @@
      ** Raw design values named by what they ARE, not what they're FOR.
      ** These are NEVER directly consumed by components.
      ** Only semantic tokens should reference these.
+     **
+     ** Color scales follow Radix's 12-step philosophy:
+     ** 1-2: Backgrounds  |  3-5: Component backgrounds
+     ** 6-8: Borders      |  9-10: Solid/accent
+     ** 11-12: Text
+     ** @see https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale
      */
 
     --pui-primitive-font-sans:
       'Arial', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
       'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-    --pui-primitive-color-primary-6: hsl(172, 96%, 53%);
+    /* ========================================
+     * Acorn Teal — 12-step primary scale
+     * Step 9 = hero/accent (highest chroma)
+     * ======================================== */
+    --pui-primitive-color-primary-1: hsl(172, 60%, 98%);
+    --pui-primitive-color-primary-2: hsl(172, 55%, 95%);
+    --pui-primitive-color-primary-3: hsl(172, 60%, 89%);
+    --pui-primitive-color-primary-4: hsl(172, 65%, 82%);
+    --pui-primitive-color-primary-5: hsl(172, 70%, 74%);
+    --pui-primitive-color-primary-6: hsl(172, 75%, 65%);
+    --pui-primitive-color-primary-7: hsl(172, 80%, 55%);
+    --pui-primitive-color-primary-8: hsl(172, 90%, 45%);
+    --pui-primitive-color-primary-9: hsl(172, 96%, 53%);
+    --pui-primitive-color-primary-10: hsl(172, 96%, 48%);
+    --pui-primitive-color-primary-11: hsl(172, 80%, 30%);
+    --pui-primitive-color-primary-12: hsl(172, 70%, 15%);
 
-    /* Sand */
+    /* ========================================
+     * Overlay (Sand) — neutral gray scale
+     * ======================================== */
     --pui-primitive-color-overlay-1: #fdfdfc;
     --pui-primitive-color-overlay-2: #f9f9f8;
     --pui-primitive-color-overlay-3: #f1f0ef;
@@ -29,27 +52,90 @@
     --pui-primitive-color-overlay-11: #63635e;
     --pui-primitive-color-overlay-12: #21201c;
 
-    /* Feedback colors */
-    --pui-primitive-color-error: hsl(0, 72%, 51%);
-    --pui-primitive-color-error-strong: hsl(0, 84%, 60%);
-    --pui-primitive-color-error-light: hsl(0, 86%, 70%);
+    /* ========================================
+     * Feedback — Red (error) 12-step scale
+     * Step 9 = Radix Tomato-9 equivalent
+     * ======================================== */
+    --pui-primitive-color-red-1: #fff8f7;
+    --pui-primitive-color-red-2: #fff0ee;
+    --pui-primitive-color-red-3: #ffe5e2;
+    --pui-primitive-color-red-4: #fdd8d3;
+    --pui-primitive-color-red-5: #f9c6c2;
+    --pui-primitive-color-red-6: #f3b0ab;
+    --pui-primitive-color-red-7: #ea928c;
+    --pui-primitive-color-red-8: #e5484d;
+    --pui-primitive-color-red-9: #dc3d43;
+    --pui-primitive-color-red-10: #d13438;
+    --pui-primitive-color-red-11: #c62a2f;
+    --pui-primitive-color-red-12: #641723;
 
-    /* Shape primitives */
+    /* Feedback — Green (success) */
+    --pui-primitive-color-green-9: #30a46c;
+    --pui-primitive-color-green-11: #18794e;
+
+    /* Feedback — Amber (warning) */
+    --pui-primitive-color-amber-9: #f5a623;
+    --pui-primitive-color-amber-11: #ad5700;
+
+    /* Feedback — Blue (info) */
+    --pui-primitive-color-blue-9: #0091ff;
+    --pui-primitive-color-blue-11: #006adc;
+
+    /* ========================================
+     * Deprecated error aliases → use red scale
+     * ======================================== */
+    --pui-primitive-color-error: var(--pui-primitive-color-red-9);
+    --pui-primitive-color-error-strong: var(--pui-primitive-color-red-8);
+    --pui-primitive-color-error-light: var(--pui-primitive-color-red-5);
+
+    /* ========================================
+     * Shape primitives
+     * ======================================== */
     --pui-primitive-radius-none: 0;
     --pui-primitive-radius-sm: 0.25rem;
     --pui-primitive-radius-md: 0.375rem;
     --pui-primitive-radius-lg: 0.5rem;
     --pui-primitive-radius-full: 9999px;
 
-    /* Shadow primitives */
+    /* ========================================
+     * Shadow primitives
+     * ======================================== */
     --pui-primitive-shadow-none: none;
     --pui-primitive-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --pui-primitive-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 
-    /* Motion primitives */
+    /* ========================================
+     * Motion primitives
+     * ======================================== */
     --pui-primitive-duration-instant: 0ms;
     --pui-primitive-duration-fast: 100ms;
     --pui-primitive-duration-normal: 200ms;
+
+    /* ========================================
+     * Typography primitives
+     * ======================================== */
+    --pui-primitive-font-size-xs: 0.75rem;
+    --pui-primitive-font-size-sm: 0.875rem;
+    --pui-primitive-font-size-base: 1rem;
+    --pui-primitive-font-size-lg: 1.125rem;
+    --pui-primitive-font-size-xl: 1.25rem;
+    --pui-primitive-font-size-2xl: 1.5rem;
+    --pui-primitive-font-size-3xl: 1.875rem;
+    --pui-primitive-font-size-4xl: 2.25rem;
+    --pui-primitive-font-size-5xl: 3rem;
+    --pui-primitive-font-size-6xl: 3.5rem;
+
+    --pui-primitive-leading-none: 1;
+    --pui-primitive-leading-tight: 1.1;
+    --pui-primitive-leading-snug: 1.2;
+    --pui-primitive-leading-normal: 1.3;
+    --pui-primitive-leading-relaxed: 1.4;
+    --pui-primitive-leading-loose: 1.5;
+
+    --pui-primitive-font-weight-normal: 400;
+    --pui-primitive-font-weight-medium: 500;
+    --pui-primitive-font-weight-semibold: 600;
+    --pui-primitive-font-weight-bold: 700;
   }
 }
 
@@ -72,23 +158,50 @@
     --pui-color-bg-muted: var(--pui-primitive-color-overlay-5);
 
     /* ========================================
+     * COLOR - Surface (page/section backgrounds)
+     * ======================================== */
+    --pui-color-surface-primary: var(--pui-primitive-color-overlay-1);
+    --pui-color-surface-secondary: var(--pui-primitive-color-overlay-3);
+
+    /* ========================================
      * COLOR - Foreground (text, icons)
      * ======================================== */
     --pui-color-fg-default: var(--pui-primitive-color-overlay-12);
     --pui-color-fg-muted: var(--pui-primitive-color-overlay-11);
     --pui-color-fg-subtle: var(--pui-primitive-color-overlay-8);
 
+    /* Foreground — extended */
+    --pui-color-fg-body: var(--pui-primitive-color-overlay-12);
+    --pui-color-fg-link-primary: var(--pui-primitive-color-overlay-12);
+    --pui-color-fg-link-secondary: var(--pui-primitive-color-overlay-8);
+    --pui-color-fg-link-active: var(--pui-primitive-color-primary-11);
+    --pui-color-fg-icon: var(--pui-primitive-color-overlay-9);
+    --pui-color-fg-icon-chevron: var(--pui-primitive-color-overlay-9);
+
     /* ========================================
      * COLOR - Border
      * ======================================== */
     --pui-color-border-default: var(--pui-primitive-color-overlay-5);
-    --pui-color-border-focus: var(--pui-primitive-color-primary-6);
+    --pui-color-border-focus: var(--pui-primitive-color-primary-9);
+    --pui-color-border-rule-primary: var(--pui-primitive-color-overlay-9);
+    --pui-color-border-rule-secondary: var(--pui-primitive-color-overlay-5);
+    --pui-color-border-input: var(--pui-color-border-default);
 
     /* ========================================
      * COLOR - Interactive (buttons, links)
      * ======================================== */
-    --pui-color-interactive-primary: var(--pui-primitive-color-primary-6);
+    --pui-color-interactive-primary: var(--pui-primitive-color-primary-9);
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-12);
+
+    /* ========================================
+     * COLOR - Button
+     * ======================================== */
+    --pui-color-button-primary-fill: var(--pui-color-interactive-primary);
+    --pui-color-button-secondary-fill: var(--pui-color-bg-default);
+    --pui-color-button-secondary-outline: var(--pui-primitive-color-overlay-8);
+    --pui-color-button-hover: var(--pui-primitive-color-primary-10);
+    --pui-color-button-active: var(--pui-primitive-color-primary-10);
+    --pui-color-button-inactive: var(--pui-primitive-color-overlay-8);
 
     /* ========================================
      * COLOR - Input Fields
@@ -98,6 +211,8 @@
     --pui-color-input-border-focus: var(--pui-color-border-focus);
     --pui-color-input-text: var(--pui-color-fg-default);
     --pui-color-input-placeholder: var(--pui-color-fg-subtle);
+    --pui-color-input-box: var(--pui-primitive-color-overlay-2);
+    --pui-color-input-outline: var(--pui-primitive-color-overlay-5);
 
     /* ========================================
      * COLOR - Form Controls (checkbox/radio)
@@ -115,9 +230,26 @@
     /* ========================================
      * COLOR - Feedback
      * ======================================== */
-    --pui-color-feedback-error: var(--pui-primitive-color-error);
-    --pui-color-feedback-error-strong: var(--pui-primitive-color-error-strong);
-    --pui-color-feedback-error-light: var(--pui-primitive-color-error-light);
+    --pui-color-feedback-error: var(--pui-primitive-color-red-9);
+    --pui-color-feedback-error-strong: var(--pui-primitive-color-red-8);
+    --pui-color-feedback-error-light: var(--pui-primitive-color-red-5);
+    --pui-color-feedback-error-surface: var(--pui-primitive-color-red-2);
+    --pui-color-feedback-error-border: var(--pui-primitive-color-red-6);
+    --pui-color-feedback-error-text: var(--pui-primitive-color-red-11);
+
+    --pui-color-feedback-success: var(--pui-primitive-color-green-9);
+    --pui-color-feedback-success-text: var(--pui-primitive-color-green-11);
+
+    --pui-color-feedback-warning: var(--pui-primitive-color-amber-9);
+    --pui-color-feedback-warning-text: var(--pui-primitive-color-amber-11);
+
+    --pui-color-feedback-info: var(--pui-primitive-color-blue-9);
+    --pui-color-feedback-info-text: var(--pui-primitive-color-blue-11);
+
+    /* ========================================
+     * COLOR - Table
+     * ======================================== */
+    --pui-color-table-inactive-item: var(--pui-primitive-color-overlay-6);
 
     /* ========================================
      * SHAPE - Border radius
@@ -139,9 +271,11 @@
     --pui-shadow-button-hover: var(--pui-primitive-shadow-sm);
     --pui-shadow-input: var(--pui-primitive-shadow-none);
     --pui-shadow-input-focus: 0 0 0 2px var(--pui-color-border-focus);
+    --pui-shadow-card: var(--pui-primitive-shadow-md);
 
     /* ========================================
      * TYPOGRAPHY - Button/Label
+     * (Deprecated: use --pui-typo-button-* instead)
      * ======================================== */
     --pui-font-weight-label: 700;
     --pui-letter-spacing-label: 0.1125rem;
@@ -154,6 +288,125 @@
     --pui-field-label-line-height: var(--text-sm--line-height);
     --pui-field-label-font-weight: 500;
     --pui-field-label-color: var(--pui-color-fg-default);
+
+    /* ========================================
+     * TYPOGRAPHY - Semantic styles
+     *
+     * Each style defines: size, leading, weight, tracking, transform
+     * These power the pui:typo-* utility classes
+     * ======================================== */
+
+    /* Heading 1: 3.5rem / 100% / medium / -0.07rem / none */
+    --pui-typo-heading-1-size: var(--pui-primitive-font-size-6xl);
+    --pui-typo-heading-1-leading: var(--pui-primitive-leading-none);
+    --pui-typo-heading-1-weight: var(--pui-primitive-font-weight-medium);
+    --pui-typo-heading-1-tracking: -0.07rem;
+    --pui-typo-heading-1-transform: none;
+
+    /* Heading 2: 3rem / 110% / medium / 0 / none */
+    --pui-typo-heading-2-size: var(--pui-primitive-font-size-5xl);
+    --pui-typo-heading-2-leading: var(--pui-primitive-leading-tight);
+    --pui-typo-heading-2-weight: var(--pui-primitive-font-weight-medium);
+    --pui-typo-heading-2-tracking: 0;
+    --pui-typo-heading-2-transform: none;
+
+    /* Heading 3: 2.25rem / 120% / medium / 0 / none */
+    --pui-typo-heading-3-size: var(--pui-primitive-font-size-4xl);
+    --pui-typo-heading-3-leading: var(--pui-primitive-leading-snug);
+    --pui-typo-heading-3-weight: var(--pui-primitive-font-weight-medium);
+    --pui-typo-heading-3-tracking: 0;
+    --pui-typo-heading-3-transform: none;
+
+    /* Heading 4: 1.5rem / 130% / medium / 0 / none */
+    --pui-typo-heading-4-size: var(--pui-primitive-font-size-2xl);
+    --pui-typo-heading-4-leading: var(--pui-primitive-leading-normal);
+    --pui-typo-heading-4-weight: var(--pui-primitive-font-weight-medium);
+    --pui-typo-heading-4-tracking: 0;
+    --pui-typo-heading-4-transform: none;
+
+    /* Heading 5: 1rem / 140% / bold / 0 / none */
+    --pui-typo-heading-5-size: var(--pui-primitive-font-size-base);
+    --pui-typo-heading-5-leading: var(--pui-primitive-leading-relaxed);
+    --pui-typo-heading-5-weight: var(--pui-primitive-font-weight-bold);
+    --pui-typo-heading-5-tracking: 0;
+    --pui-typo-heading-5-transform: none;
+
+    /* Heading 6: 1rem / 140% / bold / 0 / none */
+    --pui-typo-heading-6-size: var(--pui-primitive-font-size-base);
+    --pui-typo-heading-6-leading: var(--pui-primitive-leading-relaxed);
+    --pui-typo-heading-6-weight: var(--pui-primitive-font-weight-bold);
+    --pui-typo-heading-6-tracking: 0;
+    --pui-typo-heading-6-transform: none;
+
+    /* Tagline: 1rem / 1rem / normal / 0 / none */
+    --pui-typo-tagline-size: var(--pui-primitive-font-size-base);
+    --pui-typo-tagline-leading: var(--pui-primitive-leading-none);
+    --pui-typo-tagline-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-tagline-tracking: 0;
+    --pui-typo-tagline-transform: none;
+
+    /* Large: 1.5rem / 120% / normal / 0 / none */
+    --pui-typo-large-size: var(--pui-primitive-font-size-2xl);
+    --pui-typo-large-leading: var(--pui-primitive-leading-snug);
+    --pui-typo-large-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-large-tracking: 0;
+    --pui-typo-large-transform: none;
+
+    /* Medium: 1.25rem / 140% / normal / 0 / none */
+    --pui-typo-medium-size: var(--pui-primitive-font-size-xl);
+    --pui-typo-medium-leading: var(--pui-primitive-leading-relaxed);
+    --pui-typo-medium-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-medium-tracking: 0;
+    --pui-typo-medium-transform: none;
+
+    /* Button: 1rem / 150% / bold / 0.02rem / uppercase */
+    --pui-typo-button-size: var(--pui-primitive-font-size-base);
+    --pui-typo-button-leading: var(--pui-primitive-leading-loose);
+    --pui-typo-button-weight: var(--pui-primitive-font-weight-bold);
+    --pui-typo-button-tracking: 0.02rem;
+    --pui-typo-button-transform: uppercase;
+
+    /* Base: 1rem / 140% / normal / 0 / none */
+    --pui-typo-base-size: var(--pui-primitive-font-size-base);
+    --pui-typo-base-leading: var(--pui-primitive-leading-relaxed);
+    --pui-typo-base-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-base-tracking: 0;
+    --pui-typo-base-transform: none;
+
+    /* Small: 0.875rem / 150% / normal / 0 / none */
+    --pui-typo-small-size: var(--pui-primitive-font-size-sm);
+    --pui-typo-small-leading: var(--pui-primitive-leading-loose);
+    --pui-typo-small-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-small-tracking: 0;
+    --pui-typo-small-transform: none;
+
+    /* Tiny: 0.75rem / 150% / normal / 0 / none */
+    --pui-typo-tiny-size: var(--pui-primitive-font-size-xs);
+    --pui-typo-tiny-leading: var(--pui-primitive-leading-loose);
+    --pui-typo-tiny-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-tiny-tracking: 0;
+    --pui-typo-tiny-transform: none;
+
+    /* Label: 0.5rem / 150% / normal / 0 / none */
+    --pui-typo-label-size: 0.5rem;
+    --pui-typo-label-leading: var(--pui-primitive-leading-loose);
+    --pui-typo-label-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-label-tracking: 0;
+    --pui-typo-label-transform: none;
+
+    /* Amount: 0.625rem / 150% / normal / 0 / none */
+    --pui-typo-amount-size: 0.625rem;
+    --pui-typo-amount-leading: var(--pui-primitive-leading-loose);
+    --pui-typo-amount-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-amount-tracking: 0;
+    --pui-typo-amount-transform: none;
+
+    /* Navbar: 0.875rem / 150% / normal / 0 / none */
+    --pui-typo-navbar-size: var(--pui-primitive-font-size-sm);
+    --pui-typo-navbar-leading: var(--pui-primitive-leading-loose);
+    --pui-typo-navbar-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-navbar-tracking: 0;
+    --pui-typo-navbar-transform: none;
 
     /* ========================================
      * COLOR - Dropdown/Overlay

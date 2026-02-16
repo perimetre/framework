@@ -1,6 +1,7 @@
 @layer pui.primitive {
   [data-pui-brand='stelpro'] {
-    --pui-primitive-color-primary-6: #fe322a;
+    /* Stelpro Red — hero color at step 9 (Radix solid/accent) */
+    --pui-primitive-color-primary-9: #fe322a;
   }
 }
 
@@ -9,9 +10,8 @@
     /**
      **  SEMANTIC TOKENS
      *
-     ** Purpose-based tokens that express design intent.
-     ** These are the PUBLIC API consumed by components.
-     ** Themes override these to create different visual styles.
+     ** Only values that DIFFER from Acorn base are defined here.
+     ** Everything else is inherited.
      */
 
     /* Stelpro uses muted text on primary for better contrast with red */

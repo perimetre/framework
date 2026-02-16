@@ -29,23 +29,26 @@
   --font-pui-mono: var(--pui-primitive-font-mono);
 
   /* ========================================
-   * PRIMITIVE COLOR SCALES (for direct use when needed)
-   * Understanding the scale: https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale
+   * PRIMITIVE COLOR SCALES
+   * Radix 12-step: 1-2 bg, 3-5 component, 6-8 border, 9-10 solid, 11-12 text
+   * @see https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale
    * ======================================== */
-  --color-pui-primary-1: var(--pui-primitive-color-primary-1); /* 50 */
-  --color-pui-primary-2: var(--pui-primitive-color-primary-2); /* 100 */
-  --color-pui-primary-3: var(--pui-primitive-color-primary-3); /* 200 */
-  --color-pui-primary-4: var(--pui-primitive-color-primary-4); /* 300 */
-  --color-pui-primary-5: var(--pui-primitive-color-primary-5); /* 400 */
-  --color-pui-primary-6: var(--pui-primitive-color-primary-6); /* 500 */
-  --color-pui-primary-7: var(--pui-primitive-color-primary-7); /* 600 */
-  --color-pui-primary-8: var(--pui-primitive-color-primary-8); /* 700 */
-  --color-pui-primary-9: var(--pui-primitive-color-primary-9); /* 800 */
-  --color-pui-primary-10: var(--pui-primitive-color-primary-10); /* 900 */
+
+  /* Primary accent scale */
+  --color-pui-primary-1: var(--pui-primitive-color-primary-1);
+  --color-pui-primary-2: var(--pui-primitive-color-primary-2);
+  --color-pui-primary-3: var(--pui-primitive-color-primary-3);
+  --color-pui-primary-4: var(--pui-primitive-color-primary-4);
+  --color-pui-primary-5: var(--pui-primitive-color-primary-5);
+  --color-pui-primary-6: var(--pui-primitive-color-primary-6);
+  --color-pui-primary-7: var(--pui-primitive-color-primary-7);
+  --color-pui-primary-8: var(--pui-primitive-color-primary-8);
+  --color-pui-primary-9: var(--pui-primitive-color-primary-9);
+  --color-pui-primary-10: var(--pui-primitive-color-primary-10);
   --color-pui-primary-11: var(--pui-primitive-color-primary-11);
   --color-pui-primary-12: var(--pui-primitive-color-primary-12);
 
-  /* The gray scale, useful for texts and backgrounds */
+  /* Overlay (gray/neutral) scale */
   --color-pui-overlay-1: var(--pui-primitive-color-overlay-1);
   --color-pui-overlay-2: var(--pui-primitive-color-overlay-2);
   --color-pui-overlay-3: var(--pui-primitive-color-overlay-3);
@@ -59,10 +62,35 @@
   --color-pui-overlay-11: var(--pui-primitive-color-overlay-11);
   --color-pui-overlay-12: var(--pui-primitive-color-overlay-12);
 
+  /* Red (error/destructive) scale */
+  --color-pui-red-1: var(--pui-primitive-color-red-1);
+  --color-pui-red-2: var(--pui-primitive-color-red-2);
+  --color-pui-red-3: var(--pui-primitive-color-red-3);
+  --color-pui-red-4: var(--pui-primitive-color-red-4);
+  --color-pui-red-5: var(--pui-primitive-color-red-5);
+  --color-pui-red-6: var(--pui-primitive-color-red-6);
+  --color-pui-red-7: var(--pui-primitive-color-red-7);
+  --color-pui-red-8: var(--pui-primitive-color-red-8);
+  --color-pui-red-9: var(--pui-primitive-color-red-9);
+  --color-pui-red-10: var(--pui-primitive-color-red-10);
+  --color-pui-red-11: var(--pui-primitive-color-red-11);
+  --color-pui-red-12: var(--pui-primitive-color-red-12);
+
+  /* Green (success) */
+  --color-pui-green-9: var(--pui-primitive-color-green-9);
+  --color-pui-green-11: var(--pui-primitive-color-green-11);
+
+  /* Amber (warning) */
+  --color-pui-amber-9: var(--pui-primitive-color-amber-9);
+  --color-pui-amber-11: var(--pui-primitive-color-amber-11);
+
+  /* Blue (info) */
+  --color-pui-blue-9: var(--pui-primitive-color-blue-9);
+  --color-pui-blue-11: var(--pui-primitive-color-blue-11);
+
   /* ========================================
    * SEMANTIC COLOR TOKENS
    * All prefixed with 'pui-' to avoid conflicts with consumer projects
-   * that may define their own tokens with similar names.
    * ======================================== */
 
   /* Background colors */
@@ -70,18 +98,41 @@
   --color-pui-bg-subtle: var(--pui-color-bg-subtle);
   --color-pui-bg-muted: var(--pui-color-bg-muted);
 
+  /* Surface colors */
+  --color-pui-surface-primary: var(--pui-color-surface-primary);
+  --color-pui-surface-secondary: var(--pui-color-surface-secondary);
+
   /* Foreground colors (text, icons) */
   --color-pui-fg-default: var(--pui-color-fg-default);
   --color-pui-fg-muted: var(--pui-color-fg-muted);
   --color-pui-fg-subtle: var(--pui-color-fg-subtle);
+  --color-pui-fg-body: var(--pui-color-fg-body);
+  --color-pui-fg-link-primary: var(--pui-color-fg-link-primary);
+  --color-pui-fg-link-secondary: var(--pui-color-fg-link-secondary);
+  --color-pui-fg-link-active: var(--pui-color-fg-link-active);
+  --color-pui-fg-icon: var(--pui-color-fg-icon);
+  --color-pui-fg-icon-chevron: var(--pui-color-fg-icon-chevron);
 
   /* Border colors */
   --color-pui-border-default: var(--pui-color-border-default);
   --color-pui-border-focus: var(--pui-color-border-focus);
+  --color-pui-border-rule-primary: var(--pui-color-border-rule-primary);
+  --color-pui-border-rule-secondary: var(--pui-color-border-rule-secondary);
+  --color-pui-border-input: var(--pui-color-border-input);
 
   /* Interactive colors */
   --color-pui-interactive-primary: var(--pui-color-interactive-primary);
   --color-pui-interactive-on-primary: var(--pui-color-interactive-on-primary);
+
+  /* Button colors */
+  --color-pui-button-primary-fill: var(--pui-color-button-primary-fill);
+  --color-pui-button-secondary-fill: var(--pui-color-button-secondary-fill);
+  --color-pui-button-secondary-outline: var(
+    --pui-color-button-secondary-outline
+  );
+  --color-pui-button-hover: var(--pui-color-button-hover);
+  --color-pui-button-active: var(--pui-color-button-active);
+  --color-pui-button-inactive: var(--pui-color-button-inactive);
 
   /* Input field colors */
   --color-pui-input-bg: var(--pui-color-input-bg);
@@ -89,6 +140,8 @@
   --color-pui-input-border-focus: var(--pui-color-input-border-focus);
   --color-pui-input-text: var(--pui-color-input-text);
   --color-pui-input-placeholder: var(--pui-color-input-placeholder);
+  --color-pui-input-box: var(--pui-color-input-box);
+  --color-pui-input-outline: var(--pui-color-input-outline);
 
   /* Form control colors (checkbox/radio) */
   --color-pui-control-unchecked-bg: var(--pui-color-control-unchecked-bg);
@@ -109,6 +162,18 @@
   --color-pui-feedback-error: var(--pui-color-feedback-error);
   --color-pui-feedback-error-strong: var(--pui-color-feedback-error-strong);
   --color-pui-feedback-error-light: var(--pui-color-feedback-error-light);
+  --color-pui-feedback-error-surface: var(--pui-color-feedback-error-surface);
+  --color-pui-feedback-error-border: var(--pui-color-feedback-error-border);
+  --color-pui-feedback-error-text: var(--pui-color-feedback-error-text);
+  --color-pui-feedback-success: var(--pui-color-feedback-success);
+  --color-pui-feedback-success-text: var(--pui-color-feedback-success-text);
+  --color-pui-feedback-warning: var(--pui-color-feedback-warning);
+  --color-pui-feedback-warning-text: var(--pui-color-feedback-warning-text);
+  --color-pui-feedback-info: var(--pui-color-feedback-info);
+  --color-pui-feedback-info-text: var(--pui-color-feedback-info-text);
+
+  /* Table colors */
+  --color-pui-table-inactive-item: var(--pui-color-table-inactive-item);
 
   /* ========================================
    * SEMANTIC SHAPE TOKENS
@@ -126,6 +191,7 @@
   --shadow-pui-input: var(--pui-shadow-input);
   --shadow-pui-input-focus: var(--pui-shadow-input-focus);
   --shadow-pui-dropdown: var(--pui-shadow-dropdown);
+  --shadow-pui-card: var(--pui-shadow-card);
 
   /* ========================================
    * DROPDOWN/OVERLAY TOKENS
@@ -218,4 +284,145 @@
     .pui\:disabled\:checked\:before\:bg-pui-fg-subtle:disabled:checked:before {
     background-color: var(--pui-color-fg-subtle);
   }
+}
+
+/* ========================================
+ * TYPOGRAPHY UTILITY CLASSES
+ *
+ * Apply complete typography styles via a single class.
+ * Each utility reads from the semantic --pui-typo-* tokens,
+ * allowing brands to override typography without changing markup.
+ *
+ * Using @utility gives full variant support (responsive, hover, etc.)
+ * and automatic pui: prefix via Tailwind v4.
+ *
+ * Usage: class="pui:typo-heading-1"
+ * ======================================== */
+
+@utility typo-heading-1 {
+  font-size: var(--pui-typo-heading-1-size);
+  line-height: var(--pui-typo-heading-1-leading);
+  font-weight: var(--pui-typo-heading-1-weight);
+  letter-spacing: var(--pui-typo-heading-1-tracking);
+  text-transform: var(--pui-typo-heading-1-transform);
+}
+
+@utility typo-heading-2 {
+  font-size: var(--pui-typo-heading-2-size);
+  line-height: var(--pui-typo-heading-2-leading);
+  font-weight: var(--pui-typo-heading-2-weight);
+  letter-spacing: var(--pui-typo-heading-2-tracking);
+  text-transform: var(--pui-typo-heading-2-transform);
+}
+
+@utility typo-heading-3 {
+  font-size: var(--pui-typo-heading-3-size);
+  line-height: var(--pui-typo-heading-3-leading);
+  font-weight: var(--pui-typo-heading-3-weight);
+  letter-spacing: var(--pui-typo-heading-3-tracking);
+  text-transform: var(--pui-typo-heading-3-transform);
+}
+
+@utility typo-heading-4 {
+  font-size: var(--pui-typo-heading-4-size);
+  line-height: var(--pui-typo-heading-4-leading);
+  font-weight: var(--pui-typo-heading-4-weight);
+  letter-spacing: var(--pui-typo-heading-4-tracking);
+  text-transform: var(--pui-typo-heading-4-transform);
+}
+
+@utility typo-heading-5 {
+  font-size: var(--pui-typo-heading-5-size);
+  line-height: var(--pui-typo-heading-5-leading);
+  font-weight: var(--pui-typo-heading-5-weight);
+  letter-spacing: var(--pui-typo-heading-5-tracking);
+  text-transform: var(--pui-typo-heading-5-transform);
+}
+
+@utility typo-heading-6 {
+  font-size: var(--pui-typo-heading-6-size);
+  line-height: var(--pui-typo-heading-6-leading);
+  font-weight: var(--pui-typo-heading-6-weight);
+  letter-spacing: var(--pui-typo-heading-6-tracking);
+  text-transform: var(--pui-typo-heading-6-transform);
+}
+
+@utility typo-tagline {
+  font-size: var(--pui-typo-tagline-size);
+  line-height: var(--pui-typo-tagline-leading);
+  font-weight: var(--pui-typo-tagline-weight);
+  letter-spacing: var(--pui-typo-tagline-tracking);
+  text-transform: var(--pui-typo-tagline-transform);
+}
+
+@utility typo-large {
+  font-size: var(--pui-typo-large-size);
+  line-height: var(--pui-typo-large-leading);
+  font-weight: var(--pui-typo-large-weight);
+  letter-spacing: var(--pui-typo-large-tracking);
+  text-transform: var(--pui-typo-large-transform);
+}
+
+@utility typo-medium {
+  font-size: var(--pui-typo-medium-size);
+  line-height: var(--pui-typo-medium-leading);
+  font-weight: var(--pui-typo-medium-weight);
+  letter-spacing: var(--pui-typo-medium-tracking);
+  text-transform: var(--pui-typo-medium-transform);
+}
+
+@utility typo-button {
+  font-size: var(--pui-typo-button-size);
+  line-height: var(--pui-typo-button-leading);
+  font-weight: var(--pui-typo-button-weight);
+  letter-spacing: var(--pui-typo-button-tracking);
+  text-transform: var(--pui-typo-button-transform);
+}
+
+@utility typo-base {
+  font-size: var(--pui-typo-base-size);
+  line-height: var(--pui-typo-base-leading);
+  font-weight: var(--pui-typo-base-weight);
+  letter-spacing: var(--pui-typo-base-tracking);
+  text-transform: var(--pui-typo-base-transform);
+}
+
+@utility typo-small {
+  font-size: var(--pui-typo-small-size);
+  line-height: var(--pui-typo-small-leading);
+  font-weight: var(--pui-typo-small-weight);
+  letter-spacing: var(--pui-typo-small-tracking);
+  text-transform: var(--pui-typo-small-transform);
+}
+
+@utility typo-tiny {
+  font-size: var(--pui-typo-tiny-size);
+  line-height: var(--pui-typo-tiny-leading);
+  font-weight: var(--pui-typo-tiny-weight);
+  letter-spacing: var(--pui-typo-tiny-tracking);
+  text-transform: var(--pui-typo-tiny-transform);
+}
+
+@utility typo-label {
+  font-size: var(--pui-typo-label-size);
+  line-height: var(--pui-typo-label-leading);
+  font-weight: var(--pui-typo-label-weight);
+  letter-spacing: var(--pui-typo-label-tracking);
+  text-transform: var(--pui-typo-label-transform);
+}
+
+@utility typo-amount {
+  font-size: var(--pui-typo-amount-size);
+  line-height: var(--pui-typo-amount-leading);
+  font-weight: var(--pui-typo-amount-weight);
+  letter-spacing: var(--pui-typo-amount-tracking);
+  text-transform: var(--pui-typo-amount-transform);
+}
+
+@utility typo-navbar {
+  font-size: var(--pui-typo-navbar-size);
+  line-height: var(--pui-typo-navbar-leading);
+  font-weight: var(--pui-typo-navbar-weight);
+  letter-spacing: var(--pui-typo-navbar-tracking);
+  text-transform: var(--pui-typo-navbar-transform);
 }

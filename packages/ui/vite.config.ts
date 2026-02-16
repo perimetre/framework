@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import { glob } from 'glob';
+import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
@@ -7,6 +8,30 @@ import dts from 'vite-plugin-dts';
 import { libInjectCss } from 'vite-plugin-lib-inject-css';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(
+  readFileSync(resolve(__dirname, 'package.json'), 'utf-8')
+) as {
+  dependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+};
+
+// Externalize all dependencies and peerDependencies so they are imported
+// by package name instead of being bundled with hardcoded pnpm store paths.
+// Rolldown generates template-literal require() calls for bundled deps in CJS
+// output, which Next.js rejects as "dynamic usage of require is not supported".
+const externalDeps = [
+  ...Object.keys(pkg.dependencies ?? {}),
+  ...Object.keys(pkg.peerDependencies ?? {})
+].filter(
+  (dep) =>
+    // Keep build-only deps that shouldn't be externalized
+    !dep.startsWith('@tailwindcss/') &&
+    dep !== 'tailwindcss' &&
+    dep !== 'postcss' &&
+    dep !== 'typescript' &&
+    dep !== 'tw-animate-css' &&
+    dep !== '@ladle/react'
+);
 
 // Dynamically generate entry points for all components
 const componentFiles = glob.sync('src/components/**/index.tsx', {
@@ -67,12 +92,12 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
-        '@googlemaps/js-api-loader',
-        'react',
-        'react-dom',
-        'react/jsx-runtime',
-        'motion',
-        /^motion\//
+        ...externalDeps,
+        // Also match deep/subpath imports (e.g. @headlessui/react/..., motion/...)
+        ...externalDeps.map(
+          (dep) =>
+            new RegExp(`^${dep.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\/`)
+        )
       ],
       output: [
         {
