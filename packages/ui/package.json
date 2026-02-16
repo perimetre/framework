@@ -116,5 +116,5 @@
   ],
   "type": "module",
   "types": "./dist/index.d.ts",
-  "version": "13.8.6"
+  "version": "13.8.7"
 }
