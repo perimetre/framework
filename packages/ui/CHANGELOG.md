@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.8.6
+
+### Patch Changes
+
+- 26745c1: Added new formatDisplayValue field to place input
+
 ## 13.8.5
 
 ### Patch Changes
