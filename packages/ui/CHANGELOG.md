@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.8.1
+
+### Patch Changes
+
+- 2ede989: Fixes exported dependencies
+
 ## 13.8.0
 
 ### Minor Changes
