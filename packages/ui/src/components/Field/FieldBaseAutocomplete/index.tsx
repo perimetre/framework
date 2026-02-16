@@ -9,6 +9,7 @@ import {
 } from '@headlessui/react';
 import { type ForceRequiredProps } from '@perimetre/helpers/types';
 import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import {
   fieldBaseAutocompleteInputBrandVariants,
   fieldBaseAutocompleteOptionBrandVariants,
@@ -103,9 +104,21 @@ function FieldBaseAutocomplete<T extends AutocompleteItem>({
   const getDisplayValue =
     displayValue ?? ((item: null | T) => item?.label ?? '');
 
+  // When virtual scrolling + openOnFocus are combined, HeadlessUI's virtualizer
+  // calls scrollToIndex during the ref commit phase before the scroll container
+  // (optionsElement) is in the DOM, causing a null requestAnimationFrame crash.
+  // Deferring `immediate` by one frame lets the scroll container mount first.
+  const [deferredImmediate, setDeferredImmediate] = useState(false);
+  useEffect(() => {
+    if (isVirtual && openOnFocus) {
+      const frame = requestAnimationFrame(() => { setDeferredImmediate(true); });
+      return () => { cancelAnimationFrame(frame); };
+    }
+  }, [isVirtual, openOnFocus]);
+
   const comboboxProps = {
     disabled: disabled ?? isReadOnly,
-    immediate: openOnFocus,
+    immediate: isVirtual ? deferredImmediate : openOnFocus,
     name,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onChange: isReadOnly ? () => {} : (onChange as (value: null | T) => void),
