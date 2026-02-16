@@ -171,15 +171,21 @@ function getShadowStyles(): string {
 }
 
 /* Make the Google input transparent. Padding uses CSS custom properties
-   set on the host element so leading/trailing addons are accounted for. */
+   set on the host element so leading/trailing addons are accounted for.
+   font-size/line-height reference Tailwind v4 theme variables so brand
+   overrides are picked up automatically (CSS custom properties cascade
+   through shadow DOM). Matches FieldBaseInput's text-base / sm:text-sm/6. */
 input {
   background: transparent !important;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
   color: var(--pui-color-input-text, inherit) !important;
-  font: inherit !important;
-  font-size: inherit !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  font-size: var(--text-base, 1rem) !important;
+  line-height: var(--text-base--line-height, 1.5) !important;
+  letter-spacing: inherit !important;
   padding: 6px 0 !important;
   padding-left: var(--gmp-pl, 0.75rem) !important;
   padding-right: 0 !important;
@@ -187,10 +193,18 @@ input {
   width: 100% !important;
   height: auto !important;
   min-height: 0 !important;
-  line-height: inherit !important;
   text-align: left !important;
   text-overflow: ellipsis !important;
   overflow: hidden !important;
+}
+
+/* Responsive: matches FieldBaseInput's sm:text-sm/6.
+   Uses Tailwind v4 theme variables for brand compatibility. */
+@media (min-width: 640px) {
+  input {
+    font-size: var(--text-sm, 0.875rem) !important;
+    line-height: calc(var(--spacing, 0.25rem) * 6) !important;
+  }
 }
 
 input::placeholder {
@@ -602,8 +616,9 @@ const FieldGooglePlacesAutocomplete: React.FC<
     if (!isLoaded || !autocompleteRef.current) return;
 
     /**
-     * Handle gmp-placeselect event, fetch requested fields, and call onPlaceSelect.
+     * Handle gmp-select event, fetch requested fields, and call onPlaceSelect.
      * Only fetches the fields specified in the `fields` prop to optimize cost.
+     * Note: Google renamed this event from `gmp-placeselect` to `gmp-select`.
      */
     const handleSelect = (event: Event) => {
       void (async () => {
@@ -637,13 +652,10 @@ const FieldGooglePlacesAutocomplete: React.FC<
       })();
     };
 
-    autocompleteRef.current.addEventListener('gmp-placeselect', handleSelect);
+    autocompleteRef.current.addEventListener('gmp-select', handleSelect);
 
     return () => {
-      autocompleteRef.current?.removeEventListener(
-        'gmp-placeselect',
-        handleSelect
-      );
+      autocompleteRef.current?.removeEventListener('gmp-select', handleSelect);
     };
   }, [isLoaded, onPlaceSelect, fields]);
 
