@@ -111,8 +111,12 @@ function FieldBaseAutocomplete<T extends AutocompleteItem>({
   const [deferredImmediate, setDeferredImmediate] = useState(false);
   useEffect(() => {
     if (isVirtual && openOnFocus) {
-      const frame = requestAnimationFrame(() => { setDeferredImmediate(true); });
-      return () => { cancelAnimationFrame(frame); };
+      const frame = requestAnimationFrame(() => {
+        setDeferredImmediate(true);
+      });
+      return () => {
+        cancelAnimationFrame(frame);
+      };
     }
   }, [isVirtual, openOnFocus]);
 

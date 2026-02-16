@@ -29,10 +29,7 @@ export default {
   }
 } satisfies StoryDefault<Props>;
 
-const FilteredAutocomplete = ({
-  items: allItems,
-  ...props
-}: Props) => {
+const FilteredAutocomplete = ({ items: allItems, ...props }: Props) => {
   const [query, setQuery] = useState('');
   const filtered = useMemo(
     () =>
