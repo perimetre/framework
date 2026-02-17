@@ -5,14 +5,14 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsdoc": "^61.5.0",
-    "eslint-plugin-jsonc": "^2.21.0",
+    "eslint-plugin-jsdoc": "^61.7.1",
+    "eslint-plugin-jsonc": "^2.21.1",
     "eslint-plugin-perfectionist": "^4.15.1",
-    "eslint-plugin-playwright": "^2.4.0",
-    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-playwright": "^2.5.1",
+    "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
     "prettier-eslint": "^16.4.2",
-    "typescript-eslint": "^8.50.0"
+    "typescript-eslint": "^8.56.0"
   },
   "description": "Base ESLint configuration for Perimetre projects",
   "devDependencies": {
@@ -37,7 +37,7 @@
   "license": "GPL-3.0",
   "main": "index.mjs",
   "name": "@perimetre/eslint-config-base",
-  "packageManager": "pnpm@10.26.0",
+  "packageManager": "pnpm@10.30.0",
   "peerDependencies": {
     "eslint": ">= 9"
   },

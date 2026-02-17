@@ -2,8 +2,8 @@
   "description": "Shared configurations and tooling for Perimetre projects",
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
-    "@commitlint/cli": "^20.2.0",
-    "@commitlint/config-conventional": "^20.2.0",
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
     "@perimetre/eslint-config-base": "workspace:*",
     "@perimetre/eslint-config-react": "workspace:*",
     "@perimetre/prettier-config": "workspace:*",
@@ -12,7 +12,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "pls-changeset-me": "^0.0.11",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "turbo": "latest",
     "typescript": "^5.9.3"
   },
@@ -25,7 +25,7 @@
     ]
   },
   "name": "@perimetre/framework",
-  "packageManager": "pnpm@10.26.0",
+  "packageManager": "pnpm@10.30.0",
   "prettier": "@perimetre/prettier-config",
   "private": true,
   "repository": {

@@ -8,7 +8,7 @@ export const alertBarAcornVariants = cva({
   base: [
     'pui:flex pui:items-center pui:justify-center pui:gap-2',
     'pui:w-full pui:px-4 pui:py-2',
-    'pui:text-pui-alertbar pui:text-center'
+    'pui:typo-alertbar pui:text-center'
   ],
   variants: {
     variant: {

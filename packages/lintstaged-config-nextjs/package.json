@@ -16,7 +16,7 @@
   "license": "GPL-3.0",
   "main": "index.mjs",
   "name": "@perimetre/lintstaged-config-nextjs",
-  "packageManager": "pnpm@10.26.0",
+  "packageManager": "pnpm@10.30.0",
   "peerDependencies": {
     "lint-staged": ">= 16"
   },

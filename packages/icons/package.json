@@ -6,7 +6,7 @@
   "description": "Accessible React icon wrapper component for Perimetre projects",
   "devDependencies": {
     "@perimetre/eslint-config-base": "workspace:*",
-    "@types/react": "^18.3.27",
+    "@types/react": "^18.3.28",
     "eslint": "^9.39.2",
     "typescript": "^5.9.3"
   },
@@ -22,7 +22,7 @@
   "license": "GPL-3.0",
   "main": "./dist/index.js",
   "name": "@perimetre/icons",
-  "packageManager": "pnpm@10.26.0",
+  "packageManager": "pnpm@10.30.0",
   "peerDependencies": {
     "react": ">=18.0.0"
   },

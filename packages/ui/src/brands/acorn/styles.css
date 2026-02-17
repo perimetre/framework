@@ -428,8 +428,9 @@
     --pui-color-alertbar-fourth-bg: var(--pui-primitive-color-overlay-12);
     --pui-color-alertbar-fourth-fg: var(--pui-primitive-color-overlay-1);
 
-    /* font size */
-    --pui-alertbar-font-size: var(--pui-primitive-font-size-sm);
+    /* typography */
+    --pui-typo-alertbar-size: var(--pui-typo-small-size);
+    --pui-typo-alertbar-weight: var(--pui-typo-small-weight);
 
     /* ========================================
      * COLOR - Dropdown/Overlay

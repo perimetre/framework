@@ -186,7 +186,6 @@
   --color-pui-alertbar-third-fg: var(--pui-color-alertbar-third-fg);
   --color-pui-alertbar-fourth-bg: var(--pui-color-alertbar-fourth-bg);
   --color-pui-alertbar-fourth-fg: var(--pui-color-alertbar-fourth-fg);
-  --font-size-pui-alertbar: var(--pui-alertbar-font-size);
 
   /* ========================================
    * SEMANTIC SHAPE TOKENS
@@ -438,4 +437,9 @@
   font-weight: var(--pui-typo-navbar-weight);
   letter-spacing: var(--pui-typo-navbar-tracking);
   text-transform: var(--pui-typo-navbar-transform);
+}
+
+@utility typo-alertbar {
+  font-size: var(--pui-typo-alertbar-size);
+  font-weight: var(--pui-typo-alertbar-weight);
 }

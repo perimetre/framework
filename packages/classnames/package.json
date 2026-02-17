@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.1"
   },
   "description": "Classnames utility",
   "devDependencies": {
@@ -19,7 +19,7 @@
   "license": "GPL-3.0",
   "main": "./dist/index.js",
   "name": "@perimetre/classnames",
-  "packageManager": "pnpm@10.26.0",
+  "packageManager": "pnpm@10.30.0",
   "peerDependencies": {
     "class-variance-authority": ">=0.7.0"
   },

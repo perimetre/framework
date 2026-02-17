@@ -116,6 +116,10 @@
      * ======================================== */
     --pui-color-alertbar-first-fg: var(--pui-primitive-color-overlay-1);
 
+    /* typography — size from typo-tiny, bold */
+    --pui-typo-alertbar-size: var(--pui-typo-tiny-size);
+    --pui-typo-alertbar-weight: var(--pui-primitive-font-weight-bold);
+
     /* ========================================
      * COLOR - Button
      * Figma: "Button Primary Fill" = mid grey (overlay-11), NOT primary green

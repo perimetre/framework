@@ -1,0 +1,15 @@
+<script>
+  // Restore persisted brand into URL before Ladle reads it.
+  // Runs synchronously in <head>, before React mounts.
+  (function () {
+    var saved = localStorage.getItem('pui-ladle-brand');
+    var brands = ['acorn', 'sprig', 'stelpro'];
+    if (saved && brands.indexOf(saved) !== -1 && saved !== 'acorn') {
+      var params = new URLSearchParams(location.search);
+      if (!params.has('arg-brand')) {
+        params.set('arg-brand', saved);
+        history.replaceState(null, '', '?' + params.toString());
+      }
+    }
+  })();
+</script>
