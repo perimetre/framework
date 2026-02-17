@@ -1,5 +1,12 @@
 # @perimetre/ui
 
+## 13.9.2
+
+### Patch Changes
+
+- Updated dependencies [7117601]
+  - @perimetre/classnames@0.2.0
+
 ## 13.9.1
 
 ### Patch Changes
