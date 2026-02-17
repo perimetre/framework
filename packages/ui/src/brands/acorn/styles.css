@@ -409,6 +409,29 @@
     --pui-typo-navbar-transform: none;
 
     /* ========================================
+     * COLOR - AlertBar
+     * ======================================== */
+
+    /* variant: first (primary) */
+    --pui-color-alertbar-first-bg: var(--pui-primitive-color-primary-9);
+    --pui-color-alertbar-first-fg: var(--pui-primitive-color-overlay-12);
+
+    /* variant: second (attention/red) */
+    --pui-color-alertbar-second-bg: var(--pui-primitive-color-red-9);
+    --pui-color-alertbar-second-fg: var(--pui-primitive-color-overlay-1);
+
+    /* variant: third (neutral/light) */
+    --pui-color-alertbar-third-bg: var(--pui-primitive-color-overlay-3);
+    --pui-color-alertbar-third-fg: var(--pui-primitive-color-overlay-12);
+
+    /* variant: fourth (dark) */
+    --pui-color-alertbar-fourth-bg: var(--pui-primitive-color-overlay-12);
+    --pui-color-alertbar-fourth-fg: var(--pui-primitive-color-overlay-1);
+
+    /* font size */
+    --pui-alertbar-font-size: var(--pui-primitive-font-size-sm);
+
+    /* ========================================
      * COLOR - Dropdown/Overlay
      * ======================================== */
     --pui-color-dropdown-bg: var(--pui-color-bg-default);

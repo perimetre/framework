@@ -111,6 +111,12 @@
     --pui-color-border-rule-secondary: var(--pui-primitive-color-overlay-3);
 
     /* ========================================
+     * COLOR - AlertBar
+     * Sprig uses white text on primary green
+     * ======================================== */
+    --pui-color-alertbar-first-fg: var(--pui-primitive-color-overlay-1);
+
+    /* ========================================
      * COLOR - Button
      * Figma: "Button Primary Fill" = mid grey (overlay-11), NOT primary green
      * Figma: "Button Hover" / "Active Button" = Medium Sea Green/400 (primary-9)

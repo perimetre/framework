@@ -17,6 +17,12 @@
     /* Stelpro uses muted text on primary for better contrast with red */
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-5);
 
+    /* ========================================
+     * COLOR - AlertBar
+     * Stelpro uses light text on primary red
+     * ======================================== */
+    --pui-color-alertbar-first-fg: var(--pui-primitive-color-overlay-1);
+
     /* Stelpro uses no rounded corners for badges */
     --pui-radius-badge: var(--pui-primitive-radius-none);
   }
