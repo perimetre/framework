@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.9.0
+
+### Minor Changes
+
+- 8cdbdc4: New <AlertBar /> component
+
 ## 13.8.7
 
 ### Patch Changes
