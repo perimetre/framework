@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.9.1
+
+### Patch Changes
+
+- 8dee454: Updated AlertBar font size
+
 ## 13.9.0
 
 ### Minor Changes
