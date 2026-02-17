@@ -49,7 +49,7 @@ type Props = {
 >;
 
 export default {
-  title: 'ImageCarousel',
+  title: 'Components/ImageCarousel',
   argTypes: {
     showNavigation: {
       control: { type: 'boolean' },

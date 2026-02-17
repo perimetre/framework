@@ -7,6 +7,7 @@ type Props = {
 } & FieldPasswordProps;
 
 export default {
+  title: 'Components/Field/FieldPassword',
   argTypes: {
     corner: {
       control: {

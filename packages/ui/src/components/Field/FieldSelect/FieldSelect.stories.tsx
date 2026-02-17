@@ -14,6 +14,7 @@ type Props = {
 } & Omit<FieldSelectProps, 'options'>;
 
 export default {
+  title: 'Components/Field/FieldSelect',
   argTypes: {
     corner: {
       control: { type: 'text' }

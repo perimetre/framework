@@ -6,6 +6,7 @@ type Props = {
 } & BadgeProps;
 
 export default {
+  title: 'Components/Badge',
   argTypes: {
     label: {
       control: { type: 'text' },

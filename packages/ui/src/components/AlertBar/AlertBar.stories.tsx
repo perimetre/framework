@@ -10,6 +10,7 @@ type Props = {
 } & AlertBarProps;
 
 export default {
+  title: 'Components/AlertBar',
   argTypes: {
     label: {
       control: { type: 'text' },

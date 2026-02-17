@@ -6,6 +6,7 @@ type Props = {
 } & FieldCheckboxRadioProps;
 
 export default {
+  title: 'Components/Field/FieldCheckboxRadio',
   argTypes: {
     defaultChecked: {
       control: {

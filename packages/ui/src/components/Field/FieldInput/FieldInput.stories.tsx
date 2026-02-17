@@ -7,6 +7,7 @@ type Props = {
 } & FieldInputProps;
 
 export default {
+  title: 'Components/Field/FieldInput',
   argTypes: {
     corner: {
       control: {

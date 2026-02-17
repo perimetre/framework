@@ -6,6 +6,7 @@ type Props = {
 } & ButtonProps;
 
 export default {
+  title: 'Components/Button',
   argTypes: {
     label: {
       control: { type: 'text' },

@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default {
-  title: 'Drawer',
+  title: 'Components/Drawer',
   argTypes: {
     direction: {
       options: ['left', 'right'],

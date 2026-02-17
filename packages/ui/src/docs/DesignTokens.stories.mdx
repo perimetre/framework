@@ -1,0 +1,202 @@
+import { Meta } from '@ladle/react';
+import { DocsLayout } from './_components/DocsLayout';
+
+<Meta title="Docs/Design Tokens" />
+
+<DocsLayout>
+
+# Design Tokens
+
+Design tokens are the shared vocabulary between design and development. They are the named values — colors, spacing, radii, typography, shadows, motion — that define how the system looks and feels. When a designer changes a token value in Figma, that same change flows into code. Tokens are what make the design system a _system_ rather than a collection of one-off components.
+
+---
+
+## Why tokens matter
+
+Without tokens, every component is a snowflake. A button uses `#0CA789` because someone copy-pasted it from a mockup. An input uses `#0BA586` because it was eyeballed. Both were supposed to be "primary teal." Tokens eliminate this drift by giving every value a single, agreed-upon name.
+
+Tokens also make brand switching possible. When Acorn's primary color is teal and Sprig's is green, the token `interactive-primary` resolves to the right value for each brand automatically. Components never need to know _which_ brand is active — they just ask for the "primary action color."
+
+---
+
+## The three-tier system
+
+Our tokens are organized in three layers, each with a clear role. This structure is inspired by systems like [Radix Themes](https://www.radix-ui.com/themes/docs/theme/overview), [shadcn/ui](https://ui.shadcn.com/), and [Tailwind's own design philosophy](https://tailwindcss.com/docs/theme) — all of which separate raw values from meaningful, purpose-driven names.
+
+### Tier 1 — Primitives
+
+Primitives are the raw palette. They are named by what they _are_, not what they _do_. Think of them as the paint tubes in a studio: useful, but you don't hand a paint tube to a client.
+
+**Colors** follow a [12-step scale](https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale) inspired by [Radix UI Colors](https://www.radix-ui.com/colors). Each step has a specific role:
+
+| Steps     | Purpose          | Examples                                                       |
+| --------- | ---------------- | -------------------------------------------------------------- |
+| **1–2**   | Backgrounds      | App background, card surfaces, subtle fills                    |
+| **3–5**   | Component states | Default, hover, and active/pressed backgrounds                 |
+| **6–8**   | Borders          | Subtle separators, interactive borders, focus rings            |
+| **9–10**  | Solid fills      | Hero/accent backgrounds, hovered solid fills                   |
+| **11–12** | Text             | Low-contrast text (secondary) and high-contrast text (primary) |
+
+Step 9 is the "hero" step — the purest, most saturated version of the color. It is what you would use for a brand logo, a solid button fill, or a colored header.
+
+Each brand defines its own 12-step primary scale and an overlay (neutral gray) scale, plus feedback colors for error, success, warning, and info states.
+
+**Other primitives** include spacing increments, border radii, shadow definitions, animation durations, and font size/weight scales. These are the building blocks that semantic tokens reference.
+
+### Tier 2 — Semantic tokens
+
+Semantic tokens are the public language of the system. They are named by _purpose_, not by value. This is the layer that both designers and developers work with day-to-day.
+
+Instead of saying "use primary-6," a semantic token says "this is the interactive primary fill." Instead of "overlay-12," it says "this is the default foreground color for body text."
+
+**Color categories:**
+
+- **Background** — Page surfaces, subtle fills, muted areas
+- **Foreground** — Body text, secondary text, placeholder text, icons
+- **Border** — Default borders, focus rings, horizontal rules
+- **Interactive** — Primary action fill, hover state, text on primary
+- **Feedback** — Error, success, warning, and info states (each with surface, border, and text variants)
+
+**Shape categories:**
+
+- **Radius** — Button corners, input corners, badge corners, control corners
+- **Shadow** — Button elevation, input focus ring, card depth, dropdown depth
+
+**Typography categories:**
+
+Typography tokens follow Tailwind's approach of separating _hierarchy_ (what role does this text play?) from _size_ (how big is it?). A heading token defines not just a font size, but a complete text style: family, weight, size, line height, letter spacing, and sometimes text transform.
+
+This means "Heading 1" is a design decision — not just "make it 36px." It packages all the typographic choices that make a heading _feel_ like a heading: the weight, the tightness, the family. Our system defines semantic typography styles like `heading-1` through `heading-4`, `button`, `label`, `body`, `base`, and specialized ones like `amount` and `navbar`.
+
+### Tier 3 — Component tokens (optional)
+
+Sometimes a semantic token is not specific enough. For example, Sprig's primary button uses a gray fill instead of the brand green — even though the "interactive primary" token is green. In this case, a component-level token like `button-primary-fill` lets that one component diverge without affecting every other use of "interactive primary."
+
+Component tokens are the escape hatch, not the default. Most components can be fully expressed with semantic tokens alone. A component token is only created when a specific brand needs a component to behave differently than the semantic token would suggest.
+
+---
+
+## Brand theming — visual polymorphism
+
+Visual polymorphism is the core idea behind the system: **the same component code renders completely different visuals depending on which brand is active.** No conditional logic, no if/else per brand. The component asks for tokens by purpose, and the brand provides the values.
+
+### How it works
+
+Each brand defines its tokens in CSS, scoped to a data attribute:
+
+- **Acorn** is the base brand. It defines _every_ token — the full primitive palette, every semantic token, every typography style. It is the complete foundation.
+- **Sprig** and **Stelpro** only override what differs. If Sprig's heading style is the same as Acorn's, it inherits it automatically. Sprig only specifies the things that are uniquely Sprig.
+
+This "Acorn as base, others as overrides" approach means adding a new brand does not require redefining hundreds of tokens. You define only the differences.
+
+### What changes between brands
+
+Here is what actually varies across our current brands:
+
+| Property         | Acorn                | Sprig                   | Stelpro              |
+| ---------------- | -------------------- | ----------------------- | -------------------- |
+| Primary color    | Teal                 | Green                   | Red                  |
+| Button shape     | Pill (fully rounded) | Pill (fully rounded)    | Pill (fully rounded) |
+| Input corners    | Rounded              | Square                  | Rounded              |
+| Badge corners    | Pill                 | Square                  | Square               |
+| Card shadow      | Subtle               | Purple-tinted           | Subtle               |
+| Input focus ring | Visible shadow       | None                    | Visible shadow       |
+| Text on primary  | Dark                 | Light (white)           | Muted                |
+| Field labels     | Standard             | Smaller, lighter weight | Standard             |
+| Button fill      | Brand primary        | Gray (with green hover) | Brand primary        |
+
+Notice how some differences are purely about color (swap teal for green), while others are structural (rounded vs. square corners, visible vs. hidden focus rings). The token system handles both.
+
+### Beyond CSS: brand variants in components
+
+For most cases, swapping CSS token values is enough. But sometimes a brand needs a fundamentally different _class_ applied — not just a different value for the same property. For example, if Sprig's button text needs a completely different contrast treatment that cannot be expressed by just changing a CSS variable.
+
+In these cases, the component has "brand variant" files that specify overrides at the styling level. The key principle remains the same: **override only what differs.** If Sprig's button only changes the text color class, its variant file contains just that one change.
+
+---
+
+## Synthetic tokens
+
+Sometimes, neither the primitives nor the existing semantic tokens cover what a component needs. A "synthetic token" is a new semantic or component-level token created by developers to fill this gap.
+
+Synthetic tokens are created sparingly. They must meet all of these conditions:
+
+1. No existing semantic token covers the need
+2. The value varies between brands (or is expected to)
+3. It has a clear, cross-component or cross-brand purpose
+4. It follows the same naming pattern as other tokens
+
+An example: `alertbar-first-fg` was created because the foreground color on the first AlertBar variant differs between brands (dark text on Acorn, white text on Sprig/Stelpro). No existing semantic token mapped to this specific need.
+
+**The default is always: do not create a new token.** Use what exists. If a value appears in only one component and does not change between brands, it should simply be hardcoded.
+
+---
+
+## Color philosophy
+
+Our color system draws from the [Radix Colors palette composition](https://www.radix-ui.com/colors/docs/palette-composition/composing-a-palette) approach:
+
+**Choosing an accent scale.** Each brand picks a primary hue. Most scales (like teal, green, red) are designed for light text on solid backgrounds (step 9). A few scales (sky, mint, lime, yellow, amber) are designed for dark text instead.
+
+**Choosing a gray scale.** [Radix recommends](https://www.radix-ui.com/colors/docs/palette-composition/composing-a-palette#choosing-a-gray-scale) pairing your accent hue with a harmonizing neutral gray. A green accent pairs well with sage-tinted gray; a blue accent pairs with slate. Our brands each define their own overlay (neutral) scale to achieve this harmony.
+
+**Semantic colors.** Following widely understood conventions, we use red tones for errors, green for success, amber for warnings, and blue for informational states. These feedback colors are consistent across brands — a red error should always feel like an error, regardless of which brand is active.
+
+**The 12-step scale in practice.** When working with any color in the system, the step number tells you what the color is _for_. Step 3 is a component background. Step 7 is a border. Step 9 is a solid fill. Step 12 is high-contrast text. This consistency makes the palette predictable: designers and developers can communicate in terms of steps without memorizing hex values.
+
+---
+
+## Typography philosophy
+
+Our typography system follows [Tailwind's principle](https://tailwindcss.com/docs/font-size): **separate hierarchy from size.** A `heading-1` token is not just a font size — it is a complete typographic recipe that bundles family, weight, size, line height, letter spacing, and text transform into a single design decision.
+
+This matters because:
+
+- **Hierarchy is a design decision.** "This is a heading" is different from "this is 24px." A heading might be bold, tracked tightly, and in a display font. Making it bigger does not make it more of a heading.
+- **Sizes can vary by brand.** Sprig's field labels are smaller and lighter than Acorn's. The `field-label` token absorbs this difference without every form component needing to know about it.
+- **Consistency is automatic.** When every heading in the app uses the `heading-1` token, changing the heading style is a single-token update, not a find-and-replace across hundreds of files.
+
+Our system defines 14 semantic typography styles, from `heading-1` (the largest page-level heading) down to specialized styles like `navbar` (navigation items), `amount` (monetary values), and `button` (action labels).
+
+---
+
+## What gets tokenized (and what does not)
+
+Not everything should be a token. The rule of thumb: **tokenize appearance, hardcode structure.**
+
+| Tokenized (appearance)            | Hardcoded (structure)         |
+| --------------------------------- | ----------------------------- |
+| Colors                            | Display (flex, grid, block)   |
+| Border radii                      | Position (absolute, relative) |
+| Shadows                           | Alignment (center, stretch)   |
+| Typography styles                 | Cursor (pointer, default)     |
+| Animation durations               | Overflow behavior             |
+| Spacing _when it varies by brand_ | z-index stacking              |
+
+If changing a value requires a design conversation ("should buttons be rounded or square?"), it is a token. If it is an implementation detail ("should this use flexbox or grid?"), it is hardcoded.
+
+---
+
+## Summary
+
+1. **Primitives are the raw palette.** Named by what they are (primary-6, overlay-12), never referenced directly by components.
+2. **Semantic tokens are the shared language.** Named by purpose (interactive-primary, foreground-default), used by all components.
+3. **Component tokens are the escape hatch.** Created only when a brand needs a component to diverge from what semantic tokens provide.
+4. **Brands override, not duplicate.** Acorn defines everything. Other brands specify only differences.
+5. **Typography bundles hierarchy, not just size.** A heading token is a complete typographic decision.
+6. **Colors follow the 12-step scale.** Each step has a defined purpose, from backgrounds to text.
+7. **Tokenize what a designer would adjust. Hardcode everything else.**
+
+---
+
+## References
+
+- [Radix Colors — Understanding the Scale](https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale) — The 12-step color scale and what each step is for
+- [Radix Colors — Composing a Palette](https://www.radix-ui.com/colors/docs/palette-composition/composing-a-palette) — How to choose accent, gray, and semantic scales
+- [Radix Themes](https://www.radix-ui.com/themes/docs/theme/overview) — Themed component library with token-driven design
+- [Radix Primitives](https://www.radix-ui.com/primitives/docs/overview/introduction) — Unstyled, accessible component behaviors our system builds on
+- [shadcn/ui](https://ui.shadcn.com/) — Open-code component system with semantic CSS variable theming
+- [Tailwind CSS](https://tailwindcss.com/docs/theme) — Utility-first CSS framework powering our styling layer
+- [Catalyst](https://catalyst.tailwindui.com/docs) — Tailwind's own component starter kit
+
+</DocsLayout>

@@ -13,6 +13,7 @@ type Props = {
 } & FieldGooglePlacesAutocompleteProps;
 
 export default {
+  title: 'Components/Field/FieldGooglePlacesAutocomplete',
   argTypes: {
     corner: {
       control: { type: 'text' }

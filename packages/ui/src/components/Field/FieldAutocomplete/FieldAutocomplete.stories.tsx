@@ -20,6 +20,7 @@ const defaultItems: AutocompleteItem[] = [
 type Props = FieldAutocompleteProps<AutocompleteItem>;
 
 export default {
+  title: 'Components/Field/FieldAutocomplete',
   argTypes: {
     corner: { control: { type: 'text' } },
     description: { control: { type: 'text' } },
