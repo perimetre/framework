@@ -1,5 +1,11 @@
 # @perimetre/classnames
 
+## 0.2.0
+
+### Minor Changes
+
+- 7117601: Make sure createCn is exported
+
 ## 0.1.0
 
 ### Minor Changes
