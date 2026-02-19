@@ -183,6 +183,7 @@
      * ======================================== */
     --pui-color-border-default: var(--pui-primitive-color-overlay-5);
     --pui-color-border-focus: var(--pui-primitive-color-primary-9);
+    --pui-color-focus-outline: var(--pui-color-border-focus);
     --pui-color-border-rule-primary: var(--pui-primitive-color-overlay-9);
     --pui-color-border-rule-secondary: var(--pui-primitive-color-overlay-5);
     --pui-color-border-input: var(--pui-color-border-default);
@@ -400,6 +401,13 @@
     --pui-typo-amount-weight: var(--pui-primitive-font-weight-normal);
     --pui-typo-amount-tracking: 0;
     --pui-typo-amount-transform: none;
+
+    /* Extra Tiny: 0.625rem / 150% / normal / 0 / none */
+    --pui-typo-extra-tiny-size: 0.625rem;
+    --pui-typo-extra-tiny-leading: var(--pui-primitive-leading-loose);
+    --pui-typo-extra-tiny-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-extra-tiny-tracking: 0;
+    --pui-typo-extra-tiny-transform: none;
 
     /* Navbar: 0.875rem / 150% / normal / 0 / none */
     --pui-typo-navbar-size: var(--pui-primitive-font-size-sm);

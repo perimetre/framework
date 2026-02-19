@@ -23,8 +23,12 @@
 
     /* ========================================
      * Sprig Green — 12-step primary scale
-     * Mapped from consumer's Medium Sea Green 50-950 palette
-     * Step 9 = hero/accent (Medium Sea Green/400 #69c14c)
+     * Mapped from brand's Medium Sea Green 50-950 palette
+     * Step 9 = hero/accent (#69c14c)
+     *
+     * Brand-provided values: 50-950 (11 colors)
+     * Steps 5=9 and 6=10 share values (expected for
+     * limited palettes — see Radix 12-step docs)
      * ======================================== */
     --pui-primitive-color-primary-1: #dbfdd4;
     --pui-primitive-color-primary-2: #bcfbad;
@@ -33,10 +37,10 @@
     --pui-primitive-color-primary-5: #69c14c;
     --pui-primitive-color-primary-6: #53a03e;
     --pui-primitive-color-primary-7: #427d2e;
-    --pui-primitive-color-primary-8: #1f4114;
+    --pui-primitive-color-primary-8: #2f5d20;
     --pui-primitive-color-primary-9: #69c14c;
     --pui-primitive-color-primary-10: #53a03e;
-    --pui-primitive-color-primary-11: #2f5d20;
+    --pui-primitive-color-primary-11: #1f4114;
     --pui-primitive-color-primary-12: #0f2408;
 
     /* ========================================
@@ -72,7 +76,7 @@
     --pui-primitive-color-red-2: #fef2f2;
     --pui-primitive-color-red-6: #fecaca;
     --pui-primitive-color-red-9: #ef4444;
-    --pui-primitive-color-red-11: #ef4444;
+    --pui-primitive-color-red-11: #b91c1c;
   }
 }
 
@@ -94,13 +98,24 @@
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
 
     /* ========================================
-     * COLOR - Foreground (icons only — text inherits via primitives)
+     * COLOR - Focus
+     * Sprig uses primary green for focus rings
+     * Acorn: border-focus (teal-9) → Sprig: primary-9 (green)
+     * ======================================== */
+    --pui-color-focus-outline: var(--pui-primitive-color-primary-9);
+
+    /* ========================================
+     * COLOR - Foreground
      * Figma: "Icon (Gray)" = lg-med grey = overlay-8
      * Figma: "Icon (Chevron)" = mid grey = overlay-11
      * Acorn: both overlay-9
      * ======================================== */
     --pui-color-fg-icon: var(--pui-primitive-color-overlay-8);
     --pui-color-fg-icon-chevron: var(--pui-primitive-color-overlay-11);
+    /* Link active uses primary-8 (#2f5d20) — after step 8/11
+     * swap, acorn's primary-11 reference would resolve to
+     * #1f4114 which is too dark for link text */
+    --pui-color-fg-link-active: var(--pui-primitive-color-primary-8);
 
     /* ========================================
      * COLOR - Border

@@ -205,6 +205,9 @@
   --shadow-pui-dropdown: var(--pui-shadow-dropdown);
   --shadow-pui-card: var(--pui-shadow-card);
 
+  /* Focus outline */
+  --color-pui-focus-outline: var(--pui-color-focus-outline);
+
   /* ========================================
    * DROPDOWN/OVERLAY TOKENS
    * ======================================== */
@@ -442,4 +445,12 @@
 @utility typo-alertbar {
   font-size: var(--pui-typo-alertbar-size);
   font-weight: var(--pui-typo-alertbar-weight);
+}
+
+@utility typo-extra-tiny {
+  font-size: var(--pui-typo-extra-tiny-size);
+  line-height: var(--pui-typo-extra-tiny-leading);
+  font-weight: var(--pui-typo-extra-tiny-weight);
+  letter-spacing: var(--pui-typo-extra-tiny-tracking);
+  text-transform: var(--pui-typo-extra-tiny-transform);
 }

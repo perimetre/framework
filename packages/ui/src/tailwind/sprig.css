@@ -1,0 +1,10 @@
+/**
+ * Sprig brand tokens for Tailwind integration
+ * Includes Acorn base + Sprig overrides
+ *
+ * Usage:
+ *   @import '@perimetre/ui/tailwind';
+ *   @import '@perimetre/ui/tailwind/sprig.css';
+ */
+@import '../brands/acorn/styles.css';
+@import '../brands/sprig/styles.css';

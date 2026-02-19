@@ -1,0 +1,46 @@
+/**
+ * PUI Tailwind Integration — Source-level consumption
+ *
+ * Import this AFTER `tailwindcss` in your project's CSS.
+ * Provides PUI's theme tokens, utilities, variants, and plugins
+ * WITHOUT a second Tailwind runtime.
+ *
+ * Usage:
+ *   @import 'tailwindcss';
+ *   @import '@perimetre/ui/tailwind';
+ *   @import '@perimetre/ui/tailwind/sprig.css';
+ *   @source '../../node_modules/@perimetre/ui/dist/es';
+ *
+ * Note: Does NOT include tailwindcss/theme.css — your project provides it
+ *       via @import 'tailwindcss'.
+ * Note: Does NOT include brand tokens — import the brand file separately.
+ * Note: You MUST add @source pointing to PUI's dist/es directory so
+ *       Tailwind can scan PUI component class names.
+ */
+
+/* PUI CSS layer ordering — must be declared for proper cascade */
+@layer pui.primitive, pui.semantic, pui.theme;
+
+/* Theme bridge: @theme inline + @utility + @custom-variant */
+@import '../brands/tailwind.css';
+
+/* Animations */
+@import 'tw-animate-css';
+
+/* PUI's prefixed utilities — scoped to branded elements */
+[data-pui-brand] {
+  @import 'tailwindcss/utilities.css' prefix(pui);
+}
+
+/* Tailwind plugins */
+@plugin '@tailwindcss/typography';
+@plugin '@tailwindcss/forms' {
+  strategy: 'class';
+}
+
+/* Base theme — brand font applied to all branded elements */
+@layer pui.theme {
+  [data-pui-brand] {
+    @apply pui:font-sans;
+  }
+}

@@ -69,7 +69,9 @@
     },
     "./package.json": "./package.json",
     "./src/*": "./src/*",
-    "./styles/*.css": "./dist/styles/*.css"
+    "./styles/*.css": "./dist/styles/*.css",
+    "./tailwind": "./src/tailwind/index.css",
+    "./tailwind/*.css": "./src/tailwind/*.css"
   },
   "files": [
     "dist",

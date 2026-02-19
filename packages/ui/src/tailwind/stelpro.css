@@ -1,0 +1,10 @@
+/**
+ * Stelpro brand tokens for Tailwind integration
+ * Includes Acorn base + Stelpro overrides
+ *
+ * Usage:
+ *   @import '@perimetre/ui/tailwind';
+ *   @import '@perimetre/ui/tailwind/stelpro.css';
+ */
+@import '../brands/acorn/styles.css';
+@import '../brands/stelpro/styles.css';
