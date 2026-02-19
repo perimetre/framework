@@ -27,10 +27,15 @@
 /* Animations */
 @import 'tw-animate-css';
 
-/* PUI's prefixed utilities — scoped to branded elements */
-[data-pui-brand] {
-  @import 'tailwindcss/utilities.css' prefix(pui);
-}
+/*
+ * PUI namespace variant — makes the consumer's single Tailwind instance
+ * generate CSS for pui:-prefixed class names used in PUI components.
+ *
+ * pui:flex  → .pui\:flex:where([data-pui-brand] *, [data-pui-brand]) { display: flex }
+ *
+ * Scoped to [data-pui-brand] so PUI utilities only apply inside branded elements.
+ */
+@custom-variant pui (&:where([data-pui-brand] *, [data-pui-brand]));
 
 /* Tailwind plugins */
 @plugin '@tailwindcss/typography';
@@ -41,6 +46,6 @@
 /* Base theme — brand font applied to all branded elements */
 @layer pui.theme {
   [data-pui-brand] {
-    @apply pui:font-sans;
+    font-family: var(--font-pui-sans);
   }
 }

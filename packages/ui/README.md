@@ -4,12 +4,12 @@ A React component library with composable, brand-aware theming built on Tailwind
 
 ## Features
 
-- **Visual Polymorphism** - Same components render different visual styles per brand
-- **Design Token Architecture** - Three-tier token system (primitives, semantic, component) for radical theming
-- **RSC Compatible** - Module-level brand registry works in both Server and Client Components
-- **CVA Composition** - Brand variants use CVA (Class Variance Authority) with tailwind-merge for conflict resolution
-- **Tailwind CSS v4** - Built on the latest Tailwind with custom `pui:` prefix scoping
-- **Radix UI Primitives** - Accessible, unstyled primitives as the foundation
+- **Visual Polymorphism** — Same components render different visual styles per brand
+- **Design Token Architecture** — Three-tier token system (primitives, semantic, component) following Radix's 12-step color scale
+- **RSC Compatible** — Module-level brand registry works in both Server and Client Components
+- **CVA Composition** — Brand variants use CVA (Class Variance Authority) with tailwind-merge
+- **Tailwind CSS v4** — Source-level integration with consumer's Tailwind (recommended) or pre-built CSS
+- **Radix UI Primitives** — Accessible, unstyled primitives as the foundation
 
 ## Installation
 
@@ -19,66 +19,125 @@ pnpm add @perimetre/ui
 
 ## Quick Start
 
-### 1. Import Brand-Specific Styles
+There are two ways to consume `@perimetre/ui` styles:
 
-Import **only one** brand CSS file in your app's entry point or layout. Each brand CSS file is self-contained and includes all necessary base styles.
+| Approach                               | Best for                       | CSS output                               |
+| -------------------------------------- | ------------------------------ | ---------------------------------------- |
+| **Tailwind integration** (recommended) | Projects using Tailwind CSS v4 | Single Tailwind instance, no duplication |
+| **Pre-built CSS**                      | Projects without Tailwind      | Self-contained bundle (~15KB gzipped)    |
 
-```tsx
-// For Acorn brand (default)
-import '@perimetre/ui/styles/acorn.css';
+### Option A: Tailwind Integration (Recommended)
 
-// OR for Sprig brand
-import '@perimetre/ui/styles/sprig.css';
+For projects that already use Tailwind CSS v4. Your project's single Tailwind instance processes PUI's source-level tokens, utilities, and variants — no duplicate CSS.
 
-// OR for Stelpro brand
-import '@perimetre/ui/styles/stelpro.css';
-```
-
-**Important:**
-
-- Only import ONE brand CSS file. Each file contains only the styles for that specific brand, keeping your bundle size minimal.
-- The brand CSS files do NOT include Tailwind's preflight (CSS reset). If your app doesn't already use Tailwind CSS, you should import the optional preflight file first:
-
-```tsx
-// Optional: Only if your app doesn't already have Tailwind CSS
-import '@perimetre/ui/styles/preflight.css';
-
-// Then import your brand CSS
-import '@perimetre/ui/styles/sprig.css';
-```
-
-### Alternative: Compile with Your Own Tailwind (Advanced)
-
-If your project uses Tailwind CSS v4 and you want maximum tree-shaking (only include CSS for components you actually use), you can compile the styles yourself instead of using pre-built CSS.
-
-**Step 1:** Import the source CSS for your brand:
+#### 1. Set up your CSS entry point
 
 ```css
-/* In your app's main CSS file */
+/* globals.css */
+
+/* 1. Your Tailwind instance */
 @import 'tailwindcss';
 
-/* Import brand tokens (choose one) */
-@import '@perimetre/ui/src/styles/acorn.css';
-/* OR @import "@perimetre/ui/src/styles/sprig.css"; */
-/* OR @import "@perimetre/ui/src/styles/stelpro.css"; */
+/* 2. PUI integration: tokens, utilities, variants, plugins */
+@import '@perimetre/ui/tailwind';
+
+/* 3. Brand tokens (choose one) */
+@import '@perimetre/ui/tailwind/sprig.css';
+/* OR @import '@perimetre/ui/tailwind/acorn.css'; */
+/* OR @import '@perimetre/ui/tailwind/stelpro.css'; */
+
+/* 4. Source scanning — lets Tailwind see PUI component class names */
+@source '../../node_modules/@perimetre/ui/dist/es';
+
+/* 5. Your project-specific theme extensions */
+@theme inline {
+  --font-sans: 'Your Font', ui-sans-serif, system-ui, sans-serif;
+  --breakpoint-tablet: 48rem;
+  /* ... */
+}
 ```
 
-**Step 2:** Tailwind will automatically scan your app's bundled code and only generate CSS for the `pui:*` classes used by components you import.
+#### What `@perimetre/ui/tailwind` provides
 
-**Trade-offs:**
+- **CSS layers** — `pui.primitive`, `pui.semantic`, `pui.theme` for cascade control
+- **Theme bridge** — `@theme inline` registering all PUI tokens as Tailwind utilities (`bg-pui-primary-9`, `text-pui-fg-default`, etc.)
+- **Typography utilities** — `typo-heading-1` through `typo-extra-tiny` via `@utility`
+- **Brand variants** — `pui-acorn:`, `pui-sprig:`, `pui-stelpro:` via `@custom-variant`
+- **PUI namespace** — `@custom-variant pui` so PUI component class names (`pui:flex`, `pui:bg-pui-primary-9`) are generated by your Tailwind
+- **Animations** — `tw-animate-css`
+- **Plugins** — `@tailwindcss/typography`, `@tailwindcss/forms` (class strategy)
 
-| Approach         | Pros                          | Cons                                         |
-| ---------------- | ----------------------------- | -------------------------------------------- |
-| Pre-built CSS    | Zero config, works everywhere | Includes all utility classes (~14KB gzipped) |
-| Compile yourself | Only includes classes you use | Requires Tailwind v4, longer build times     |
+#### What `@perimetre/ui/tailwind/sprig.css` provides
 
-For most projects, the pre-built CSS is recommended. The compile-yourself approach is useful for large apps where every kilobyte matters.
+Brand-specific design tokens (CSS custom properties) for the Sprig brand, layered on top of the Acorn base. Each brand file imports `acorn/styles.css` + its own overrides.
 
-### 2. Initialize Brand at App Startup
+#### Using PUI tokens in your project
 
-Set the active brand at module load time. In Next.js App Router, server and client bundles are separate, so you need to initialize the brand in **both**:
+PUI tokens are available as CSS custom properties on any element under `[data-pui-brand]`. Use them via Tailwind utilities:
 
-**Step 1:** Create a client-side brand initializer component:
+```html
+<!-- PUI semantic tokens (recommended) -->
+<p class="text-pui-fg-default bg-pui-surface-primary">...</p>
+<button class="bg-pui-button-primary-fill text-pui-interactive-on-primary">...</button>
+
+<!-- PUI primitive scales (for brand-specific values not covered by semantics) -->
+<div class="bg-pui-primary-9 text-pui-overlay-1">...</div>
+
+<!-- PUI typography utilities -->
+<h1 class="typo-heading-1">...</h1>
+<p class="typo-base">...</p>
+<small class="typo-tiny">...</small>
+
+<!-- Brand-conditional styles -->
+<div class="pui-sprig:rounded-none pui-acorn:rounded-full">...</div>
+```
+
+Or reference tokens directly in CSS:
+
+```css
+.my-component {
+  color: var(--pui-color-fg-default);
+  border-color: var(--pui-color-border-rule-primary);
+  box-shadow: var(--pui-shadow-card);
+}
+```
+
+#### Important: `data-pui-brand` placement
+
+PUI tokens are CSS custom properties scoped to `[data-pui-brand]`. Place this attribute on `<body>` or whatever element wraps your branded content. Elements outside this scope won't have access to PUI tokens.
+
+```tsx
+<body data-pui-brand="sprig">{/* PUI tokens available here */}</body>
+```
+
+If you reference PUI token vars (like `var(--pui-color-fg-body)`) in base styles, apply them on or inside the `[data-pui-brand]` element — not on `:root` / `<html>`:
+
+```css
+/* PUI tokens don't exist on :root — only on [data-pui-brand] and descendants */
+body {
+  @apply text-pui-fg-body typo-base font-sans;
+}
+```
+
+### Option B: Pre-built CSS
+
+For projects that don't use Tailwind CSS. Each brand file is self-contained with its own Tailwind runtime and all PUI utilities.
+
+```tsx
+// Import ONE brand CSS file in your app's entry point
+import '@perimetre/ui/styles/sprig.css';
+
+// Optional: CSS reset (only if your app doesn't already have one)
+import '@perimetre/ui/styles/preflight.css';
+```
+
+> **Note:** The pre-built CSS includes its own Tailwind instance with a `pui:` prefix to avoid conflicts with your app's styles. If your project also uses Tailwind CSS, use **Option A** instead to avoid duplicate Tailwind output.
+
+### Initialize the Brand
+
+Set the active brand at module load time. In Next.js App Router, server and client bundles are separate, so initialize in both:
+
+**Client-side initializer:**
 
 ```tsx
 // src/components/BrandInitializer.tsx
@@ -86,31 +145,26 @@ Set the active brand at module load time. In Next.js App Router, server and clie
 
 import { setActiveBrand } from '@perimetre/ui';
 
-// Runs at module load time on the client
 setActiveBrand('sprig');
 
-// Empty component - just needs to be imported to trigger the module load
 export default function BrandInitializer() {
   return null;
 }
 ```
 
-**Step 2:** Use it in your root layout alongside server-side initialization:
+**Root layout:**
 
 ```tsx
-// app/layout.tsx (Next.js App Router)
+// app/layout.tsx
 import { setActiveBrand } from '@perimetre/ui';
-import '@perimetre/ui/styles/sprig.css';
 import BrandInitializer from '@/components/BrandInitializer';
 
-// Initialize brand on server (for Server Components)
 setActiveBrand('sprig');
 
 export default function RootLayout({ children }) {
   return (
     <html>
       <body data-pui-brand="sprig">
-        {/* Initialize brand on client (for Client Components) */}
         <BrandInitializer />
         {children}
       </body>
@@ -119,44 +173,77 @@ export default function RootLayout({ children }) {
 }
 ```
 
-**Why both?**
-
-- **Server-side `setActiveBrand()`**: Sets the brand for Server Components rendered on the server
-- **Client-side `BrandInitializer`**: Sets the brand for Client Components (like `ImageCarousel`) which run in a separate client bundle
-- **`data-pui-brand` attribute**: Provides CSS scoping for design tokens
-
-**Important:**
-
-- All three (server init, client init, data attribute) must use the same brand value
-- The `BrandInitializer` component renders nothing - it only triggers the module-level `setActiveBrand()` call
-- Components automatically use the correct brand variants via `getBrandVariant()`
+All three must agree: server-side `setActiveBrand()`, client-side `setActiveBrand()`, and the `data-pui-brand` attribute.
 
 ## Design Token Architecture
 
-The UI library uses a three-tier token architecture for visual polymorphism. See [Design Token Guide](./docs/design-token-guide.md) for the complete documentation.
+Three-tier token system following [Radix's 12-step color scale](https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale). See [Design Token Guide](./docs/design-token-guide.md) for full documentation.
 
 ### Token Tiers
 
-1. **Primitives** - Raw values (`--pui-primitive-color-primary-6`)
-2. **Semantic** - Purpose-based tokens that reference primitives
-3. **Component** - Optional component-specific overrides
+1. **Primitives** (`--pui-primitive-*`) — Raw values named by what they ARE, not what they're FOR. Color scales follow Radix 12-step: steps 1-2 backgrounds, 3-5 component backgrounds, 6-8 borders, 9-10 solid/accent, 11-12 text.
+2. **Semantic** (`--pui-color-*`, `--pui-typo-*`, etc.) — Purpose-based tokens that reference primitives. Components consume these.
+3. **Component** — Optional component-specific overrides when semantics aren't sufficient.
+
+### Tailwind Bridge
+
+PUI tokens are bridged to Tailwind via `@theme inline` in `tailwind.css`:
+
+```
+CSS custom property          → Tailwind utility class
+--color-pui-primary-9        → bg-pui-primary-9, text-pui-primary-9
+--color-pui-fg-default       → text-pui-fg-default
+--color-pui-button-hover     → bg-pui-button-hover
+--shadow-pui-card            → shadow-pui-card
+--ease-pui-out-cubic         → ease-pui-out-cubic
+```
 
 ### CSS Layers
 
-Styles are organized in CSS layers for proper cascade control:
-
 ```css
-@layer pui.tw.theme, pui.tw.base;
-@layer pui.primitives, pui.semantic, pui.theme, pui.components;
+@layer pui.primitive; /* Raw color scales, font stacks */
+@layer pui.semantic; /* Purpose-based tokens referencing primitives */
+@layer pui.theme; /* Tailwind theme bridge, base styles */
 ```
 
-### Tailwind Integration
+### Brand-Specific Overrides
 
-The library uses Tailwind v4 with:
+Each brand only defines values that DIFFER from the Acorn base. Sprig overrides ~30 tokens; everything else is inherited:
 
-- Custom `pui:` prefix for all utilities
-- Scoping via `important: '[data-pui-brand]'` in config
-- Custom variants for brand-specific styles: `pui:acorn:`, `pui:sprig:`, `pui:stelpro:`
+```css
+/* brands/sprig/styles.css — only differences from Acorn */
+@layer pui.semantic {
+  [data-pui-brand='sprig'] {
+    --pui-color-button-primary-fill: var(--pui-primitive-color-overlay-11);
+    --pui-color-button-hover: var(--pui-primitive-color-primary-9);
+    --pui-color-focus-outline: var(--pui-primitive-color-primary-9);
+    /* ... only what differs */
+  }
+}
+```
+
+## Exports
+
+Import exactly what you need for optimal tree-shaking:
+
+```typescript
+// Brand initialization
+import { setActiveBrand } from '@perimetre/ui';
+import { getActiveBrand, getBrandVariant, BRANDS } from '@perimetre/ui';
+
+// Components (tree-shakeable)
+import Button from '@perimetre/ui/components/Button';
+import { FieldInput } from '@perimetre/ui/components/Field/FieldInput';
+
+// Tailwind integration (source-level, recommended)
+// Used via @import in CSS — see Quick Start above
+
+// Pre-built CSS (alternative)
+import '@perimetre/ui/styles/acorn.css';
+import '@perimetre/ui/styles/sprig.css';
+import '@perimetre/ui/styles/stelpro.css';
+import '@perimetre/ui/styles/preflight.css'; // CSS reset, only if needed
+```
 
 ## Development
 
@@ -168,52 +255,10 @@ The library uses Tailwind v4 with:
 ### Commands
 
 ```bash
-# Start development server (Ladle)
-pnpm dev
-
-# Build the library
-pnpm build
-
-# Type check
-pnpm typecheck
+pnpm dev        # Start Ladle dev server
+pnpm build      # Build the library
+pnpm typecheck  # Type check
 ```
-
-### Ladle
-
-The package uses [Ladle](https://ladle.dev/) for component development and documentation. Run `pnpm dev` to browse available components and their variants.
-
-## Exports
-
-The package avoids barrel exports for optimal tree-shaking. Import exactly what you need:
-
-```typescript
-// Brand initialization (call at module load time in root layout)
-import { setActiveBrand } from '@perimetre/ui';
-
-// Brand utilities (rarely needed - components use these internally)
-import { getActiveBrand, getBrandVariant, BRANDS } from '@perimetre/ui';
-
-// Individual components (tree-shakeable - import from specific paths)
-import Button from '@perimetre/ui/components/Button';
-import { FieldInput } from '@perimetre/ui/components/Field/FieldInput';
-
-// Brand-specific CSS (import only ONE)
-import '@perimetre/ui/styles/acorn.css'; // ~14.7KB
-import '@perimetre/ui/styles/sprig.css'; // ~15.0KB
-import '@perimetre/ui/styles/stelpro.css'; // ~14.8KB
-
-// Optional preflight (CSS reset) - only if your app doesn't have Tailwind CSS
-import '@perimetre/ui/styles/preflight.css'; // ~4.8KB
-```
-
-### CSS Bundle Sizes (gzipped)
-
-| File      | Size    | Gzipped |
-| --------- | ------- | ------- |
-| Preflight | 4.8 KB  | 1.3 KB  |
-| Acorn     | 14.7 KB | 3.3 KB  |
-| Sprig     | 15.0 KB | 3.3 KB  |
-| Stelpro   | 14.8 KB | 3.3 KB  |
 
 ## Peer Dependencies
 
@@ -222,9 +267,5 @@ import '@perimetre/ui/styles/preflight.css'; // ~4.8KB
 
 ## Related Packages
 
-- `@perimetre/classnames` - Utility combining clsx and tailwind-merge
-- `@perimetre/icons` - Accessible React icon wrapper
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on adding new components and creating brand themes.
+- `@perimetre/classnames` — Utility combining clsx and tailwind-merge
+- `@perimetre/icons` — Accessible React icon wrapper
