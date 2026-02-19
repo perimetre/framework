@@ -8,7 +8,7 @@ import { globalIgnores } from 'eslint/config';
  */
 export default [
   ...baseConfig,
-  globalIgnores(['.turbo', 'examples/**']),
+  globalIgnores(['.turbo', 'examples/**', 'packages/tokens/src/sets/**/*']),
   {
     languageOptions: {
       parserOptions: {

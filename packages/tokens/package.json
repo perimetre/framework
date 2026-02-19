@@ -1,0 +1,34 @@
+{
+  "description": "Design tokens for the Perimetre design system",
+  "devDependencies": {
+    "@tokens-studio/sd-transforms": "^2.0.3",
+    "style-dictionary": "^5.3.1",
+    "tsx": "^4.21.0"
+  },
+  "exports": {
+    "./brands/*.css": "./css/brands/*.css",
+    "./sets/*": "./src/sets/*"
+  },
+  "files": [
+    "css",
+    "src/sets"
+  ],
+  "name": "@perimetre/tokens",
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/tokens",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "type": "module",
+  "version": "0.0.1"
+}

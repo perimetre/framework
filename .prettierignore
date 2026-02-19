@@ -5,5 +5,6 @@ build
 .next
 **/__generated__/
 **/(payload)/**/*
+packages/tokens/src/sets/**/*
 # prettier 3.8.1 crashes on HTML files with only <script> tags
 packages/ui/.ladle/head.html
