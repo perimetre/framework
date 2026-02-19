@@ -1,0 +1,104 @@
+@layer pui.primitive {
+  [data-pui-brand='cima'] {
+    /**
+     ** PRIMITIVE TOKENS
+     *
+     ** Raw design values named by what they ARE, not what they're FOR.
+     ** These are NEVER directly consumed by components.
+     ** Only semantic tokens should reference these.
+     **
+     ** Color scales follow Radix's 12-step philosophy:
+     ** 1-2: Backgrounds  |  3-5: Component backgrounds
+     ** 6-8: Borders      |  9-10: Solid/accent
+     ** 11-12: Text
+     **
+     ** Source of truth: Figma "CIMA Web Design System" + "CIMA Primitives.json"
+     */
+
+    /* PPTelegraph — Cima's custom brand typeface */
+    --pui-primitive-font-sans:
+      'PPTelegraph', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+      'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* ========================================
+     * Vert-Cima — 12-step primary scale
+     * Mapped from Figma "color.vert-cima" 50-950 palette (11 colors).
+     * Steps 1-2 share value (50=100 in brand palette — expected for
+     * limited palettes, see Radix 12-step docs).
+     * Step 9 = hero/accent = vert-cima.500 (#9bc632)
+     *   → used for: primary button fill, focus rings, checked controls
+     * Step 10 = hover = vert-cima.600 (#7a9c24)
+     * ======================================== */
+    --pui-primitive-color-primary-1: #e8fec7; /* vert-cima.50  */
+    --pui-primitive-color-primary-2: #e8fec7; /* vert-cima.100 (same as 50) */
+    --pui-primitive-color-primary-3: #c0f43f; /* vert-cima.200 */
+    --pui-primitive-color-primary-4: #b4e539; /* vert-cima.300 */
+    --pui-primitive-color-primary-5: #a7d636; /* vert-cima.400 */
+    --pui-primitive-color-primary-6: #9bc632; /* vert-cima.500 (same as step 9) */
+    --pui-primitive-color-primary-7: #7a9c24; /* vert-cima.600 (same as step 10) */
+    --pui-primitive-color-primary-8: #5a7417; /* vert-cima.700 */
+    --pui-primitive-color-primary-9: #9bc632; /* vert-cima.500 — hero/solid accent */
+    --pui-primitive-color-primary-10: #7a9c24; /* vert-cima.600 — hover */
+    --pui-primitive-color-primary-11: #3a4e0d; /* vert-cima.800 */
+    --pui-primitive-color-primary-12: #1e2903; /* vert-cima.900 */
+
+    /* ========================================
+     * Overlay (Neutres) — 12-step neutral scale
+     * Mapped from Figma "color.neutres" — cool blue-gray palette.
+     * Brand-provided steps: blanc, 200, 300, 500, 700, 800, 900.
+     * Missing steps (2, 3, 5, 7, 9) are linearly interpolated.
+     * ======================================== */
+    --pui-primitive-color-overlay-1: #ffffff; /* blanc */
+    --pui-primitive-color-overlay-2: #f5f6f8; /* interpolated */
+    --pui-primitive-color-overlay-3: #eceef1; /* interpolated */
+    --pui-primitive-color-overlay-4: #e5e7eb; /* neutre-200 */
+    --pui-primitive-color-overlay-5: #d8dbdf; /* interpolated */
+    --pui-primitive-color-overlay-6: #d1d5dc; /* neutre-300 — input border */
+    --pui-primitive-color-overlay-7: #b8bdc5; /* interpolated */
+    --pui-primitive-color-overlay-8: #99a1af; /* neutre-500 */
+    --pui-primitive-color-overlay-9: #6e7a8a; /* interpolated */
+    --pui-primitive-color-overlay-10: #4a5565; /* neutre-700 */
+    --pui-primitive-color-overlay-11: #364153; /* neutre-800 — field labels, muted text */
+    --pui-primitive-color-overlay-12: #0a0a0a; /* neutre-900 — body text, headings */
+  }
+}
+
+@layer pui.semantic {
+  [data-pui-brand='cima'] {
+    /**
+     **  SEMANTIC TOKENS
+     *
+     ** Only values that DIFFER from Acorn base are defined here.
+     ** Everything else is inherited.
+     **
+     ** Source: Figma "CIMA Web Design System" node 56:1552
+     **   • bouton primaire: fond vert CIMA+ (#9bc632), texte blanc, gras
+     **   • bouton secondaire: bordure 2px vert CIMA+, texte vert CIMA+, fond blanc
+     **   • champs: rayon 10px, bordure 1px #D1D5DC, focus 2px vert CIMA+
+     */
+
+    /* ========================================
+     * COLOR - Interactive
+     * Figma: "texte: blanc, gras" on primary button (vert CIMA+ fill).
+     * Primary-9 (#9bc632) is the button fill by default via Acorn.
+     * ======================================== */
+    --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
+
+    /* ========================================
+     * COLOR - Field label
+     * Figma: labels use #364153 (neutre-800 = overlay-11, muted)
+     * Acorn default: fg-default (overlay-12)
+     * ======================================== */
+    --pui-field-label-color: var(--pui-color-fg-muted);
+
+    /* ========================================
+     * SHAPE - Radius
+     * Figma: buttons and inputs both use 10px rounded corners.
+     * No matching primitive in the scale (sm=4, md=6, lg=8, full=∞),
+     * so 0.625rem (10px) is set directly.
+     * ======================================== */
+    --pui-radius-button: 0.625rem; /* 10px — Figma: rounded-[10px] on all buttons */
+    --pui-radius-input: 0.625rem; /* 10px — Figma: rayon 10px on inputs */
+    --pui-radius-badge: 0.625rem; /* 10px — consistent with button/input radius */
+  }
+}
