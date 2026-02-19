@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.10.0
+
+### Minor Changes
+
+- 28df067: Exporting tailwind for consumers
+
 ## 13.9.2
 
 ### Patch Changes
