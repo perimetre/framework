@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 13.11.0
+
+### Minor Changes
+
+- d32a405: Updating namespace
+
 ## 13.10.0
 
 ### Minor Changes
