@@ -4,7 +4,7 @@
       "font": {
         "sans": {
           "$value": "'Gotham', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
-          "$type": "fontFamily"
+          "$type": "fontFamilies"
         }
       },
       "color": {

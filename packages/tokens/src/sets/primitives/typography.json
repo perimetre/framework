@@ -4,7 +4,7 @@
       "font": {
         "sans": {
           "$value": "'Arial', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
-          "$type": "fontFamily"
+          "$type": "fontFamilies"
         },
         "size": {
           "$type": "fontSizes",
@@ -20,7 +20,7 @@
           "6xl": { "$value": "3.5rem" }
         },
         "weight": {
-          "$type": "fontWeight",
+          "$type": "fontWeights",
           "normal": { "$value": 400 },
           "medium": { "$value": 500 },
           "semibold": { "$value": 600 },
