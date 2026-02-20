@@ -2,7 +2,7 @@
   "pui": {
     "primitive": {
       "radius": {
-        "$type": "dimension",
+        "$type": "borderRadius",
         "none": { "$value": "0" },
         "sm": { "$value": "0.25rem" },
         "md": { "$value": "0.375rem" },

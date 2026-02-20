@@ -92,26 +92,27 @@
     },
     "typo": {
       "alertbar": {
-        "size": { "$value": "{pui.typo.tiny.size}" },
-        "weight": { "$value": "{pui.primitive.font.weight.bold}" }
+        "size": { "$value": "{pui.typo.tiny.size}", "$type": "fontSizes" },
+        "weight": { "$value": "{pui.primitive.font.weight.bold}", "$type": "fontWeights" }
       }
     },
     "radius": {
-      "$type": "dimension",
+      "$type": "borderRadius",
       "input": { "$value": "0" },
       "badge": { "$value": "0" },
       "control": { "$value": "0" },
       "dropdown": { "$value": "0" }
     },
     "shadow": {
+      "$type": "boxShadow",
       "card": { "$value": "7px 5px 30px 0 rgba(72, 73, 121, 0.15)" },
       "input-focus": { "$value": "none" },
       "dropdown": { "$value": "none" }
     },
     "field-label": {
-      "font-size": { "$value": "var(--text-xs)" },
-      "line-height": { "$value": "150%" },
-      "font-weight": { "$value": "400" }
+      "font-size": { "$value": "var(--text-xs)", "$type": "fontSizes" },
+      "line-height": { "$value": "150%", "$type": "lineHeights" },
+      "font-weight": { "$value": "400", "$type": "fontWeights" }
     }
   }
 }

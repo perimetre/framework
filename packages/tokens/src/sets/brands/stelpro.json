@@ -18,7 +18,7 @@
       }
     },
     "radius": {
-      "$type": "dimension",
+      "$type": "borderRadius",
       "badge": { "$value": "{pui.primitive.radius.none}" }
     }
   }

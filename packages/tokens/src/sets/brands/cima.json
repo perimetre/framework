@@ -49,7 +49,7 @@
       "color": { "$value": "{pui.color.fg.muted}", "$type": "color" }
     },
     "radius": {
-      "$type": "dimension",
+      "$type": "borderRadius",
       "button": { "$value": "0.625rem" },
       "input": { "$value": "0.625rem" },
       "badge": { "$value": "0.625rem" }

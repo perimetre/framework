@@ -7,7 +7,7 @@
           "$type": "fontFamily"
         },
         "size": {
-          "$type": "dimension",
+          "$type": "fontSizes",
           "xs": { "$value": "0.75rem" },
           "sm": { "$value": "0.875rem" },
           "base": { "$value": "1rem" },
@@ -28,7 +28,7 @@
         }
       },
       "leading": {
-        "$type": "number",
+        "$type": "lineHeights",
         "none": { "$value": 1 },
         "tight": { "$value": 1.1 },
         "snug": { "$value": 1.2 },
