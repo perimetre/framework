@@ -1,0 +1,66 @@
+{
+  "pui": {
+    "primitive": {
+      "color": {
+        "$type": "color",
+        "primary": {
+          "1": { "$value": "hsl(172, 60%, 98%)" },
+          "2": { "$value": "hsl(172, 55%, 95%)" },
+          "3": { "$value": "hsl(172, 60%, 89%)" },
+          "4": { "$value": "hsl(172, 65%, 82%)" },
+          "5": { "$value": "hsl(172, 70%, 74%)" },
+          "6": { "$value": "hsl(172, 75%, 65%)" },
+          "7": { "$value": "hsl(172, 80%, 55%)" },
+          "8": { "$value": "hsl(172, 90%, 45%)" },
+          "9": { "$value": "hsl(172, 96%, 53%)" },
+          "10": { "$value": "hsl(172, 96%, 48%)" },
+          "11": { "$value": "hsl(172, 80%, 30%)" },
+          "12": { "$value": "hsl(172, 70%, 15%)" }
+        },
+        "overlay": {
+          "1": { "$value": "#fdfdfc" },
+          "2": { "$value": "#f9f9f8" },
+          "3": { "$value": "#f1f0ef" },
+          "4": { "$value": "#e9e8e6" },
+          "5": { "$value": "#e2e1de" },
+          "6": { "$value": "#dad9d6" },
+          "7": { "$value": "#cfceca" },
+          "8": { "$value": "#bcbbb5" },
+          "9": { "$value": "#8d8d86" },
+          "10": { "$value": "#82827c" },
+          "11": { "$value": "#63635e" },
+          "12": { "$value": "#21201c" }
+        },
+        "red": {
+          "1": { "$value": "#fff8f7" },
+          "2": { "$value": "#fff0ee" },
+          "3": { "$value": "#ffe5e2" },
+          "4": { "$value": "#fdd8d3" },
+          "5": { "$value": "#f9c6c2" },
+          "6": { "$value": "#f3b0ab" },
+          "7": { "$value": "#ea928c" },
+          "8": { "$value": "#e5484d" },
+          "9": { "$value": "#dc3d43" },
+          "10": { "$value": "#d13438" },
+          "11": { "$value": "#c62a2f" },
+          "12": { "$value": "#641723" }
+        },
+        "green": {
+          "9": { "$value": "#30a46c" },
+          "11": { "$value": "#18794e" }
+        },
+        "amber": {
+          "9": { "$value": "#f5a623" },
+          "11": { "$value": "#ad5700" }
+        },
+        "blue": {
+          "9": { "$value": "#0091ff" },
+          "11": { "$value": "#006adc" }
+        },
+        "error": { "$value": "{pui.primitive.color.red.9}" },
+        "error-strong": { "$value": "{pui.primitive.color.red.8}" },
+        "error-light": { "$value": "{pui.primitive.color.red.5}" }
+      }
+    }
+  }
+}

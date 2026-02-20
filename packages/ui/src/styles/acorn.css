@@ -5,4 +5,4 @@
  * Usage: import '@perimetre/ui/styles/acorn.css'
  */
 @import './base.css';
-@import '../brands/acorn/styles.css';
+@import '@perimetre/tokens/brands/acorn.css';

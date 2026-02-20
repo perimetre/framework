@@ -7,5 +7,5 @@
  * Note: Stelpro extends Acorn (the base theme), so Acorn tokens are included.
  */
 @import './base.css';
-@import '../brands/acorn/styles.css';
-@import '../brands/stelpro/styles.css';
+@import '@perimetre/tokens/brands/acorn.css';
+@import '@perimetre/tokens/brands/stelpro.css';

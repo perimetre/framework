@@ -1,5 +1,13 @@
 {
   "tokenSetOrder": [
-    "global"
+    "primitives/colors",
+    "primitives/typography",
+    "primitives/shape",
+    "primitives/shadow",
+    "primitives/motion",
+    "semantic/base",
+    "brands/sprig",
+    "brands/stelpro",
+    "brands/cima"
   ]
 }

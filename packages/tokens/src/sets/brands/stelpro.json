@@ -1,0 +1,25 @@
+{
+  "pui": {
+    "primitive": {
+      "color": {
+        "$type": "color",
+        "primary": {
+          "9": { "$value": "#fe322a" }
+        }
+      }
+    },
+    "color": {
+      "$type": "color",
+      "interactive": {
+        "on-primary": { "$value": "{pui.primitive.color.overlay.5}" }
+      },
+      "alertbar": {
+        "first-fg": { "$value": "{pui.primitive.color.overlay.1}" }
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "badge": { "$value": "{pui.primitive.radius.none}" }
+    }
+  }
+}

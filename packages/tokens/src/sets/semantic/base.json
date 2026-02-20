@@ -1,0 +1,262 @@
+{
+  "pui": {
+    "color": {
+      "$type": "color",
+      "bg": {
+        "default": { "$value": "{pui.primitive.color.overlay.1}" },
+        "subtle": { "$value": "{pui.primitive.color.overlay.3}" },
+        "muted": { "$value": "{pui.primitive.color.overlay.5}" }
+      },
+      "surface": {
+        "primary": { "$value": "{pui.primitive.color.overlay.1}" },
+        "secondary": { "$value": "{pui.primitive.color.overlay.3}" }
+      },
+      "fg": {
+        "default": { "$value": "{pui.primitive.color.overlay.12}" },
+        "muted": { "$value": "{pui.primitive.color.overlay.11}" },
+        "subtle": { "$value": "{pui.primitive.color.overlay.8}" },
+        "body": { "$value": "{pui.primitive.color.overlay.12}" },
+        "link-primary": { "$value": "{pui.primitive.color.overlay.12}" },
+        "link-secondary": { "$value": "{pui.primitive.color.overlay.8}" },
+        "link-active": { "$value": "{pui.primitive.color.primary.11}" },
+        "icon": { "$value": "{pui.primitive.color.overlay.9}" },
+        "icon-chevron": { "$value": "{pui.primitive.color.overlay.9}" }
+      },
+      "border": {
+        "default": { "$value": "{pui.primitive.color.overlay.5}" },
+        "focus": { "$value": "{pui.primitive.color.primary.9}" },
+        "rule-primary": { "$value": "{pui.primitive.color.overlay.9}" },
+        "rule-secondary": { "$value": "{pui.primitive.color.overlay.5}" },
+        "input": { "$value": "{pui.color.border.default}" }
+      },
+      "focus-outline": { "$value": "{pui.color.border.focus}" },
+      "interactive": {
+        "primary": { "$value": "{pui.primitive.color.primary.9}" },
+        "on-primary": { "$value": "{pui.primitive.color.overlay.12}" }
+      },
+      "button": {
+        "primary-fill": { "$value": "{pui.color.interactive.primary}" },
+        "secondary-fill": { "$value": "{pui.color.bg.default}" },
+        "secondary-outline": { "$value": "{pui.primitive.color.overlay.8}" },
+        "hover": { "$value": "{pui.primitive.color.primary.10}" },
+        "active": { "$value": "{pui.primitive.color.primary.10}" },
+        "inactive": { "$value": "{pui.primitive.color.overlay.8}" }
+      },
+      "input": {
+        "bg": { "$value": "{pui.color.bg.default}" },
+        "border": { "$value": "{pui.color.border.default}" },
+        "border-focus": { "$value": "{pui.color.border.focus}" },
+        "text": { "$value": "{pui.color.fg.default}" },
+        "placeholder": { "$value": "{pui.color.fg.subtle}" },
+        "box": { "$value": "{pui.primitive.color.overlay.2}" },
+        "outline": { "$value": "{pui.primitive.color.overlay.5}" }
+      },
+      "control": {
+        "unchecked-bg": { "$value": "{pui.color.bg.default}" },
+        "unchecked-border": { "$value": "{pui.color.border.default}" },
+        "checked-bg": { "$value": "{pui.color.interactive.primary}" },
+        "checked-border": { "$value": "{pui.color.interactive.primary}" },
+        "checked-border-inverted": { "$value": "{pui.color.control.checked-border}" },
+        "checkmark": { "$value": "{pui.color.interactive.primary}" },
+        "checkmark-inverted": { "$value": "{pui.color.bg.default}" }
+      },
+      "feedback": {
+        "error": { "$value": "{pui.primitive.color.red.9}" },
+        "error-strong": { "$value": "{pui.primitive.color.red.8}" },
+        "error-light": { "$value": "{pui.primitive.color.red.5}" },
+        "error-surface": { "$value": "{pui.primitive.color.red.2}" },
+        "error-border": { "$value": "{pui.primitive.color.red.6}" },
+        "error-text": { "$value": "{pui.primitive.color.red.11}" },
+        "success": { "$value": "{pui.primitive.color.green.9}" },
+        "success-text": { "$value": "{pui.primitive.color.green.11}" },
+        "warning": { "$value": "{pui.primitive.color.amber.9}" },
+        "warning-text": { "$value": "{pui.primitive.color.amber.11}" },
+        "info": { "$value": "{pui.primitive.color.blue.9}" },
+        "info-text": { "$value": "{pui.primitive.color.blue.11}" }
+      },
+      "table": {
+        "inactive-item": { "$value": "{pui.primitive.color.overlay.6}" }
+      },
+      "alertbar": {
+        "first-bg": { "$value": "{pui.primitive.color.primary.9}" },
+        "first-fg": { "$value": "{pui.primitive.color.overlay.12}" },
+        "second-bg": { "$value": "{pui.primitive.color.red.9}" },
+        "second-fg": { "$value": "{pui.primitive.color.overlay.1}" },
+        "third-bg": { "$value": "{pui.primitive.color.overlay.3}" },
+        "third-fg": { "$value": "{pui.primitive.color.overlay.12}" },
+        "fourth-bg": { "$value": "{pui.primitive.color.overlay.12}" },
+        "fourth-fg": { "$value": "{pui.primitive.color.overlay.1}" }
+      },
+      "dropdown": {
+        "bg": { "$value": "{pui.color.bg.default}" },
+        "border": { "$value": "{pui.color.border.default}" },
+        "text": { "$value": "{pui.color.fg.default}" },
+        "text-secondary": { "$value": "{pui.color.fg.muted}" },
+        "text-matched": { "$value": "{pui.color.interactive.primary}" },
+        "text-active": { "$value": "{pui.color.fg.default}" },
+        "text-secondary-active": { "$value": "{pui.color.fg.muted}" },
+        "text-matched-active": { "$value": "{pui.color.interactive.primary}" },
+        "item-bg": { "$value": "{pui.color.bg.default}" },
+        "item-hover-bg": { "$value": "{pui.primitive.color.overlay.3}" },
+        "separator": { "$value": "{pui.primitive.color.overlay.4}" }
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "button": { "$value": "{pui.primitive.radius.full}" },
+      "input": { "$value": "{pui.primitive.radius.md}" },
+      "badge": { "$value": "{pui.primitive.radius.full}" },
+      "control": { "$value": "{pui.primitive.radius.sm}" },
+      "dropdown": { "$value": "{pui.radius.input}" }
+    },
+    "border-width": {
+      "$type": "dimension",
+      "default": { "$value": "1px" }
+    },
+    "shadow": {
+      "button": { "$value": "{pui.primitive.shadow.none}" },
+      "button-hover": { "$value": "{pui.primitive.shadow.sm}" },
+      "input": { "$value": "{pui.primitive.shadow.none}" },
+      "input-focus": { "$value": "0 0 0 2px var(--pui-color-border-focus)" },
+      "card": { "$value": "{pui.primitive.shadow.md}" },
+      "dropdown": { "$value": "{pui.primitive.shadow.md}" }
+    },
+    "font-weight-label": { "$value": "700" },
+    "letter-spacing-label": { "$value": "0.1125rem" },
+    "text-transform-label": { "$value": "uppercase" },
+    "field-label": {
+      "font-size": { "$value": "var(--text-sm)" },
+      "line-height": { "$value": "var(--text-sm--line-height)" },
+      "font-weight": { "$value": "500" },
+      "color": { "$value": "{pui.color.fg.default}", "$type": "color" }
+    },
+    "typo": {
+      "heading-1": {
+        "size": { "$value": "{pui.primitive.font.size.6xl}" },
+        "leading": { "$value": "{pui.primitive.leading.none}" },
+        "weight": { "$value": "{pui.primitive.font.weight.medium}" },
+        "tracking": { "$value": "-0.07rem" },
+        "transform": { "$value": "none" }
+      },
+      "heading-2": {
+        "size": { "$value": "{pui.primitive.font.size.5xl}" },
+        "leading": { "$value": "{pui.primitive.leading.tight}" },
+        "weight": { "$value": "{pui.primitive.font.weight.medium}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "heading-3": {
+        "size": { "$value": "{pui.primitive.font.size.4xl}" },
+        "leading": { "$value": "{pui.primitive.leading.snug}" },
+        "weight": { "$value": "{pui.primitive.font.weight.medium}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "heading-4": {
+        "size": { "$value": "{pui.primitive.font.size.2xl}" },
+        "leading": { "$value": "{pui.primitive.leading.normal}" },
+        "weight": { "$value": "{pui.primitive.font.weight.medium}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "heading-5": {
+        "size": { "$value": "{pui.primitive.font.size.base}" },
+        "leading": { "$value": "{pui.primitive.leading.relaxed}" },
+        "weight": { "$value": "{pui.primitive.font.weight.bold}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "heading-6": {
+        "size": { "$value": "{pui.primitive.font.size.base}" },
+        "leading": { "$value": "{pui.primitive.leading.relaxed}" },
+        "weight": { "$value": "{pui.primitive.font.weight.bold}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "tagline": {
+        "size": { "$value": "{pui.primitive.font.size.base}" },
+        "leading": { "$value": "{pui.primitive.leading.none}" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "large": {
+        "size": { "$value": "{pui.primitive.font.size.2xl}" },
+        "leading": { "$value": "{pui.primitive.leading.snug}" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "medium": {
+        "size": { "$value": "{pui.primitive.font.size.xl}" },
+        "leading": { "$value": "{pui.primitive.leading.relaxed}" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "button": {
+        "size": { "$value": "{pui.primitive.font.size.base}" },
+        "leading": { "$value": "{pui.primitive.leading.loose}" },
+        "weight": { "$value": "{pui.primitive.font.weight.bold}" },
+        "tracking": { "$value": "0.02rem" },
+        "transform": { "$value": "uppercase" }
+      },
+      "base": {
+        "size": { "$value": "{pui.primitive.font.size.base}" },
+        "leading": { "$value": "{pui.primitive.leading.relaxed}" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "small": {
+        "size": { "$value": "{pui.primitive.font.size.sm}" },
+        "leading": { "$value": "{pui.primitive.leading.loose}" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "tiny": {
+        "size": { "$value": "{pui.primitive.font.size.xs}" },
+        "leading": { "$value": "{pui.primitive.leading.loose}" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "label": {
+        "size": { "$value": "0.5rem" },
+        "leading": { "$value": "{pui.primitive.leading.loose}" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "amount": {
+        "size": { "$value": "0.625rem" },
+        "leading": { "$value": "{pui.primitive.leading.loose}" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "extra-tiny": {
+        "size": { "$value": "0.625rem" },
+        "leading": { "$value": "{pui.primitive.leading.loose}" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "navbar": {
+        "size": { "$value": "{pui.primitive.font.size.sm}" },
+        "leading": { "$value": "{pui.primitive.leading.loose}" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}" },
+        "tracking": { "$value": "0" },
+        "transform": { "$value": "none" }
+      },
+      "alertbar": {
+        "size": { "$value": "{pui.typo.small.size}" },
+        "weight": { "$value": "{pui.typo.small.weight}" }
+      }
+    },
+    "duration": {
+      "normal": { "$value": "{pui.primitive.duration.normal}" }
+    }
+  }
+}

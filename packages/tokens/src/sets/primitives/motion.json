@@ -1,0 +1,12 @@
+{
+  "pui": {
+    "primitive": {
+      "duration": {
+        "$type": "duration",
+        "instant": { "$value": "0ms" },
+        "fast": { "$value": "100ms" },
+        "normal": { "$value": "200ms" }
+      }
+    }
+  }
+}

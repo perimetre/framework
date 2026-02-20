@@ -1,0 +1,58 @@
+{
+  "pui": {
+    "primitive": {
+      "font": {
+        "sans": {
+          "$value": "'PPTelegraph', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+          "$type": "fontFamily"
+        }
+      },
+      "color": {
+        "$type": "color",
+        "primary": {
+          "1": { "$value": "#e8fec7" },
+          "2": { "$value": "#e8fec7" },
+          "3": { "$value": "#c0f43f" },
+          "4": { "$value": "#b4e539" },
+          "5": { "$value": "#a7d636" },
+          "6": { "$value": "#9bc632" },
+          "7": { "$value": "#7a9c24" },
+          "8": { "$value": "#5a7417" },
+          "9": { "$value": "#9bc632" },
+          "10": { "$value": "#7a9c24" },
+          "11": { "$value": "#3a4e0d" },
+          "12": { "$value": "#1e2903" }
+        },
+        "overlay": {
+          "1": { "$value": "#ffffff" },
+          "2": { "$value": "#f5f6f8" },
+          "3": { "$value": "#eceef1" },
+          "4": { "$value": "#e5e7eb" },
+          "5": { "$value": "#d8dbdf" },
+          "6": { "$value": "#d1d5dc" },
+          "7": { "$value": "#b8bdc5" },
+          "8": { "$value": "#99a1af" },
+          "9": { "$value": "#6e7a8a" },
+          "10": { "$value": "#4a5565" },
+          "11": { "$value": "#364153" },
+          "12": { "$value": "#0a0a0a" }
+        }
+      }
+    },
+    "color": {
+      "$type": "color",
+      "interactive": {
+        "on-primary": { "$value": "{pui.primitive.color.overlay.1}" }
+      }
+    },
+    "field-label": {
+      "color": { "$value": "{pui.color.fg.muted}", "$type": "color" }
+    },
+    "radius": {
+      "$type": "dimension",
+      "button": { "$value": "0.625rem" },
+      "input": { "$value": "0.625rem" },
+      "badge": { "$value": "0.625rem" }
+    }
+  }
+}

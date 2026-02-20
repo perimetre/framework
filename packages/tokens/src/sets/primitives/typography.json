@@ -1,0 +1,41 @@
+{
+  "pui": {
+    "primitive": {
+      "font": {
+        "sans": {
+          "$value": "'Arial', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+          "$type": "fontFamily"
+        },
+        "size": {
+          "$type": "dimension",
+          "xs": { "$value": "0.75rem" },
+          "sm": { "$value": "0.875rem" },
+          "base": { "$value": "1rem" },
+          "lg": { "$value": "1.125rem" },
+          "xl": { "$value": "1.25rem" },
+          "2xl": { "$value": "1.5rem" },
+          "3xl": { "$value": "1.875rem" },
+          "4xl": { "$value": "2.25rem" },
+          "5xl": { "$value": "3rem" },
+          "6xl": { "$value": "3.5rem" }
+        },
+        "weight": {
+          "$type": "fontWeight",
+          "normal": { "$value": 400 },
+          "medium": { "$value": 500 },
+          "semibold": { "$value": 600 },
+          "bold": { "$value": 700 }
+        }
+      },
+      "leading": {
+        "$type": "number",
+        "none": { "$value": 1 },
+        "tight": { "$value": 1.1 },
+        "snug": { "$value": 1.2 },
+        "normal": { "$value": 1.3 },
+        "relaxed": { "$value": 1.4 },
+        "loose": { "$value": 1.5 }
+      }
+    }
+  }
+}

@@ -6,20 +6,85 @@ This guide covers how to contribute to the UI library, with a focus on creating 
 
 The `@perimetre/ui` library uses a **visual polymorphism** architecture where components adapt their appearance based on the active brand. This is achieved through:
 
-1. **Design Tokens** - CSS custom properties that define visual values
+1. **Design Tokens** - CSS custom properties defined as JSON in `@perimetre/tokens` and generated into CSS
 2. **Brand Variants** - CVA configurations that compose base + brand-specific styles
 
 For a deep dive into the design token architecture, see [Design Token Guide](./docs/design-token-guide.md).
 
 ## Creating a New Brand/Theme
 
-Adding a new brand involves three steps:
+Adding a new brand spans two packages:
 
-1. Register the brand
-2. Define CSS tokens
-3. Create component variants (optional)
+1. **`packages/tokens`** — Create brand token JSON and generate CSS (source of truth)
+2. **`packages/ui`** — Register the brand, wire up CSS imports, add component variants
 
-### Step 1: Register the Brand
+### Step 1: Create Brand Tokens (`packages/tokens`)
+
+Brand tokens live in `packages/tokens` as W3C DTCG JSON. Only include tokens that **differ** from the acorn base.
+
+**Create `packages/tokens/src/sets/brands/yourbrand.json`:**
+
+```json
+{
+  "pui": {
+    "primitive": {
+      "font": {
+        "sans": {
+          "$value": "'Your Font', ui-sans-serif, system-ui, sans-serif",
+          "$type": "fontFamily"
+        }
+      },
+      "color": {
+        "primary": {
+          "9": { "$value": "#0ea5e9", "$type": "color" }
+        }
+      }
+    },
+    "color": {
+      "interactive": {
+        "on-primary": {
+          "$value": "{pui.primitive.color.overlay.1}",
+          "$type": "color"
+        }
+      }
+    },
+    "radius": {
+      "button": { "$value": "0.5rem", "$type": "dimension" }
+    }
+  }
+}
+```
+
+**Update `packages/tokens/src/sets/$themes.json`** — add the new brand:
+
+```json
+{
+  "name": "yourbrand",
+  "selectedTokenSets": {
+    "primitives/colors": "source",
+    "primitives/typography": "source",
+    "primitives/shape": "source",
+    "primitives/shadow": "source",
+    "primitives/motion": "source",
+    "semantic/base": "enabled",
+    "brands/yourbrand": "enabled"
+  }
+}
+```
+
+**Add to `packages/tokens/src/scripts/build.ts`** — add `'yourbrand'` to the `BRANDS` array.
+
+**Build the CSS:**
+
+```bash
+cd packages/tokens
+pnpm build
+# Verify css/brands/yourbrand.css contains only overrides
+```
+
+Commit both the JSON and generated CSS. See `packages/tokens/CONTRIBUTING.md` for the full token format reference.
+
+### Step 2: Register the Brand (`packages/ui`)
 
 Add your brand to the brands list:
 
@@ -30,92 +95,49 @@ export const DEFAULT_BRAND: Brand = 'acorn';
 export const BRANDS = ['acorn', 'sprig', 'stelpro', 'yourbrand'] as const;
 ```
 
-### Step 2: Define CSS Tokens
+### Step 3: Create CSS Entry File (`packages/ui`)
 
-Create a CSS file for your brand's design tokens:
-
-```css
-/* src/brands/yourbrand/styles.css */
-@layer pui.primitive {
-  [data-pui-brand='yourbrand'] {
-    /**
-     * PRIMITIVE TOKENS
-     *
-     * Raw design values named by what they ARE, not what they're FOR.
-     * These are NEVER directly consumed by components.
-     * Only semantic tokens should reference these.
-     */
-
-    /* Typography */
-    --pui-primitive-font-sans:
-      'Your Font', ui-sans-serif, system-ui, sans-serif;
-
-    /* Primary color scale (following Radix color scale convention) */
-    --pui-primitive-color-primary-1: #f0f9ff;
-    --pui-primitive-color-primary-2: #e0f2fe;
-    --pui-primitive-color-primary-3: #bae6fd;
-    --pui-primitive-color-primary-4: #7dd3fc;
-    --pui-primitive-color-primary-5: #38bdf8;
-    --pui-primitive-color-primary-6: #0ea5e9; /* Main brand color */
-    --pui-primitive-color-primary-7: #0284c7;
-    --pui-primitive-color-primary-8: #0369a1;
-    --pui-primitive-color-primary-9: #075985;
-    --pui-primitive-color-primary-10: #0c4a6e;
-    --pui-primitive-color-primary-11: #082f49;
-    --pui-primitive-color-primary-12: #0a1929;
-
-    /* Overlay/gray scale */
-    --pui-primitive-color-overlay-1: #ffffff;
-    --pui-primitive-color-overlay-2: #fafafa;
-    /* ... continue scale ... */
-    --pui-primitive-color-overlay-12: #171717;
-  }
-}
-
-@layer pui.semantic {
-  [data-pui-brand='yourbrand'] {
-    /**
-     * SEMANTIC TOKENS
-     *
-     * Purpose-based tokens that express design intent.
-     * These are the PUBLIC API consumed by components.
-     * Override these to change how components look.
-     */
-
-    /* Example semantic overrides if needed */
-  }
-}
-```
-
-Import your brand's CSS in the brands index:
+**Create `src/styles/yourbrand.css`:**
 
 ```css
-/* src/brands/styles.css */
-@import './acorn/styles.css';
-@import './sprig/styles.css';
-@import './stelpro/styles.css';
-@import './yourbrand/styles.css';
+/**
+ * YourBrand Brand CSS
+ *
+ * Import this file in your project to use the YourBrand brand theme.
+ * Usage: import '@perimetre/ui/styles/yourbrand.css'
+ *
+ * Note: YourBrand extends Acorn (the base theme), so Acorn tokens are included.
+ */
+@import './base.css';
+@import '@perimetre/tokens/brands/acorn.css';
+@import '@perimetre/tokens/brands/yourbrand.css';
 ```
 
-### Step 3: Add Tailwind Custom Variant (Optional)
+**Update `src/styles/ladle.css`** to include the new brand for development:
+
+```css
+@import '@perimetre/tokens/brands/yourbrand.css';
+```
+
+### Step 4: Add Tailwind Custom Variant (Optional)
 
 If you want to write brand-specific styles in markup, add a custom variant:
 
 ```css
 /* src/brands/tailwind.css */
-/* Add at the end of the file */
-@custom-variant yourbrand (&:where([data-pui-brand=yourbrand], [data-pui-brand=yourbrand] *));
+/* Add with the other @custom-variant declarations */
+@custom-variant pui-yourbrand (&:where([data-pui-brand=yourbrand], [data-pui-brand=yourbrand] *));
 ```
 
 This enables markup like:
 
 ```html
-<div class="pui:yourbrand:rounded-lg pui:acorn:rounded-full">
+<div class="pui:pui-yourbrand:rounded-lg pui:pui-acorn:rounded-full">
   <!-- Different radius per brand -->
 </div>
 ```
 
-### Step 4: Create Component Variants (Optional)
+### Step 5: Create Component Variants (Optional)
 
 If your brand needs component-specific style overrides beyond what CSS tokens provide, create brand variants:
 
@@ -176,9 +198,9 @@ Pattern: `--pui-primitive-{category}-{name}`
 Pattern: `--pui-{category}-{subcategory}-{element}-{state?}`
 
 ```css
---pui-color-background-default: ...;
---pui-color-interactive-primary-hover: ...;
---pui-shape-radius-button: ...;
+--pui-color-bg-default: ...;
+--pui-color-interactive-primary: ...;
+--pui-radius-button: ...;
 ```
 
 ### What to Tokenize
@@ -240,9 +262,12 @@ See the main [CONTRIBUTING.md](../../CONTRIBUTING.md) for versioning guidelines.
 
 6. **Document token usage** - Add comments explaining which tokens a component uses
 
+7. **Token changes start in `packages/tokens`** - Never add CSS custom properties directly in brand CSS files. Define them as JSON in `@perimetre/tokens` and run the build.
+
 ## Resources
 
 - [Design Token Guide](./docs/design-token-guide.md) - Complete token architecture documentation
+- [@perimetre/tokens CONTRIBUTING](../tokens/CONTRIBUTING.md) - Token JSON format, adding tokens, adding brands
 - [CVA Documentation](https://cva.style/) - Class Variance Authority
 - [Radix UI](https://radix-ui.com/) - Accessible primitives
 - [Tailwind CSS v4](https://tailwindcss.com/) - Utility-first CSS

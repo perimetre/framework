@@ -1,0 +1,57 @@
+[
+  {
+    "id": "acorn",
+    "name": "Acorn",
+    "group": "brand",
+    "selectedTokenSets": {
+      "primitives/colors": "source",
+      "primitives/typography": "source",
+      "primitives/shape": "source",
+      "primitives/shadow": "source",
+      "primitives/motion": "source",
+      "semantic/base": "enabled"
+    }
+  },
+  {
+    "id": "sprig",
+    "name": "Sprig",
+    "group": "brand",
+    "selectedTokenSets": {
+      "primitives/colors": "source",
+      "primitives/typography": "source",
+      "primitives/shape": "source",
+      "primitives/shadow": "source",
+      "primitives/motion": "source",
+      "semantic/base": "enabled",
+      "brands/sprig": "enabled"
+    }
+  },
+  {
+    "id": "stelpro",
+    "name": "Stelpro",
+    "group": "brand",
+    "selectedTokenSets": {
+      "primitives/colors": "source",
+      "primitives/typography": "source",
+      "primitives/shape": "source",
+      "primitives/shadow": "source",
+      "primitives/motion": "source",
+      "semantic/base": "enabled",
+      "brands/stelpro": "enabled"
+    }
+  },
+  {
+    "id": "cima",
+    "name": "Cima",
+    "group": "brand",
+    "selectedTokenSets": {
+      "primitives/colors": "source",
+      "primitives/typography": "source",
+      "primitives/shape": "source",
+      "primitives/shadow": "source",
+      "primitives/motion": "source",
+      "semantic/base": "enabled",
+      "brands/cima": "enabled"
+    }
+  }
+]

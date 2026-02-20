@@ -1,0 +1,117 @@
+{
+  "pui": {
+    "primitive": {
+      "font": {
+        "sans": {
+          "$value": "'Gotham', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+          "$type": "fontFamily"
+        }
+      },
+      "color": {
+        "$type": "color",
+        "primary": {
+          "1": { "$value": "#dbfdd4" },
+          "2": { "$value": "#bcfbad" },
+          "3": { "$value": "#82ed5f" },
+          "4": { "$value": "#76d756" },
+          "5": { "$value": "#69c14c" },
+          "6": { "$value": "#53a03e" },
+          "7": { "$value": "#427d2e" },
+          "8": { "$value": "#2f5d20" },
+          "9": { "$value": "#69c14c" },
+          "10": { "$value": "#53a03e" },
+          "11": { "$value": "#1f4114" },
+          "12": { "$value": "#0f2408" }
+        },
+        "overlay": {
+          "1": { "$value": "#ffffff" },
+          "2": { "$value": "#f9f9f9" },
+          "3": { "$value": "#f5f5f5" },
+          "4": { "$value": "#e8e8e8" },
+          "5": { "$value": "#d4d4d4" },
+          "6": { "$value": "#c0c0c0" },
+          "7": { "$value": "#b3b3b3" },
+          "8": { "$value": "#a7a8aa" },
+          "9": { "$value": "#7a7a7a" },
+          "10": { "$value": "#666666" },
+          "11": { "$value": "#545454" },
+          "12": { "$value": "#2c2826" }
+        },
+        "red": {
+          "2": { "$value": "#fef2f2" },
+          "6": { "$value": "#fecaca" },
+          "9": { "$value": "#ef4444" },
+          "11": { "$value": "#b91c1c" }
+        }
+      }
+    },
+    "color": {
+      "$type": "color",
+      "interactive": {
+        "on-primary": { "$value": "{pui.primitive.color.overlay.1}" }
+      },
+      "focus-outline": { "$value": "{pui.primitive.color.primary.9}" },
+      "fg": {
+        "icon": { "$value": "{pui.primitive.color.overlay.8}" },
+        "icon-chevron": { "$value": "{pui.primitive.color.overlay.11}" },
+        "link-active": { "$value": "{pui.primitive.color.primary.8}" }
+      },
+      "border": {
+        "rule-primary": { "$value": "{pui.primitive.color.overlay.11}" },
+        "rule-secondary": { "$value": "{pui.primitive.color.overlay.3}" }
+      },
+      "alertbar": {
+        "first-fg": { "$value": "{pui.primitive.color.overlay.1}" }
+      },
+      "button": {
+        "primary-fill": { "$value": "{pui.primitive.color.overlay.11}" },
+        "hover": { "$value": "{pui.primitive.color.primary.9}" },
+        "active": { "$value": "{pui.primitive.color.primary.9}" }
+      },
+      "input": {
+        "bg": { "$value": "{pui.primitive.color.overlay.2}" },
+        "border": { "$value": "{pui.primitive.color.overlay.3}" },
+        "outline": { "$value": "{pui.primitive.color.overlay.3}" }
+      },
+      "control": {
+        "unchecked-bg": { "$value": "{pui.primitive.color.overlay.3}" },
+        "checked-border": { "$value": "{pui.primitive.color.primary.7}" },
+        "checked-border-inverted": { "$value": "{pui.primitive.color.primary.9}" },
+        "checkmark": { "$value": "{pui.primitive.color.overlay.1}" },
+        "checkmark-inverted": { "$value": "{pui.primitive.color.primary.9}" }
+      },
+      "table": {
+        "inactive-item": { "$value": "{pui.primitive.color.overlay.8}" }
+      },
+      "dropdown": {
+        "bg": { "$value": "{pui.primitive.color.overlay.2}" },
+        "border": { "$value": "{pui.primitive.color.overlay.3}" },
+        "item-hover-bg": { "$value": "{pui.primitive.color.overlay.2}" },
+        "separator": { "$value": "{pui.primitive.color.overlay.3}" }
+      }
+    },
+    "typo": {
+      "alertbar": {
+        "size": { "$value": "{pui.typo.tiny.size}" },
+        "weight": { "$value": "{pui.primitive.font.weight.bold}" }
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "input": { "$value": "0" },
+      "badge": { "$value": "0" },
+      "control": { "$value": "0" },
+      "dropdown": { "$value": "0" }
+    },
+    "shadow": {
+      "card": { "$value": "7px 5px 30px 0 rgba(72, 73, 121, 0.15)" },
+      "input-focus": { "$value": "none" },
+      "dropdown": { "$value": "none" }
+    },
+    "field-label": {
+      "font-size": { "$value": "var(--text-xs)" },
+      "line-height": { "$value": "150%" },
+      "font-weight": { "$value": "400" }
+    }
+  }
+}
