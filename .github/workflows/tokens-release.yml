@@ -1,0 +1,98 @@
+name: Tokens Auto-Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/tokens/src/sets/**'
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  tokens-release:
+    name: Release Token Updates
+    runs-on: ubuntu-latest
+    # Skip if the push was made by this workflow (prevent loops)
+    if: github.actor != 'github-actions[bot]'
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Check if changeset already exists for tokens
+        id: check
+        run: |
+          # Look for any pending changeset that already bumps @perimetre/tokens
+          if grep -rl '@perimetre/tokens' .changeset/*.md 2>/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create changeset for tokens
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          CHANGESET_ID=$(echo "${{ github.sha }}" | head -c 8)
+          cat > ".changeset/tokens-update-${CHANGESET_ID}.md" << 'EOF'
+          ---
+          "@perimetre/tokens": patch
+          ---
+
+          Update design tokens from Figma Tokens Studio
+          EOF
+
+          # Remove leading whitespace from heredoc
+          sed -i "s/^          //" ".changeset/tokens-update-${CHANGESET_ID}.md"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Cache Turborepo
+        uses: actions/cache@v4
+        with:
+          path: |
+            .turbo
+            node_modules/.cache/turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Consume changesets and bump versions
+        run: pnpm run version
+
+      - name: Build all packages
+        run: pnpm turbo run build
+
+      - name: Publish packages
+        run: pnpm changeset publish
+
+      - name: Commit and push version bumps
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+          git commit -m "chore(release): version packages [tokens auto-release]"
+          git push
