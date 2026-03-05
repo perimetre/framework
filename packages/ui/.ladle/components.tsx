@@ -97,6 +97,10 @@ export const Provider: GlobalProvider = ({ children, globalState }) => {
   // Derive the brand directly - no state needed
   const brand = brandValue ?? DEFAULT_BRAND;
 
+  // Set active brand synchronously during render so that child components
+  // calling getBrandVariant() get the correct brand on the first render.
+  setActiveBrand(brand);
+
   // Install the URL patch once on mount (handles sidebar navigation)
   useEffect(() => installBrandUrlPatch(), []);
 
@@ -112,9 +116,8 @@ export const Provider: GlobalProvider = ({ children, globalState }) => {
     }
   }, [brandValue]);
 
-  // Sync external systems: brand registry and document.body attribute
+  // Sync document.body attribute for Radix Portal content
   useEffect(() => {
-    setActiveBrand(brand);
     document.body.setAttribute('data-pui-brand', brand);
   }, [brand]);
 

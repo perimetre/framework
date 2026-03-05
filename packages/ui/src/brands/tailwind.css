@@ -290,6 +290,18 @@
     background-color: var(--pui-color-fg-subtle);
   }
 
+  [data-pui-brand] .before\:pui\:bg-pui-control-checked-bg:before {
+    background-color: var(--pui-color-control-checked-bg);
+  }
+
+  [data-pui-brand] .before\:pui\:bg-pui-control-checkmark:before {
+    background-color: var(--pui-color-control-checkmark);
+  }
+
+  [data-pui-brand] .before\:pui\:bg-pui-control-checkmark-inverted:before {
+    background-color: var(--pui-color-control-checkmark-inverted);
+  }
+
   /* Pseudo-element + pseudoclass combinations */
   [data-pui-brand] .pui\:checked\:before\:block:checked:before {
     display: block;

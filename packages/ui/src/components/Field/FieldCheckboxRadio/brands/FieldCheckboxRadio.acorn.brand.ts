@@ -26,17 +26,31 @@ export const fieldCheckboxRadioAcornVariants = cva({
     variant: {
       default: [
         // Primary icon on white/transparent background (not filled)
-        'pui:checked:border-pui-control-checked-border',
-        'pui:indeterminate:border-pui-control-checked-border'
+        'pui:checked:border-pui-control-checked-border'
       ],
       inverted: [
         // Icon on primary background (filled)
         'pui:checked:border-pui-control-checked-border-inverted pui:checked:bg-pui-control-checked-bg',
-        'pui:indeterminate:border-pui-control-checked-border-inverted pui:indeterminate:bg-pui-control-checked-bg',
         'pui:disabled:checked:bg-pui-bg-subtle'
       ]
     }
   },
+  compoundVariants: [
+    {
+      // Indeterminate styles only apply to checkboxes.
+      // Radio :indeterminate matches when no radio in the group is selected (browser default),
+      // which would incorrectly show checked styles on all unselected radios.
+      type: 'checkbox',
+      variant: 'default',
+      class: 'pui:indeterminate:border-pui-control-checked-border'
+    },
+    {
+      type: 'checkbox',
+      variant: 'inverted',
+      class:
+        'pui:indeterminate:border-pui-control-checked-border-inverted pui:indeterminate:bg-pui-control-checked-bg'
+    }
+  ],
   defaultVariants: {
     variant: 'default'
   }

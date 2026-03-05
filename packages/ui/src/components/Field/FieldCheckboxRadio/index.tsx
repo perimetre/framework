@@ -128,6 +128,10 @@ const FieldCheckboxRadio: React.FC<FieldCheckboxRadioProps> = ({
       </div>
     </div>
   ) : (
+    // Radio inner dot uses `before:` pseudo-element background utilities from brand variants.
+    // These require manual CSS definitions in `brands/tailwind.css` because Tailwind CSS v4's
+    // `@import` with CSS nesting doesn't auto-generate `::before` variant utilities.
+    // See the "Pseudo-element backgrounds" section in tailwind.css.
     <input
       ref={ref}
       checked={checked}

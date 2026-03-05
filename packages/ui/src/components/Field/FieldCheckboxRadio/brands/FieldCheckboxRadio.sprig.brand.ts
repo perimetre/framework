@@ -15,18 +15,30 @@ export const fieldCheckboxRadioSprigVariants = cva({
       // Sprig checkboxes are filled when checked
       default: [
         'pui:checked:bg-pui-control-checked-bg',
-        'pui:indeterminate:bg-pui-control-checked-bg',
-        'pui:checked:border-pui-control-checked-border',
-        'pui:indeterminate:border-pui-control-checked-border'
+        // Match border to bg so the border is invisible on the filled radio
+        'pui:checked:border-pui-control-checked-bg'
       ],
       inverted: [
         'pui:checked:bg-pui-control-unchecked-bg',
-        'pui:indeterminate:bg-pui-control-unchecked-bg',
-        'pui:checked:border-pui-control-checked-border-inverted',
-        'pui:indeterminate:border-pui-control-checked-border-inverted'
+        'pui:checked:border-pui-control-checked-border-inverted'
       ]
     }
-  }
+  },
+  compoundVariants: [
+    {
+      // Indeterminate styles only apply to checkboxes — see acorn brand for rationale.
+      type: 'checkbox',
+      variant: 'default',
+      class:
+        'pui:indeterminate:bg-pui-control-checked-bg pui:indeterminate:border-pui-control-checked-border'
+    },
+    {
+      type: 'checkbox',
+      variant: 'inverted',
+      class:
+        'pui:indeterminate:bg-pui-control-unchecked-bg pui:indeterminate:border-pui-control-checked-border-inverted'
+    }
+  ]
 });
 
 export const fieldCheckboxRadioBoxSprigVariants = cva({
@@ -44,5 +56,15 @@ export const fieldCheckboxRadioCheckboxIconSprigVariants = cva({
 });
 
 export const fieldCheckboxRadioRadioIconSprigVariants = cva({
-  base: []
+  base: [],
+  variants: {
+    variant: {
+      // Sprig default radios are filled green when checked.
+      // The dot needs to be white (checkmark) to contrast against the green background.
+      default: ['before:pui:bg-pui-control-checkmark'],
+      // Sprig inverted radios have a white bg (unchecked-bg) with green border.
+      // The dot needs to be green (checked-bg) to contrast against the white background.
+      inverted: ['before:pui:bg-pui-control-checked-bg']
+    }
+  }
 });
