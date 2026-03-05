@@ -35,6 +35,7 @@
 
 @layer pui.semantic {
   [data-pui-brand='sprig'] {
+    --pui-color-fg-link-secondary: var(--pui-primitive-color-overlay-11);
     --pui-color-fg-link-active: var(--pui-primitive-color-primary-8);
     --pui-color-fg-icon: var(--pui-primitive-color-overlay-8);
     --pui-color-fg-icon-chevron: var(--pui-primitive-color-overlay-11);

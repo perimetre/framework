@@ -112,6 +112,7 @@
      * ======================================== */
     --pui-color-fg-icon: var(--pui-primitive-color-overlay-8);
     --pui-color-fg-icon-chevron: var(--pui-primitive-color-overlay-11);
+    --pui-color-fg-link-secondary: var(--pui-primitive-color-overlay-11);
     /* Link active uses primary-8 (#2f5d20) — after step 8/11
      * swap, acorn's primary-11 reference would resolve to
      * #1f4114 which is too dark for link text */

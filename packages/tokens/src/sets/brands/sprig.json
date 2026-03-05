@@ -54,6 +54,7 @@
       "fg": {
         "icon": { "$value": "{pui.primitive.color.overlay.8}" },
         "icon-chevron": { "$value": "{pui.primitive.color.overlay.11}" },
+        "link-secondary": { "$value": "{pui.primitive.color.overlay.11}" },
         "link-active": { "$value": "{pui.primitive.color.primary.8}" }
       },
       "border": {
