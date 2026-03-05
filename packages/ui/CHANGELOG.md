@@ -1,5 +1,13 @@
 # @perimetre/ui
 
+## 13.11.1
+
+### Patch Changes
+
+- c403833: Update sprig link color
+- Updated dependencies [c403833]
+  - @perimetre/tokens@0.0.2
+
 ## 13.11.0
 
 ### Minor Changes
