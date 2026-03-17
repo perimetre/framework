@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 14.0.0
+
+### Major Changes
+
+- bd8f21e: fix(ui): update ImageCarouselThumbnail Sprig brand border styles
+
 ## 13.11.2
 
 ### Patch Changes
