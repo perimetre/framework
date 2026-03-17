@@ -124,7 +124,7 @@
      * Figma: "Border/Rule - Secondary" = light grey = overlay-3 (Acorn: overlay-5)
      * ======================================== */
     --pui-color-border-rule-primary: var(--pui-primitive-color-overlay-11);
-    --pui-color-border-rule-secondary: var(--pui-primitive-color-overlay-3);
+    --pui-color-border-rule-secondary: var(--pui-primitive-color-overlay-8);
 
     /* ========================================
      * COLOR - AlertBar
