@@ -12,14 +12,17 @@ export type ImageCarouselSlideProps = {
  */
 const ImageCarouselSlide: React.FC<ImageCarouselSlideProps> = ({
   children,
-  className
+  className,
+  ...props
 }) => {
   const imageCarouselSlideVariants = getBrandVariant(
     imageCarouselSlideBrandVariants
   );
 
   return (
-    <div className={imageCarouselSlideVariants({ className })}>{children}</div>
+    <div className={imageCarouselSlideVariants({ className })} {...props}>
+      {children}
+    </div>
   );
 };
 
