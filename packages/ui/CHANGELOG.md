@@ -1,5 +1,12 @@
 # @perimetre/ui
 
+## 14.0.1
+
+### Patch Changes
+
+- 90f216e: add data-pui-component prop to ImageCarousel sub-components and add border-none
+- 90f216e: fix(ui): update ImageCarouselThumbnail Sprig brand border styles
+
 ## 14.0.0
 
 ### Major Changes
