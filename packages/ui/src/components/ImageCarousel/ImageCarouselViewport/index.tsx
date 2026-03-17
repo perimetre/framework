@@ -14,13 +14,17 @@ export type ImageCarouselViewportProps = {
 const ImageCarouselViewport = React.forwardRef<
   HTMLDivElement,
   ImageCarouselViewportProps
->(({ children, className }, ref: ForwardedRef<HTMLDivElement>) => {
+>(({ children, className, ...props }, ref: ForwardedRef<HTMLDivElement>) => {
   const imageCarouselViewportVariants = getBrandVariant(
     imageCarouselViewportBrandVariants
   );
 
   return (
-    <div ref={ref} className={imageCarouselViewportVariants({ className })}>
+    <div
+      ref={ref}
+      className={imageCarouselViewportVariants({ className })}
+      {...props}
+    >
       {children}
     </div>
   );

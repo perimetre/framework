@@ -21,13 +21,16 @@ export type ImageCarouselDotsContainerProps = {
  */
 export const ImageCarouselDotsContainer: React.FC<
   ImageCarouselDotsContainerProps
-> = ({ children, className }) => {
+> = ({ children, className, ...props }) => {
   const imageCarouselDotsContainerVariants = getBrandVariant(
     imageCarouselDotsContainerBrandVariants
   );
 
   return (
-    <div className={imageCarouselDotsContainerVariants({ className })}>
+    <div
+      className={imageCarouselDotsContainerVariants({ className })}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -39,7 +42,8 @@ export const ImageCarouselDotsContainer: React.FC<
 export const ImageCarouselDot: React.FC<ImageCarouselDotProps> = ({
   index,
   isSelected,
-  onClick
+  onClick,
+  ...props
 }) => {
   const imageCarouselDotVariants = getBrandVariant(
     imageCarouselDotBrandVariants
@@ -50,6 +54,7 @@ export const ImageCarouselDot: React.FC<ImageCarouselDotProps> = ({
       aria-label={`Go to slide ${String(index + 1)}`}
       className={imageCarouselDotVariants({ selected: isSelected })}
       onClick={onClick}
+      {...props}
     />
   );
 };

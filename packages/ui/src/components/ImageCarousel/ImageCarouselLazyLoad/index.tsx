@@ -25,13 +25,16 @@ export type ImageCarouselLazyLoadSpinnerProps = {
  */
 export const ImageCarouselLazyLoadContainer: React.FC<
   ImageCarouselLazyLoadContainerProps
-> = ({ children, className }) => {
+> = ({ children, className, ...props }) => {
   const imageCarouselLazyLoadContainerVariants = getBrandVariant(
     imageCarouselLazyLoadContainerBrandVariants
   );
 
   return (
-    <div className={imageCarouselLazyLoadContainerVariants({ className })}>
+    <div
+      className={imageCarouselLazyLoadContainerVariants({ className })}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -42,7 +45,7 @@ export const ImageCarouselLazyLoadContainer: React.FC<
  */
 export const ImageCarouselLazyLoadSpinner: React.FC<
   ImageCarouselLazyLoadSpinnerProps
-> = ({ isHidden }) => {
+> = ({ isHidden, ...props }) => {
   const imageCarouselLazyLoadSpinnerVariants = getBrandVariant(
     imageCarouselLazyLoadSpinnerBrandVariants
   );
@@ -51,6 +54,7 @@ export const ImageCarouselLazyLoadSpinner: React.FC<
     <div
       aria-label="Loading"
       className={imageCarouselLazyLoadSpinnerVariants({ hidden: isHidden })}
+      {...props}
     >
       {/* Simple spinner SVG */}
       <svg
@@ -82,13 +86,16 @@ export const ImageCarouselLazyLoadSpinner: React.FC<
  */
 export const ImageCarouselImageWrapper: React.FC<
   ImageCarouselImageWrapperProps
-> = ({ children, isLoaded }) => {
+> = ({ children, isLoaded, ...props }) => {
   const imageCarouselImageWrapperVariants = getBrandVariant(
     imageCarouselImageWrapperBrandVariants
   );
 
   return (
-    <div className={imageCarouselImageWrapperVariants({ loaded: isLoaded })}>
+    <div
+      className={imageCarouselImageWrapperVariants({ loaded: isLoaded })}
+      {...props}
+    >
       {children}
     </div>
   );

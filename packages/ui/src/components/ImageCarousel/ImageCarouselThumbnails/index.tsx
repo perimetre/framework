@@ -22,7 +22,7 @@ export type ImageCarouselThumbnailsContainerProps = {
  */
 export const ImageCarouselThumbnailsContainer: React.FC<
   ImageCarouselThumbnailsContainerProps
-> = ({ children, className, orientation }) => {
+> = ({ children, className, orientation, ...props }) => {
   const imageCarouselThumbnailsContainerVariants = getBrandVariant(
     imageCarouselThumbnailsContainerBrandVariants
   );
@@ -33,6 +33,7 @@ export const ImageCarouselThumbnailsContainer: React.FC<
         className,
         orientation
       })}
+      {...props}
     >
       {children}
     </div>
@@ -47,7 +48,8 @@ export const ImageCarouselThumbnail: React.FC<ImageCarouselThumbnailProps> = ({
   isSelected,
   onClick,
   orientation,
-  renderThumbnail
+  renderThumbnail,
+  ...props
 }) => {
   const imageCarouselThumbnailVariants = getBrandVariant(
     imageCarouselThumbnailBrandVariants
@@ -62,6 +64,7 @@ export const ImageCarouselThumbnail: React.FC<ImageCarouselThumbnailProps> = ({
         orientation
       })}
       onClick={onClick}
+      {...props}
     >
       {renderThumbnail()}
     </button>

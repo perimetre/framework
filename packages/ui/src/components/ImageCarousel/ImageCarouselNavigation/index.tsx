@@ -22,14 +22,15 @@ export type ImageCarouselNavButtonProps = {
  */
 export const ImageCarouselControls: React.FC<ImageCarouselControlsProps> = ({
   children,
-  className
+  className,
+  ...props
 }) => {
   const imageCarouselControlsVariants = getBrandVariant(
     imageCarouselControlsBrandVariants
   );
 
   return (
-    <div className={imageCarouselControlsVariants({ className })}>
+    <div className={imageCarouselControlsVariants({ className })} {...props}>
       {children}
     </div>
   );
@@ -41,7 +42,8 @@ export const ImageCarouselControls: React.FC<ImageCarouselControlsProps> = ({
 export const ImageCarouselNavButton: React.FC<ImageCarouselNavButtonProps> = ({
   direction,
   disabled,
-  onClick
+  onClick,
+  ...props
 }) => {
   const imageCarouselNavButtonVariants = getBrandVariant(
     imageCarouselNavButtonBrandVariants
@@ -53,6 +55,7 @@ export const ImageCarouselNavButton: React.FC<ImageCarouselNavButtonProps> = ({
       className={imageCarouselNavButtonVariants()}
       disabled={disabled}
       onClick={onClick}
+      {...props}
     >
       {direction === 'prev' ? (
         <ChevronLeftIcon className="pui:w-5 pui:h-5" />
