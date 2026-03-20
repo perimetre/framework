@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "lib": ["ESNext", "DOM"],
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": true
+  },
+  "extends": "../../tsconfig.base.json",
+  "include": ["index.ts"]
+}
