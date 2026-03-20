@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 14.0.2
+
+### Patch Changes
+
+- d5bbbcf: add Sprig brand variant for ImageCarouselViewport
+
 ## 14.0.1
 
 ### Patch Changes
