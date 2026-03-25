@@ -10,6 +10,10 @@ export const imageCarouselThumbnailSprigVariants = cva({
       true: 'pui:rounded-none pui:border pui:border-pui-color-border-rule-primary',
       false:
         'pui:rounded-none pui:border pui:border-pui-primitive-color-overlay-8'
+    },
+    orientation: {
+      horizontal: ['pui:w-16', 'pui:h-16'],
+      vertical: ['pui:w-14', 'pui:h-14']
     }
   }
 });
