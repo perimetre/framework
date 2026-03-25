@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 14.0.3
+
+### Patch Changes
+
+- b100a6f: Make sprig's thumbnail size square
+
 ## 14.0.2
 
 ### Patch Changes
