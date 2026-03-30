@@ -264,7 +264,7 @@ const ImageCarousel = <T,>({
       <div
         data-pui-component="ViewportWrapper"
         className={cn(
-          'pui:relative pui:h-full pui:grow pui:group/imageCarousel',
+          'pui:relative pui:h-full pui:grow group/imageCarousel pui:group/imageCarousel',
           viewportClassName
         )}
       >
