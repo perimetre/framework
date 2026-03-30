@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 14.1.2
+
+### Patch Changes
+
+- 60c55a4: Fixes opacity also affecting thumbnail borders
+
 ## 14.1.1
 
 ### Patch Changes
