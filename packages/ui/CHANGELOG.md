@@ -1,5 +1,16 @@
 # @perimetre/ui
 
+## 14.1.0
+
+### Minor Changes
+
+- 860384f: Update tokens and add new styles for ImageCarousel buttons on sprig
+
+### Patch Changes
+
+- Updated dependencies [860384f]
+  - @perimetre/tokens@0.0.3
+
 ## 14.0.3
 
 ### Patch Changes
