@@ -3,6 +3,7 @@
     "primitive": {
       "duration": {
         "$type": "duration",
+        "$description": "Animation/transition duration primitives.",
         "instant": { "$value": "0ms" },
         "fast": { "$value": "100ms" },
         "normal": { "$value": "200ms" }

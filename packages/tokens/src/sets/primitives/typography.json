@@ -4,10 +4,12 @@
       "font": {
         "sans": {
           "$value": "'Arial', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
-          "$type": "fontFamilies"
+          "$type": "fontFamilies",
+          "$description": "Default sans-serif font stack. Brands override this (e.g., Sprig uses Gotham)."
         },
         "size": {
           "$type": "fontSizes",
+          "$description": "Font size scale. Referenced by semantic typography tokens (typo-heading-1, typo-base, etc.).",
           "xs": { "$value": "0.75rem" },
           "sm": { "$value": "0.875rem" },
           "base": { "$value": "1rem" },
@@ -21,6 +23,7 @@
         },
         "weight": {
           "$type": "fontWeights",
+          "$description": "Font weight scale.",
           "normal": { "$value": 400 },
           "medium": { "$value": 500 },
           "semibold": { "$value": 600 },
@@ -29,6 +32,7 @@
       },
       "leading": {
         "$type": "lineHeights",
+        "$description": "Line-height scale. Named for relative tightness rather than numeric value.",
         "none": { "$value": 1 },
         "tight": { "$value": 1.1 },
         "snug": { "$value": 1.2 },

@@ -3,6 +3,7 @@
     "primitive": {
       "radius": {
         "$type": "borderRadius",
+        "$description": "Border radius primitives. Semantic tokens (radius-button, radius-input, etc.) reference these.",
         "none": { "$value": "0" },
         "sm": { "$value": "0.25rem" },
         "md": { "$value": "0.375rem" },

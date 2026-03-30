@@ -8,7 +8,7 @@
  */
 @import './preflight.css';
 @import './base.css';
-@import '../brands/acorn/styles.css';
-@import '../brands/stelpro/styles.css';
-@import '../brands/sprig/styles.css';
-@import '../brands/cima/styles.css';
+@import '@perimetre/tokens/brands/acorn.css';
+@import '@perimetre/tokens/brands/stelpro.css';
+@import '@perimetre/tokens/brands/sprig.css';
+@import '@perimetre/tokens/brands/cima.css';

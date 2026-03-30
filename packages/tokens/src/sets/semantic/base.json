@@ -2,7 +2,9 @@
   "pui": {
     "color": {
       "$type": "color",
+      "$description": "Purpose-based semantic tokens that express design intent. These are the PUBLIC API consumed by components. Themes override these to create different visual styles.",
       "bg": {
+        "$description": "Background surfaces.",
         "default": {
           "$value": "{pui.primitive.color.overlay.1}"
         },
@@ -14,6 +16,7 @@
         }
       },
       "surface": {
+        "$description": "Page/section backgrounds.",
         "primary": {
           "$value": "{pui.primitive.color.overlay.1}"
         },
@@ -22,6 +25,7 @@
         }
       },
       "fg": {
+        "$description": "Foreground (text, icons).",
         "default": {
           "$value": "{pui.primitive.color.overlay.12}"
         },
@@ -51,8 +55,13 @@
         }
       },
       "border": {
+        "$description": "Borders, strokes, dividers.",
         "default": {
           "$value": "{pui.primitive.color.overlay.5}"
+        },
+        "baseline": {
+          "$value": "{pui.primitive.color.overlay.8}",
+          "$description": "Non-active, middle-ground border for HRs, dividers, and non-interactive border elements."
         },
         "focus": {
           "$value": "{pui.primitive.color.primary.9}"
@@ -71,6 +80,7 @@
         "$value": "{pui.color.border.focus}"
       },
       "interactive": {
+        "$description": "Interactive elements (buttons, links).",
         "primary": {
           "$value": "{pui.primitive.color.primary.9}"
         },
@@ -79,6 +89,7 @@
         }
       },
       "button": {
+        "$description": "Button colors.",
         "primary-fill": {
           "$value": "{pui.color.interactive.primary}"
         },
@@ -99,6 +110,7 @@
         }
       },
       "input": {
+        "$description": "Input field colors.",
         "bg": {
           "$value": "{pui.color.bg.default}"
         },
@@ -122,6 +134,7 @@
         }
       },
       "control": {
+        "$description": "Form controls (checkbox/radio).",
         "unchecked-bg": {
           "$value": "{pui.color.bg.default}"
         },
@@ -145,6 +158,7 @@
         }
       },
       "feedback": {
+        "$description": "Feedback states (error, success, warning, info).",
         "error": {
           "$value": "{pui.primitive.color.red.9}"
         },
@@ -183,11 +197,13 @@
         }
       },
       "table": {
+        "$description": "Table colors.",
         "inactive-item": {
           "$value": "{pui.primitive.color.overlay.6}"
         }
       },
       "alertbar": {
+        "$description": "AlertBar variants: first (primary), second (attention/red), third (neutral/light), fourth (dark).",
         "first-bg": {
           "$value": "{pui.primitive.color.primary.9}"
         },
@@ -214,6 +230,7 @@
         }
       },
       "dropdown": {
+        "$description": "Dropdown/overlay colors.",
         "bg": {
           "$value": "{pui.color.bg.default}"
         },
@@ -251,6 +268,7 @@
     },
     "radius": {
       "$type": "borderRadius",
+      "$description": "Border radius — element-specific shape tokens.",
       "button": {
         "$value": "{pui.primitive.radius.full}"
       },
@@ -269,12 +287,14 @@
     },
     "border-width": {
       "$type": "borderWidth",
+      "$description": "Border width tokens.",
       "default": {
         "$value": "1px"
       }
     },
     "shadow": {
       "$type": "boxShadow",
+      "$description": "Elevation — box shadow tokens.",
       "button": {
         "$value": "{pui.primitive.shadow.none}"
       },
@@ -296,17 +316,21 @@
     },
     "font-weight-label": {
       "$value": "700",
-      "$type": "fontWeights"
+      "$type": "fontWeights",
+      "$description": "Deprecated — use typo-button-weight instead."
     },
     "letter-spacing-label": {
       "$value": "0.1125rem",
-      "$type": "letterSpacing"
+      "$type": "letterSpacing",
+      "$description": "Deprecated — use typo-button-tracking instead."
     },
     "text-transform-label": {
       "$value": "uppercase",
-      "$type": "textCase"
+      "$type": "textCase",
+      "$description": "Deprecated — use typo-button-transform instead."
     },
     "field-label": {
+      "$description": "Field label typography.",
       "font-size": {
         "$value": "var(--text-sm)",
         "$type": "fontSizes"
@@ -325,7 +349,9 @@
       }
     },
     "typo": {
+      "$description": "Semantic typography styles. Each style defines: size, leading, weight, tracking, transform. These power the pui:typo-* utility classes.",
       "heading-1": {
+        "$description": "Heading 1: 3.5rem / 100% / medium / -0.07rem / none.",
         "size": {
           "$value": "{pui.primitive.font.size.6xl}",
           "$type": "fontSizes"
@@ -348,6 +374,7 @@
         }
       },
       "heading-2": {
+        "$description": "Heading 2: 3rem / 110% / medium / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.5xl}",
           "$type": "fontSizes"
@@ -370,6 +397,7 @@
         }
       },
       "heading-3": {
+        "$description": "Heading 3: 2.25rem / 120% / medium / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.4xl}",
           "$type": "fontSizes"
@@ -392,6 +420,7 @@
         }
       },
       "heading-4": {
+        "$description": "Heading 4: 1.5rem / 130% / medium / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.2xl}",
           "$type": "fontSizes"
@@ -414,6 +443,7 @@
         }
       },
       "heading-5": {
+        "$description": "Heading 5: 1rem / 140% / bold / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.base}",
           "$type": "fontSizes"
@@ -436,6 +466,7 @@
         }
       },
       "heading-6": {
+        "$description": "Heading 6: 1rem / 140% / bold / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.base}",
           "$type": "fontSizes"
@@ -458,6 +489,7 @@
         }
       },
       "tagline": {
+        "$description": "Tagline: 1rem / 100% / normal / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.base}",
           "$type": "fontSizes"
@@ -480,6 +512,7 @@
         }
       },
       "large": {
+        "$description": "Large: 1.5rem / 120% / normal / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.2xl}",
           "$type": "fontSizes"
@@ -502,6 +535,7 @@
         }
       },
       "medium": {
+        "$description": "Medium: 1.25rem / 140% / normal / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.xl}",
           "$type": "fontSizes"
@@ -524,6 +558,7 @@
         }
       },
       "button": {
+        "$description": "Button: 1rem / 150% / bold / 0.02rem / uppercase.",
         "size": {
           "$value": "{pui.primitive.font.size.base}",
           "$type": "fontSizes"
@@ -546,6 +581,7 @@
         }
       },
       "base": {
+        "$description": "Base: 1rem / 140% / normal / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.base}",
           "$type": "fontSizes"
@@ -568,6 +604,7 @@
         }
       },
       "small": {
+        "$description": "Small: 0.875rem / 150% / normal / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.sm}",
           "$type": "fontSizes"
@@ -590,6 +627,7 @@
         }
       },
       "tiny": {
+        "$description": "Tiny: 0.75rem / 150% / normal / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.xs}",
           "$type": "fontSizes"
@@ -612,6 +650,7 @@
         }
       },
       "label": {
+        "$description": "Label: 0.5rem / 150% / normal / 0 / none.",
         "size": {
           "$value": "0.5rem",
           "$type": "fontSizes"
@@ -634,6 +673,7 @@
         }
       },
       "amount": {
+        "$description": "Amount: 0.625rem / 150% / normal / 0 / none.",
         "size": {
           "$value": "0.625rem",
           "$type": "fontSizes"
@@ -656,6 +696,7 @@
         }
       },
       "extra-tiny": {
+        "$description": "Extra Tiny: 0.625rem / 150% / normal / 0 / none.",
         "size": {
           "$value": "0.625rem",
           "$type": "fontSizes"
@@ -678,6 +719,7 @@
         }
       },
       "navbar": {
+        "$description": "Navbar: 0.875rem / 150% / normal / 0 / none.",
         "size": {
           "$value": "{pui.primitive.font.size.sm}",
           "$type": "fontSizes"
@@ -700,6 +742,7 @@
         }
       },
       "alertbar": {
+        "$description": "AlertBar typography.",
         "size": {
           "$value": "{pui.typo.small.size}",
           "$type": "fontSizes"
@@ -711,6 +754,7 @@
       }
     },
     "duration": {
+      "$description": "Motion tokens.",
       "normal": {
         "$value": "{pui.primitive.duration.normal}"
       },

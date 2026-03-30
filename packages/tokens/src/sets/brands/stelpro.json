@@ -4,22 +4,34 @@
       "color": {
         "$type": "color",
         "primary": {
-          "9": { "$value": "#fe322a" }
+          "9": {
+            "$value": "#fe322a",
+            "$description": "Stelpro Red — hero color at step 9 (Radix solid/accent)."
+          }
         }
       }
     },
     "color": {
       "$type": "color",
       "interactive": {
-        "on-primary": { "$value": "{pui.primitive.color.overlay.5}" }
+        "on-primary": {
+          "$value": "{pui.primitive.color.overlay.5}",
+          "$description": "Stelpro uses muted text on primary for better contrast with red. Acorn: overlay-12."
+        }
       },
       "alertbar": {
-        "first-fg": { "$value": "{pui.primitive.color.overlay.1}" }
+        "first-fg": {
+          "$value": "{pui.primitive.color.overlay.1}",
+          "$description": "Stelpro uses light text on primary red alertbar. Acorn: overlay-12."
+        }
       }
     },
     "radius": {
       "$type": "borderRadius",
-      "badge": { "$value": "{pui.primitive.radius.none}" }
+      "badge": {
+        "$value": "{pui.primitive.radius.none}",
+        "$description": "Stelpro uses no rounded corners for badges."
+      }
     }
   }
 }

@@ -3,7 +3,9 @@
     "primitive": {
       "color": {
         "$type": "color",
+        "$description": "Raw design values named by what they ARE, not what they're FOR. These are NEVER directly consumed by components — only semantic tokens should reference these. Color scales follow Radix's 12-step philosophy: 1-2 Backgrounds, 3-5 Component backgrounds, 6-8 Borders, 9-10 Solid/accent, 11-12 Text. See https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale",
         "primary": {
+          "$description": "Acorn Teal — 12-step primary scale. Step 9 = hero/accent (highest chroma).",
           "1": { "$value": "hsl(172, 60%, 98%)" },
           "2": { "$value": "hsl(172, 55%, 95%)" },
           "3": { "$value": "hsl(172, 60%, 89%)" },
@@ -18,6 +20,7 @@
           "12": { "$value": "hsl(172, 70%, 15%)" }
         },
         "overlay": {
+          "$description": "Overlay (Sand) — neutral gray scale.",
           "1": { "$value": "#fdfdfc" },
           "2": { "$value": "#f9f9f8" },
           "3": { "$value": "#f1f0ef" },
@@ -32,6 +35,7 @@
           "12": { "$value": "#21201c" }
         },
         "red": {
+          "$description": "Feedback — Red (error) 12-step scale. Step 9 = Radix Tomato-9 equivalent.",
           "1": { "$value": "#fff8f7" },
           "2": { "$value": "#fff0ee" },
           "3": { "$value": "#ffe5e2" },
@@ -46,20 +50,32 @@
           "12": { "$value": "#641723" }
         },
         "green": {
+          "$description": "Feedback — Green (success).",
           "9": { "$value": "#30a46c" },
           "11": { "$value": "#18794e" }
         },
         "amber": {
+          "$description": "Feedback — Amber (warning).",
           "9": { "$value": "#f5a623" },
           "11": { "$value": "#ad5700" }
         },
         "blue": {
+          "$description": "Feedback — Blue (info).",
           "9": { "$value": "#0091ff" },
           "11": { "$value": "#006adc" }
         },
-        "error": { "$value": "{pui.primitive.color.red.9}" },
-        "error-strong": { "$value": "{pui.primitive.color.red.8}" },
-        "error-light": { "$value": "{pui.primitive.color.red.5}" }
+        "error": {
+          "$value": "{pui.primitive.color.red.9}",
+          "$description": "Deprecated alias — use red scale directly."
+        },
+        "error-strong": {
+          "$value": "{pui.primitive.color.red.8}",
+          "$description": "Deprecated alias — use red scale directly."
+        },
+        "error-light": {
+          "$value": "{pui.primitive.color.red.5}",
+          "$description": "Deprecated alias — use red scale directly."
+        }
       }
     }
   }

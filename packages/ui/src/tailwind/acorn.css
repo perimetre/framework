@@ -5,4 +5,4 @@
  *   @import '@perimetre/ui/tailwind';
  *   @import '@perimetre/ui/tailwind/acorn.css';
  */
-@import '../brands/acorn/styles.css';
+@import '@perimetre/tokens/brands/acorn.css';

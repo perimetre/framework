@@ -10,6 +10,7 @@
       "color": {
         "$type": "color",
         "primary": {
+          "$description": "Sprig Green — 12-step primary scale. Step 9 = hero/accent (#69c14c). Brand-provided values: 50-950 (11 colors). Steps 5=9 and 6=10 share values — expected for limited palettes (see Radix 12-step docs).",
           "1": { "$value": "#dbfdd4" },
           "2": { "$value": "#bcfbad" },
           "3": { "$value": "#82ed5f" },
@@ -24,6 +25,7 @@
           "12": { "$value": "#0f2408" }
         },
         "overlay": {
+          "$description": "Neutral gray scale. Consumer values: 50=#fff, 100=#f9f9f9, 200=#f5f5f5, 400=#a7a8aa, 500=#545454, 900=#2c2826. Steps 4-7 and 9-10 are interpolated. Corporate site mapping: super light grey=step 2, light grey=step 3, lg-med grey=step 8, mid grey=step 11, dark grey=step 12.",
           "1": { "$value": "#ffffff" },
           "2": { "$value": "#f9f9f9" },
           "3": { "$value": "#f5f5f5" },
@@ -38,6 +40,7 @@
           "12": { "$value": "#2c2826" }
         },
         "red": {
+          "$description": "Feedback Red — mapped from Tailwind Red palette per Figma spec.",
           "2": { "$value": "#fef2f2" },
           "6": { "$value": "#fecaca" },
           "9": { "$value": "#ef4444" },
@@ -48,57 +51,142 @@
     "color": {
       "$type": "color",
       "interactive": {
-        "on-primary": { "$value": "{pui.primitive.color.overlay.1}" }
+        "on-primary": {
+          "$value": "{pui.primitive.color.overlay.1}",
+          "$description": "Sprig uses light (white) text on primary green. Acorn uses dark (overlay-12)."
+        }
       },
-      "focus-outline": { "$value": "{pui.primitive.color.primary.9}" },
+      "focus-outline": {
+        "$value": "{pui.primitive.color.primary.9}",
+        "$description": "Sprig uses primary green for focus rings."
+      },
       "fg": {
-        "icon": { "$value": "{pui.primitive.color.overlay.8}" },
-        "icon-chevron": { "$value": "{pui.primitive.color.overlay.11}" },
-        "link-secondary": { "$value": "{pui.primitive.color.overlay.11}" },
-        "link-active": { "$value": "{pui.primitive.color.primary.8}" }
+        "icon": {
+          "$value": "{pui.primitive.color.overlay.8}",
+          "$description": "Figma: 'Icon (Gray)' = lg-med grey = overlay-8. Acorn: overlay-9."
+        },
+        "icon-chevron": {
+          "$value": "{pui.primitive.color.overlay.11}",
+          "$description": "Figma: 'Icon (Chevron)' = mid grey = overlay-11. Acorn: overlay-9."
+        },
+        "link-secondary": {
+          "$value": "{pui.primitive.color.overlay.11}",
+          "$description": "Acorn: overlay-8."
+        },
+        "link-active": {
+          "$value": "{pui.primitive.color.primary.8}",
+          "$description": "Uses primary-8 (#2f5d20) — acorn's primary-11 reference would resolve to #1f4114 which is too dark for link text."
+        }
       },
       "border": {
-        "rule-primary": { "$value": "{pui.primitive.color.overlay.11}" },
-        "rule-secondary": { "$value": "{pui.primitive.color.overlay.3}" }
+        "rule-primary": {
+          "$value": "{pui.primitive.color.overlay.11}",
+          "$description": "Figma: 'Border/Rule - Primary' = mid grey = overlay-11. Acorn: overlay-9."
+        },
+        "rule-secondary": {
+          "$value": "{pui.primitive.color.overlay.3}",
+          "$description": "Figma: 'Border/Rule - Secondary' = light grey = overlay-3. Acorn: overlay-5."
+        }
       },
       "alertbar": {
-        "first-fg": { "$value": "{pui.primitive.color.overlay.1}" }
+        "first-fg": {
+          "$value": "{pui.primitive.color.overlay.1}",
+          "$description": "Sprig uses white text on primary green alertbar. Acorn: overlay-12."
+        }
       },
       "button": {
-        "primary-fill": { "$value": "{pui.primitive.color.overlay.11}" },
-        "hover": { "$value": "{pui.primitive.color.primary.9}" },
-        "active": { "$value": "{pui.primitive.color.primary.9}" }
+        "primary-fill": {
+          "$value": "{pui.primitive.color.overlay.11}",
+          "$description": "Figma: 'Button Primary Fill' = mid grey (overlay-11), NOT primary green. Acorn: interactive-primary."
+        },
+        "hover": {
+          "$value": "{pui.primitive.color.primary.9}",
+          "$description": "Figma: 'Button Hover' = Medium Sea Green/400 (primary-9). Acorn: primary-10."
+        },
+        "active": {
+          "$value": "{pui.primitive.color.primary.9}",
+          "$description": "Figma: 'Active Button' = Medium Sea Green/400 (primary-9). Acorn: primary-10."
+        }
       },
       "input": {
-        "bg": { "$value": "{pui.primitive.color.overlay.2}" },
-        "border": { "$value": "{pui.primitive.color.overlay.3}" },
-        "outline": { "$value": "{pui.primitive.color.overlay.3}" }
+        "bg": {
+          "$value": "{pui.primitive.color.overlay.2}",
+          "$description": "Figma: 'Input Box' = super light grey = overlay-2. Acorn: overlay-1."
+        },
+        "border": {
+          "$value": "{pui.primitive.color.overlay.3}",
+          "$description": "Figma: 'Input Outline' = light grey = overlay-3. Acorn: overlay-5."
+        },
+        "outline": {
+          "$value": "{pui.primitive.color.overlay.3}",
+          "$description": "Figma: 'Input Outline' = light grey = overlay-3. Acorn: overlay-5."
+        }
       },
       "control": {
-        "unchecked-bg": { "$value": "{pui.primitive.color.overlay.3}" },
-        "checked-border": { "$value": "{pui.primitive.color.primary.7}" },
-        "checked-border-inverted": { "$value": "{pui.primitive.color.primary.9}" },
-        "checkmark": { "$value": "{pui.primitive.color.overlay.1}" },
-        "checkmark-inverted": { "$value": "{pui.primitive.color.primary.9}" }
+        "unchecked-bg": {
+          "$value": "{pui.primitive.color.overlay.3}",
+          "$description": "Acorn: overlay-1."
+        },
+        "checked-border": {
+          "$value": "{pui.primitive.color.primary.7}",
+          "$description": "Acorn: primary-9 (interactive-primary)."
+        },
+        "checked-border-inverted": {
+          "$value": "{pui.primitive.color.primary.9}",
+          "$description": "Acorn: same as checked-border."
+        },
+        "checkmark": {
+          "$value": "{pui.primitive.color.overlay.1}",
+          "$description": "White checkmark. Acorn: primary-9."
+        },
+        "checkmark-inverted": {
+          "$value": "{pui.primitive.color.primary.9}",
+          "$description": "Acorn: overlay-1."
+        }
       },
       "table": {
-        "inactive-item": { "$value": "{pui.primitive.color.overlay.8}" }
+        "inactive-item": {
+          "$value": "{pui.primitive.color.overlay.8}",
+          "$description": "Figma: 'Table/Inactive Item' = lg-med grey = overlay-8. Acorn: overlay-6."
+        }
       },
       "dropdown": {
-        "bg": { "$value": "{pui.primitive.color.overlay.2}" },
-        "border": { "$value": "{pui.primitive.color.overlay.3}" },
-        "item-hover-bg": { "$value": "{pui.primitive.color.overlay.2}" },
-        "separator": { "$value": "{pui.primitive.color.overlay.3}" }
+        "$description": "Sprig dropdowns use squared, subtle styling.",
+        "bg": {
+          "$value": "{pui.primitive.color.overlay.2}",
+          "$description": "Acorn: overlay-1."
+        },
+        "border": {
+          "$value": "{pui.primitive.color.overlay.3}",
+          "$description": "Acorn: overlay-5."
+        },
+        "item-hover-bg": {
+          "$value": "{pui.primitive.color.overlay.2}",
+          "$description": "Acorn: overlay-3."
+        },
+        "separator": {
+          "$value": "{pui.primitive.color.overlay.3}",
+          "$description": "Acorn: overlay-4."
+        }
       }
     },
     "typo": {
       "alertbar": {
-        "size": { "$value": "{pui.typo.tiny.size}", "$type": "fontSizes" },
-        "weight": { "$value": "{pui.primitive.font.weight.bold}", "$type": "fontWeights" }
+        "size": {
+          "$value": "{pui.typo.tiny.size}",
+          "$type": "fontSizes",
+          "$description": "Sprig uses tiny size. Acorn: small."
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.bold}",
+          "$type": "fontWeights",
+          "$description": "Sprig uses bold. Acorn: normal (small weight)."
+        }
       }
     },
     "radius": {
       "$type": "borderRadius",
+      "$description": "Sprig uses squared corners for most elements.",
       "input": { "$value": "0" },
       "badge": { "$value": "0" },
       "control": { "$value": "0" },
@@ -106,11 +194,18 @@
     },
     "shadow": {
       "$type": "boxShadow",
-      "card": { "$value": "7px 5px 30px 0 rgba(72, 73, 121, 0.15)" },
-      "input-focus": { "$value": "none" },
+      "card": {
+        "$value": "7px 5px 30px 0 rgba(72, 73, 121, 0.15)",
+        "$description": "Purple-tinted card shadow."
+      },
+      "input-focus": {
+        "$value": "none",
+        "$description": "Sprig hides the input focus ring shadow. Acorn: 2px primary ring."
+      },
       "dropdown": { "$value": "none" }
     },
     "field-label": {
+      "$description": "Sprig uses smaller, lighter field labels.",
       "font-size": { "$value": "var(--text-xs)", "$type": "fontSizes" },
       "line-height": { "$value": "150%", "$type": "lineHeights" },
       "font-weight": { "$value": "400", "$type": "fontWeights" }

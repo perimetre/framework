@@ -6,5 +6,5 @@
  *   @import '@perimetre/ui/tailwind';
  *   @import '@perimetre/ui/tailwind/sprig.css';
  */
-@import '../brands/acorn/styles.css';
-@import '../brands/sprig/styles.css';
+@import '@perimetre/tokens/brands/acorn.css';
+@import '@perimetre/tokens/brands/sprig.css';
