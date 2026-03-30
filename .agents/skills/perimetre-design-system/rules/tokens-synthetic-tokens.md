@@ -58,25 +58,31 @@ Examples:
 
 ### Implementation Pattern in This Repo
 
-1. Define the token in brand CSS (`packages/ui/src/brands/*/styles.css`)
-2. Keep Acorn as baseline; override only where needed in Sprig/Stelpro
+1. Define the token in `packages/tokens/src/sets/semantic/base.json` (or the appropriate brand JSON for overrides)
+2. Run `pnpm build` in `packages/tokens` to regenerate CSS
 3. Bridge to Tailwind utility in `packages/ui/src/brands/tailwind.css` using `@theme inline`
 4. Consume via `pui:` utilities in CVA/component classes
 
 Example:
 
-```css
-/* brands/acorn/styles.css */
-@layer pui.semantic {
-  [data-pui-brand] {
-    --pui-shadow-focus-strong: 0 0 0 3px var(--pui-color-border-focus);
+```json
+// packages/tokens/src/sets/semantic/base.json
+{
+  "pui": {
+    "shadow": {
+      "focus-strong": {
+        "$value": "0 0 0 3px var(--pui-color-border-focus)",
+        "$type": "boxShadow",
+        "$description": "Strong focus ring for high-contrast focus states."
+      }
+    }
   }
 }
+```
 
-/* brands/tailwind.css */
-@theme inline {
-  --shadow-pui-focus-strong: var(--pui-shadow-focus-strong);
-}
+```css
+/* packages/ui/src/brands/tailwind.css — @theme inline block */
+--shadow-pui-focus-strong: var(--pui-shadow-focus-strong);
 ```
 
 ```ts
@@ -86,7 +92,7 @@ Example:
 
 ### Synthetic Token Governance
 
-- Add a short rationale comment where the token is introduced
+- Add a `$description` field in the token JSON explaining the rationale
 - Prefer extending existing semantic categories before adding new categories
 - Audit synthetic tokens regularly; remove unused or single-use tokens
 - If a synthetic token becomes broadly useful, promote it into core semantic vocabulary

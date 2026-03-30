@@ -28,32 +28,48 @@ The CSS architecture uses named layers to control specificity and ensure predict
 
 Note: current `packages/ui` brand files use `@layer pui.primitive` (singular). Follow existing naming in this package unless you are intentionally doing a full layer-name migration.
 
+### Token Source of Truth: `packages/tokens`
+
+Token values are defined as W3C DTCG JSON in `packages/tokens/src/sets/` and built into CSS via Style Dictionary. The generated CSS lives in `packages/tokens/dist/brands/`. See `packages/tokens/CONTRIBUTING.md` for the full JSON format and workflow.
+
 ### Brand CSS File Structure
 
-Each brand has a CSS entry file that imports progressively:
+All CSS entry points import generated token CSS from `@perimetre/tokens`:
 
-**Acorn entry (`styles/acorn.css`):**
-
-```css
-@import '../styles/base.css';
-@import '../brands/acorn/styles.css';
-```
-
-**Sprig entry (`styles/sprig.css`):**
+**Pre-built entry points (`packages/ui/src/styles/`)** — self-contained with Tailwind runtime:
 
 ```css
-@import '../styles/base.css';
-@import '../brands/acorn/styles.css'; /* Always include acorn as base */
-@import '../brands/sprig/styles.css'; /* Sprig overrides */
+/* styles/acorn.css */
+@import './base.css';
+@import '@perimetre/tokens/brands/acorn.css';
+
+/* styles/sprig.css */
+@import './base.css';
+@import '@perimetre/tokens/brands/acorn.css';
+@import '@perimetre/tokens/brands/sprig.css';
 ```
 
-**Stelpro entry (`styles/stelpro.css`):**
+**Tailwind entry points (`packages/ui/src/tailwind/`)** — source-level, no Tailwind runtime:
 
 ```css
-@import '../styles/base.css';
-@import '../brands/acorn/styles.css'; /* Always include acorn as base */
-@import '../brands/stelpro/styles.css'; /* Stelpro overrides */
+/* tailwind/acorn.css */
+@import '@perimetre/tokens/brands/acorn.css';
+
+/* tailwind/sprig.css */
+@import '@perimetre/tokens/brands/acorn.css';
+@import '@perimetre/tokens/brands/sprig.css';
 ```
+
+**Ladle dev environment** imports all brands for switching:
+
+```css
+@import '@perimetre/tokens/brands/acorn.css';
+@import '@perimetre/tokens/brands/sprig.css';
+@import '@perimetre/tokens/brands/stelpro.css';
+@import '@perimetre/tokens/brands/cima.css';
+```
+
+Token changes only need to be made in `packages/tokens` (JSON → build → CSS). The `packages/ui/src/brands/{brand}/styles.css` files are legacy and no longer imported.
 
 **Key insight:** Acorn tokens are ALWAYS loaded. Brand overrides sit on top and use CSS specificity to win:
 

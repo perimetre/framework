@@ -112,6 +112,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "ladle serve --viteConfig .ladle/vite.config.ts",
+    "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit"
   },
   "sideEffects": [

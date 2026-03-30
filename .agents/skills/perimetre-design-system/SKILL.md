@@ -35,13 +35,32 @@ Reference these guidelines when:
 
 ## Source of Truth
 
-Always prioritize current implementation details from `packages/ui` over generic design-system advice.
+Always prioritize current implementation details from the codebase over generic design-system advice.
+
+**Token definitions** have a single source of truth:
+
+- `packages/tokens/` — W3C DTCG JSON → generated CSS via Style Dictionary
+
+When adding or modifying tokens:
+
+1. Edit JSON in `packages/tokens/src/sets/` (primitives, semantic, or brand overrides)
+2. Run `pnpm build` in the tokens package → regenerates `dist/brands/*.css`
+3. Add the Tailwind bridge in `packages/ui/src/brands/tailwind.css` (for utility class generation)
+4. Commit both JSON and generated CSS
+
+All CSS entry points (styles, tailwind, Ladle) import from `@perimetre/tokens/brands/*.css`.
+
+The legacy `packages/ui/src/brands/{brand}/styles.css` files have been removed.
 
 - Primary docs:
   - `packages/ui/docs/design-token-guide.md`
   - `packages/ui/docs/building-radically-themeable-react-component-libraries.md`
+  - `packages/tokens/README.md` — Token package architecture and build pipeline
+  - `packages/tokens/CONTRIBUTING.md` — Token JSON format, naming, adding tokens/brands
 - Primary code:
-  - `packages/ui/src/brands/*`
+  - `packages/tokens/src/sets/` — Token JSON source of truth (primitives, semantic, brands)
+  - `packages/tokens/dist/brands/` — Generated CSS (committed to git)
+  - `packages/ui/src/brands/tailwind.css` — Tailwind bridge (token → utility mapping)
   - `packages/ui/src/components/*`
   - `packages/ui/src/lib/brand-registry.ts`
   - `packages/ui/src/lib/cva/index.ts`
@@ -79,29 +98,48 @@ Always prioritize current implementation details from `packages/ui` over generic
 ## Architecture Overview
 
 ```
+packages/tokens/                       # Token source of truth
+├── src/sets/                          # W3C DTCG JSON token definitions
+│   ├── primitives/
+│   │   ├── colors.json                # Primary, overlay, red, green, amber, blue
+│   │   ├── typography.json            # Font families, sizes, weights, leading
+│   │   ├── shape.json                 # Border radius
+│   │   ├── shadow.json                # Box shadows
+│   │   └── motion.json                # Durations
+│   ├── semantic/
+│   │   └── base.json                  # All semantic tokens (acorn defaults)
+│   ├── brands/
+│   │   ├── sprig.json                 # Only overrides from acorn
+│   │   ├── stelpro.json               # Only overrides from acorn
+│   │   └── cima.json                  # Only overrides from acorn
+│   └── $themes.json                   # Tokens Studio theme composition
+├── src/scripts/build.ts               # JSON → CSS build (Style Dictionary v5)
+└── dist/brands/                       # Generated CSS (committed to git)
+    ├── acorn.css                      # Full primitives + semantics
+    ├── sprig.css                      # Brand overrides only
+    ├── stelpro.css                    # Brand overrides only
+    └── cima.css                       # Brand overrides only
+
 packages/ui/src/
-├── brands/                          # Brand definitions + CSS tokens
-│   ├── index.ts                     # Brand type, BRANDS const, DEFAULT_BRAND
-│   ├── tailwind.css                 # @theme inline bridge + custom variants
-│   ├── acorn/styles.css             # Base brand: all primitives + semantics
-│   ├── sprig/styles.css             # Overrides only what differs
-│   └── stelpro/styles.css           # Overrides only what differs
+├── brands/                            # Brand registry + Tailwind bridge
+│   ├── index.ts                       # Brand type, BRANDS const, DEFAULT_BRAND
+│   └── tailwind.css                   # @theme inline bridge + custom variants
 ├── components/
 │   └── ComponentName/
-│       ├── index.tsx                # Brand-agnostic component
+│       ├── index.tsx                  # Brand-agnostic component
 │       └── brands/
-│           ├── index.ts             # Brand variants registry
+│           ├── index.ts               # Brand variants registry
 │           ├── ComponentName.acorn.brand.ts   # Base (required)
 │           ├── ComponentName.sprig.brand.ts   # Optional overrides
 │           └── ComponentName.stelpro.brand.ts # Optional overrides
 ├── lib/
-│   ├── brand-registry.ts            # Module-level brand state (RSC-safe)
-│   └── cva/index.ts                 # CVA + twMerge integration
+│   ├── brand-registry.ts              # Module-level brand state (RSC-safe)
+│   └── cva/index.ts                   # CVA + twMerge integration
 └── styles/
-    ├── base.css                     # Tailwind imports + brand scoping
-    ├── acorn.css                    # Brand CSS entry: base + acorn
-    ├── sprig.css                    # Brand CSS entry: base + acorn + sprig
-    └── stelpro.css                  # Brand CSS entry: base + acorn + stelpro
+    ├── base.css                       # Tailwind imports + brand scoping
+    ├── acorn.css                      # Imports base + @perimetre/tokens/brands/acorn.css
+    ├── sprig.css                      # Imports base + tokens acorn + tokens sprig
+    └── stelpro.css                    # Imports base + tokens acorn + tokens stelpro
 ```
 
 ## Core Principles
@@ -165,18 +203,21 @@ Can the component be fully expressed with existing semantic tokens?
 
 ## Common Mistakes
 
-| Mistake                                      | Fix                                                               |
-| -------------------------------------------- | ----------------------------------------------------------------- |
-| Using raw color values in components         | Use `pui:bg-pui-interactive-primary` etc.                         |
-| Creating tokens for `display`, `position`    | Hardcode structural properties                                    |
-| Missing `pui:` prefix on utilities           | All utilities must use the `pui:` prefix                          |
-| Creating brand variant for identical styling | Only create brand files when styles differ                        |
-| Using React Context for brand state          | Use module-level `brand-registry.ts` (RSC-safe)                   |
-| Importing from barrel without need           | Use per-component imports for tree-shaking                        |
-| Missing `data-pui-brand` on root element     | Required for CSS token scoping                                    |
-| Creating component tokens prematurely        | Start with semantic tokens; add component tokens only when needed |
-| Creating synthetic tokens for one-off styles | Synthetic tokens need clear multi-use or cross-brand value        |
-| Tokenizing one-off values                    | Only tokenize values that repeat or vary between brands           |
+| Mistake                                      | Fix                                                                     |
+| -------------------------------------------- | ----------------------------------------------------------------------- |
+| Using raw color values in components         | Use `pui:bg-pui-interactive-primary` etc.                               |
+| Creating tokens for `display`, `position`    | Hardcode structural properties                                          |
+| Missing `pui:` prefix on utilities           | All utilities must use the `pui:` prefix                                |
+| Creating brand variant for identical styling | Only create brand files when styles differ                              |
+| Using React Context for brand state          | Use module-level `brand-registry.ts` (RSC-safe)                         |
+| Importing from barrel without need           | Use per-component imports for tree-shaking                              |
+| Missing `data-pui-brand` on root element     | Required for CSS token scoping                                          |
+| Creating component tokens prematurely        | Start with semantic tokens; add component tokens only when needed       |
+| Creating synthetic tokens for one-off styles | Synthetic tokens need clear multi-use or cross-brand value              |
+| Tokenizing one-off values                    | Only tokenize values that repeat or vary between brands                 |
+| Adding tokens directly in UI brand CSS       | Define tokens in `packages/tokens` JSON, not in UI brand CSS files      |
+| Forgetting to rebuild tokens after JSON edit | Run `pnpm build` in tokens package, commit generated CSS                |
+| Forgetting the Tailwind bridge               | New tokens need a bridge entry in `packages/ui/src/brands/tailwind.css` |
 
 ## Review Checklist
 
@@ -195,6 +236,9 @@ When reviewing `@perimetre/ui` code, check:
 - [ ] New tokens follow naming convention: `--pui-{category}-{name}`
 - [ ] Token is justified: changes between brands OR used in 3+ components
 - [ ] Synthetic token (if added) has explicit rationale and no existing semantic alternative
+- [ ] New tokens defined in `packages/tokens` (JSON source of truth), not in UI brand CSS
+- [ ] Token JSON changes rebuilt (`pnpm build` in tokens) and generated CSS committed
+- [ ] New tokens bridged to Tailwind in `packages/ui/src/brands/tailwind.css`
 
 ## Reference Files
 

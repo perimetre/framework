@@ -9,47 +9,62 @@ tags: brands, new-brand, setup, css, tokens, variants, step-by-step
 
 Follow these steps to add a new brand to `@perimetre/ui`. The process involves updating types, creating CSS tokens, creating a CSS entry file, and optionally adding component variant overrides.
 
-### Step 1: Register the Brand
+### Step 1: Create Token JSON in `packages/tokens`
 
-**Update `src/brands/index.ts`:**
+**Create `packages/tokens/src/sets/brands/newbrand.json`:**
+
+Only include tokens that DIFFER from acorn. The JSON can contain both primitive and semantic overrides:
+
+```json
+{
+  "pui": {
+    "primitive": {
+      "color": {
+        "$type": "color",
+        "primary": {
+          "9": { "$value": "#8b5cf6" }
+        }
+      }
+    },
+    "color": {
+      "$type": "color",
+      "interactive": {
+        "on-primary": { "$value": "{pui.primitive.color.overlay.1}" }
+      }
+    },
+    "radius": {
+      "$type": "borderRadius",
+      "button": { "$value": "0.5rem" },
+      "badge": { "$value": "0.25rem" }
+    }
+  }
+}
+```
+
+**Update `packages/tokens/src/sets/$themes.json`** to add the new brand theme.
+
+**Add brand to `BRANDS` array** in `packages/tokens/src/scripts/build.ts`.
+
+**Build:** `cd packages/tokens && pnpm build` → generates `dist/brands/newbrand.css`.
+
+Commit both JSON and generated CSS.
+
+### Step 2: Register the Brand in `packages/ui`
+
+**Update `packages/ui/src/brands/index.ts`:**
 
 ```typescript
 export const BRANDS = ['acorn', 'sprig', 'stelpro', 'newbrand'] as const;
-// Brand type automatically updates: 'acorn' | 'sprig' | 'stelpro' | 'newbrand'
-```
-
-### Step 2: Create Brand CSS Tokens
-
-**Create `src/brands/newbrand/styles.css`:**
-
-Only define tokens that DIFFER from Acorn. Start minimal and add tokens as needed.
-
-```css
-@layer pui.primitive {
-  [data-pui-brand='newbrand'] {
-    /* Override primitive values that differ from acorn */
-    --pui-primitive-color-primary-6: #8b5cf6; /* Purple primary */
-  }
-}
-
-@layer pui.semantic {
-  [data-pui-brand='newbrand'] {
-    /* Override semantic tokens only if they can't be derived from primitives */
-    --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
-    --pui-radius-button: 0.5rem; /* Rounded but not pill */
-    --pui-radius-badge: 0.25rem;
-  }
-}
 ```
 
 ### Step 3: Create CSS Entry File
 
-**Create `src/styles/newbrand.css`:**
+**Create `packages/ui/src/styles/newbrand.css`:**
 
 ```css
-@import '../styles/base.css';
-@import '../brands/acorn/styles.css'; /* Always include acorn base */
-@import '../brands/newbrand/styles.css'; /* Brand overrides */
+@import './base.css';
+@import '@perimetre/tokens/brands/acorn.css';
+@import '@perimetre/tokens/brands/newbrand.css';
 ```
 
 ### Step 4: Add to Build Entry Points
@@ -107,9 +122,13 @@ export const buttonBrandVariants = {
 
 ### Checklist for New Brand
 
-- [ ] Brand added to `BRANDS` const in `src/brands/index.ts`
-- [ ] Brand CSS file created at `src/brands/newbrand/styles.css`
-- [ ] CSS entry file created at `src/styles/newbrand.css`
+- [ ] Brand JSON created at `packages/tokens/src/sets/brands/newbrand.json`
+- [ ] Brand added to `$themes.json` and `build.ts` BRANDS array in tokens package
+- [ ] Tokens built (`pnpm build` in tokens) and generated CSS committed
+- [ ] Brand added to `BRANDS` const in `packages/ui/src/brands/index.ts`
+- [ ] CSS entry file created at `packages/ui/src/styles/newbrand.css` (imports from `@perimetre/tokens`)
+- [ ] Tailwind entry file created at `packages/ui/src/tailwind/newbrand.css` (imports from `@perimetre/tokens`)
+- [ ] Custom variant added to `packages/ui/src/brands/tailwind.css`
 - [ ] Only DIFFERENT primitive/semantic values overridden (not all)
 - [ ] Component variant overrides created ONLY where class structure differs
 - [ ] Brand registry updated for affected components
@@ -148,11 +167,15 @@ If the only difference is the primary color VALUE, CSS tokens handle it. No vari
 
 ```css
 /* WRONG: Missing acorn base */
-@import '../styles/base.css';
-@import '../brands/newbrand/styles.css'; /* Missing acorn! */
+@import './base.css';
+@import '@perimetre/tokens/brands/newbrand.css'; /* Missing acorn! */
 
 /* RIGHT: Always include acorn */
-@import '../styles/base.css';
-@import '../brands/acorn/styles.css';
-@import '../brands/newbrand/styles.css';
+@import './base.css';
+@import '@perimetre/tokens/brands/acorn.css';
+@import '@perimetre/tokens/brands/newbrand.css';
 ```
+
+**Forgetting to update tokens package:**
+
+Adding tokens only in `packages/ui/src/brands/` CSS files without also adding them to `packages/tokens/src/sets/` JSON. Both must stay in sync.

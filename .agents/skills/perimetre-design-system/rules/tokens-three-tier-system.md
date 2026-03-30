@@ -189,7 +189,18 @@ Before creating a new token, run through this checklist:
 
 If all checks pass:
 
-1. Add the primitive in `brands/acorn/styles.css` under `@layer pui.primitive`
-2. Add the semantic token in `brands/acorn/styles.css` under `@layer pui.semantic`
-3. Bridge it to Tailwind in `brands/tailwind.css` under `@theme inline`
-4. Override the primitive or semantic value in other brand CSS files as needed
+**Step 1: Define the token in `packages/tokens` (source of truth)**
+
+1. For primitives: add to the appropriate file in `packages/tokens/src/sets/primitives/` (e.g., `colors.json`)
+2. For semantic tokens: add to `packages/tokens/src/sets/semantic/base.json`
+3. For brand overrides: add to `packages/tokens/src/sets/brands/{brand}.json`
+4. Rebuild: run `pnpm build` in `packages/tokens/` — generates `dist/brands/*.css`
+5. Commit both the JSON changes and the regenerated CSS
+
+**Step 2: Bridge to Tailwind in `packages/ui`**
+
+6. Add the token to `packages/ui/src/brands/tailwind.css` under `@theme inline`
+
+The bridge follows the pattern: `--{tailwind-namespace}-pui-{token-path}: var(--pui-{token-path})`
+
+All CSS entry points (styles, tailwind, Ladle) import generated CSS from `@perimetre/tokens/brands/*.css` — there is no need to duplicate token definitions in the UI package.
