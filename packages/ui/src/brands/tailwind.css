@@ -115,6 +115,7 @@
 
   /* Border colors */
   --color-pui-border-default: var(--pui-color-border-default);
+  --color-pui-border-baseline: var(--pui-color-border-baseline);
   --color-pui-border-focus: var(--pui-color-border-focus);
   --color-pui-border-rule-primary: var(--pui-color-border-rule-primary);
   --color-pui-border-rule-secondary: var(--pui-color-border-rule-secondary);
@@ -465,4 +466,23 @@
   font-weight: var(--pui-typo-extra-tiny-weight);
   letter-spacing: var(--pui-typo-extra-tiny-tracking);
   text-transform: var(--pui-typo-extra-tiny-transform);
+}
+
+/* ========================================
+ * INTERACTIVE PRIMARY UTILITIES (unlayered)
+ *
+ * Tailwind v4's JIT does not auto-generate border/text utilities
+ * for the pui-interactive-primary theme token.
+ * Unlayered rules override all @layer rules regardless of specificity.
+ * ======================================== */
+[data-pui-brand] .pui\:border-pui-interactive-primary {
+  border-color: var(--pui-color-interactive-primary);
+}
+
+[data-pui-brand] .hover\:pui\:border-pui-interactive-primary:hover {
+  border-color: var(--pui-color-interactive-primary);
+}
+
+[data-pui-brand] .hover\:pui\:text-pui-interactive-primary:hover {
+  color: var(--pui-color-interactive-primary);
 }

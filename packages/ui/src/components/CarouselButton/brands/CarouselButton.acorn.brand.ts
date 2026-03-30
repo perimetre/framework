@@ -1,9 +1,9 @@
 import { cva } from '@/lib/cva';
 
 /**
- * Acorn brand ImageCarouselNavButton variant
+ * Acorn brand CarouselButton variant
  */
-export const imageCarouselNavButtonAcornVariants = cva({
+export const carouselButtonAcornVariants = cva({
   base: [
     'pui:pointer-events-auto',
     'pui:flex',

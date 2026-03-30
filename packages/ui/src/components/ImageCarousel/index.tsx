@@ -10,6 +10,7 @@ import EmblaClassNames from 'embla-carousel-class-names';
 import useEmblaCarousel from 'embla-carousel-react';
 import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures';
 import { useCallback, useEffect, useState } from 'react';
+import CarouselButton from '../CarouselButton';
 import ImageCarouselContainer from './ImageCarouselContainer';
 import {
   ImageCarouselDot,
@@ -20,10 +21,7 @@ import {
   ImageCarouselLazyLoadContainer,
   ImageCarouselLazyLoadSpinner
 } from './ImageCarouselLazyLoad';
-import {
-  ImageCarouselControls,
-  ImageCarouselNavButton
-} from './ImageCarouselNavigation';
+import { ImageCarouselControls } from './ImageCarouselNavigation';
 import ImageCarouselRoot from './ImageCarouselRoot';
 import ImageCarouselSlide from './ImageCarouselSlide';
 import {
@@ -264,8 +262,11 @@ const ImageCarousel = <T,>({
 
       {/* Viewport wrapper - contains viewport and navigation controls */}
       <div
-        className={cn('pui:relative pui:h-full pui:grow', viewportClassName)}
         data-pui-component="ViewportWrapper"
+        className={cn(
+          'pui:relative pui:h-full pui:grow pui:group/imageCarousel',
+          viewportClassName
+        )}
       >
         <ImageCarouselViewport ref={emblaRef}>
           <ImageCarouselContainer data-pui-component="Container">
@@ -302,13 +303,15 @@ const ImageCarousel = <T,>({
         {/* Navigation Controls */}
         {showNavigation && (
           <ImageCarouselControls data-pui-component="Controls">
-            <ImageCarouselNavButton
+            <CarouselButton
+              aria-label="Previous slide"
               data-pui-component="NavButton"
               direction="prev"
               disabled={prevBtnDisabled}
               onClick={scrollPrev}
             />
-            <ImageCarouselNavButton
+            <CarouselButton
+              aria-label="Next slide"
               data-pui-component="NavButton"
               direction="next"
               disabled={nextBtnDisabled}

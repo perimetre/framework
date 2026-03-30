@@ -98,6 +98,7 @@
     --pui-color-fg-icon: var(--pui-primitive-color-overlay-9);
     --pui-color-fg-icon-chevron: var(--pui-primitive-color-overlay-9);
     --pui-color-border-default: var(--pui-primitive-color-overlay-5);
+    --pui-color-border-baseline: var(--pui-primitive-color-overlay-8);
     --pui-color-border-focus: var(--pui-primitive-color-primary-9);
     --pui-color-border-rule-primary: var(--pui-primitive-color-overlay-9);
     --pui-color-border-rule-secondary: var(--pui-primitive-color-overlay-5);

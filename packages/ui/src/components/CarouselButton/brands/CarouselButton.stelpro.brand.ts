@@ -1,9 +1,9 @@
 import { cva } from '@/lib/cva';
 
 /**
- * Stelpro brand ImageCarouselNavButton variant overrides
+ * Stelpro brand CarouselButton variant overrides
  */
-export const imageCarouselNavButtonStelproVariants = cva({
+export const carouselButtonStelproVariants = cva({
   base: [
     'pui:bg-pui-interactive-primary',
     'pui:text-pui-interactive-on-primary',

@@ -7,9 +7,8 @@ export const imageCarouselThumbnailSprigVariants = cva({
   base: ['pui:rounded-none', 'pui:border'],
   variants: {
     selected: {
-      true: 'pui:rounded-none pui:border pui:border-pui-color-border-rule-primary',
-      false:
-        'pui:rounded-none pui:border pui:border-pui-primitive-color-overlay-8'
+      true: 'pui:border-pui-color-border-rule-primary',
+      false: 'pui:border-pui-border-baseline'
     },
     orientation: {
       horizontal: ['pui:w-16', 'pui:h-16'],
