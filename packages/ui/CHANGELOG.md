@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 14.1.1
+
+### Patch Changes
+
+- 8be5581: Fixes consumer group classes not being generated
+
 ## 14.1.0
 
 ### Minor Changes
