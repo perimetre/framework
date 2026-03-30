@@ -16,8 +16,8 @@ export const imageCarouselThumbnailAcornVariants = cva({
   ],
   variants: {
     selected: {
-      false: 'pui:opacity-60 hover:pui:opacity-80',
-      true: 'pui:opacity-100 pui:border-white pui:ring-2 pui:ring-white/50'
+      false: '',
+      true: 'pui:border-white pui:ring-2 pui:ring-white/50'
     },
     orientation: {
       horizontal: ['pui:w-20', 'pui:h-16'],

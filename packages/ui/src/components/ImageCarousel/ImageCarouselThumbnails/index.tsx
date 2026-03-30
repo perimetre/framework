@@ -1,4 +1,5 @@
 import { getBrandVariant } from '@/lib/brand-registry';
+import { cn } from '@perimetre/classnames';
 import { type VariantProps } from 'cva';
 import {
   imageCarouselThumbnailBrandVariants,
@@ -66,7 +67,14 @@ export const ImageCarouselThumbnail: React.FC<ImageCarouselThumbnailProps> = ({
       onClick={onClick}
       {...props}
     >
-      {renderThumbnail()}
+      <span
+        className={cn(
+          'pui:block pui:size-full pui:transition-opacity pui:duration-200',
+          isSelected ? 'pui:opacity-100' : 'pui:opacity-60 hover:pui:opacity-80'
+        )}
+      >
+        {renderThumbnail()}
+      </span>
     </button>
   );
 };

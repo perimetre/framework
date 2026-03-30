@@ -373,6 +373,7 @@ GraphQL integration with:
 - **Error-as-values pattern** - Service builder returns Result types, never throws exceptions
 - **Accessibility required** - Icons package requires aria-hidden or label at compile time
 - **Brand CSS required** - UI library components need brand CSS import to work
+- **Named groups/peers need dual classes** - When using `group/name` or `peer/name` in PUI components, always include both `group/name` and `pui:group/name` on the marker element. See `packages/ui/docs/tailwind-named-groups-and-peers.md`
 - **Use workspace:\*** protocol - For internal dependencies during monorepo development
 - **Never manual version bumps** - Always use changesets workflow
 - **Absolute GitHub URLs** - When referencing LLM documentation or examples

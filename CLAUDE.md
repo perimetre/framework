@@ -218,6 +218,23 @@ GraphQL integration with:
 - `workspace:*` protocol ensures local development uses local packages
 - Always use absolute GitHub URLs when referencing documentation
 
+## Troubleshooting
+
+### Named `group/` and `peer/` in PUI components
+
+When using named Tailwind groups or peers (e.g., `group/myName`, `peer/myName`) inside `@perimetre/ui` components, you **must** include both the unprefixed and `pui:`-prefixed marker class. The `@custom-variant pui` integration used by consumer apps generates selectors that reference the unprefixed group name, while the DOM class includes the `pui:` prefix.
+
+```tsx
+{
+  /* Always use both */
+}
+<div className="group/myName pui:group/myName">
+  <div className="pui:group-hover/myName:opacity-100">...</div>
+</div>;
+```
+
+See `packages/ui/docs/tailwind-named-groups-and-peers.md` for full details.
+
 ## Commands Reference
 
 ```bash
