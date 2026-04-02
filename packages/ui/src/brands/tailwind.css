@@ -26,6 +26,7 @@
   --ease-pui-in-out-circ: cubic-bezier(0.785, 0.135, 0.15, 0.86);
 
   --font-pui-sans: var(--pui-primitive-font-sans);
+  --font-pui-display: var(--pui-primitive-font-display);
   --font-pui-mono: var(--pui-primitive-font-mono);
 
   /* ========================================
@@ -330,6 +331,7 @@
  * ======================================== */
 
 @utility typo-heading-1 {
+  font-family: var(--pui-typo-heading-1-family, var(--pui-primitive-font-sans));
   font-size: var(--pui-typo-heading-1-size);
   line-height: var(--pui-typo-heading-1-leading);
   font-weight: var(--pui-typo-heading-1-weight);
@@ -338,6 +340,7 @@
 }
 
 @utility typo-heading-2 {
+  font-family: var(--pui-typo-heading-2-family, var(--pui-primitive-font-sans));
   font-size: var(--pui-typo-heading-2-size);
   line-height: var(--pui-typo-heading-2-leading);
   font-weight: var(--pui-typo-heading-2-weight);
@@ -346,6 +349,7 @@
 }
 
 @utility typo-heading-3 {
+  font-family: var(--pui-typo-heading-3-family, var(--pui-primitive-font-sans));
   font-size: var(--pui-typo-heading-3-size);
   line-height: var(--pui-typo-heading-3-leading);
   font-weight: var(--pui-typo-heading-3-weight);
@@ -354,6 +358,7 @@
 }
 
 @utility typo-heading-4 {
+  font-family: var(--pui-typo-heading-4-family, var(--pui-primitive-font-sans));
   font-size: var(--pui-typo-heading-4-size);
   line-height: var(--pui-typo-heading-4-leading);
   font-weight: var(--pui-typo-heading-4-weight);
@@ -362,6 +367,7 @@
 }
 
 @utility typo-heading-5 {
+  font-family: var(--pui-typo-heading-5-family, var(--pui-primitive-font-sans));
   font-size: var(--pui-typo-heading-5-size);
   line-height: var(--pui-typo-heading-5-leading);
   font-weight: var(--pui-typo-heading-5-weight);
@@ -370,6 +376,7 @@
 }
 
 @utility typo-heading-6 {
+  font-family: var(--pui-typo-heading-6-family, var(--pui-primitive-font-sans));
   font-size: var(--pui-typo-heading-6-size);
   line-height: var(--pui-typo-heading-6-leading);
   font-weight: var(--pui-typo-heading-6-weight);
@@ -442,6 +449,7 @@
 }
 
 @utility typo-amount {
+  font-family: var(--pui-typo-amount-family, var(--pui-primitive-font-sans));
   font-size: var(--pui-typo-amount-size);
   line-height: var(--pui-typo-amount-leading);
   font-weight: var(--pui-typo-amount-weight);

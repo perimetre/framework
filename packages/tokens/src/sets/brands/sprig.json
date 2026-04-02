@@ -69,6 +69,10 @@
           "$value": "{pui.primitive.color.overlay.11}",
           "$description": "Figma: 'Icon (Chevron)' = mid grey = overlay-11. Acorn: overlay-9."
         },
+        "link-primary": {
+          "$value": "{pui.color.fg.default}",
+          "$description": "Sprig uses fg-default for link-primary. Acorn: overlay-12."
+        },
         "link-secondary": {
           "$value": "{pui.primitive.color.overlay.11}",
           "$description": "Acorn: overlay-8."

@@ -1,6 +1,23 @@
 {
   "pui": {
     "primitive": {
+      "font": {
+        "sans": {
+          "$value": "'Geist', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+          "$type": "fontFamilies",
+          "$description": "Microbird body font."
+        },
+        "display": {
+          "$value": "'Big Shoulders Text', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+          "$type": "fontFamilies",
+          "$description": "Microbird display/heading font (H1-H3, Data Medium)."
+        },
+        "mono": {
+          "$value": "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace",
+          "$type": "fontFamilies",
+          "$description": "Microbird monospace font for data display."
+        }
+      },
       "color": {
         "$type": "color",
         "primary": {
@@ -17,6 +34,81 @@
           "3": { "$value": "#F4F4F4", "$description": "Medium background (Figma: Generic bg med)." },
           "12": { "$value": "#222222", "$description": "Darkest neutral (Figma: Generic bg dark / Text dark)." }
         }
+      }
+    },
+    "typo": {
+      "$description": "Microbird typography overrides. H1-H3 use Big Shoulders Text (display font, uppercase). H4-H5 and body use Geist. Buttons are normal-case, normal-weight. Data uses Geist Mono.",
+      "heading-1": {
+        "size": { "$value": "6.25rem", "$type": "fontSizes", "$description": "100px — Figma H1." },
+        "weight": { "$value": "{pui.primitive.font.weight.semibold}", "$type": "fontWeights" },
+        "tracking": { "$value": "-0.01em", "$type": "letterSpacing" },
+        "transform": { "$value": "uppercase", "$type": "textCase" },
+        "family": { "$value": "{pui.primitive.font.display}", "$type": "fontFamilies" }
+      },
+      "heading-2": {
+        "size": { "$value": "5rem", "$type": "fontSizes", "$description": "80px — Figma H2." },
+        "leading": { "$value": "1.05", "$type": "lineHeights" },
+        "weight": { "$value": "{pui.primitive.font.weight.semibold}", "$type": "fontWeights" },
+        "tracking": { "$value": "-0.01em", "$type": "letterSpacing" },
+        "transform": { "$value": "uppercase", "$type": "textCase" },
+        "family": { "$value": "{pui.primitive.font.display}", "$type": "fontFamilies" }
+      },
+      "heading-3": {
+        "size": { "$value": "{pui.primitive.font.size.3xl}", "$type": "fontSizes", "$description": "30px — Figma H3." },
+        "leading": { "$value": "{pui.primitive.leading.tight}", "$type": "lineHeights" },
+        "weight": { "$value": "{pui.primitive.font.weight.semibold}", "$type": "fontWeights" },
+        "tracking": { "$value": "-0.01em", "$type": "letterSpacing" },
+        "transform": { "$value": "uppercase", "$type": "textCase" },
+        "family": { "$value": "{pui.primitive.font.display}", "$type": "fontFamilies" }
+      },
+      "heading-4": {
+        "leading": { "$value": "{pui.primitive.leading.snug}", "$type": "lineHeights" },
+        "weight": { "$value": "{pui.primitive.font.weight.semibold}", "$type": "fontWeights" },
+        "tracking": { "$value": "-0.01em", "$type": "letterSpacing" }
+      },
+      "heading-5": {
+        "size": { "$value": "{pui.primitive.font.size.xl}", "$type": "fontSizes", "$description": "20px — Figma H5." },
+        "weight": { "$value": "{pui.primitive.font.weight.semibold}", "$type": "fontWeights" },
+        "tracking": { "$value": "-0.01em", "$type": "letterSpacing" }
+      },
+      "large": {
+        "size": { "$value": "{pui.primitive.font.size.xl}", "$type": "fontSizes", "$description": "20px — Figma Text Large." },
+        "leading": { "$value": "1.6", "$type": "lineHeights" }
+      },
+      "medium": {
+        "size": { "$value": "{pui.primitive.font.size.lg}", "$type": "fontSizes", "$description": "18px — Figma Text Medium." },
+        "leading": { "$value": "1.6", "$type": "lineHeights" }
+      },
+      "base": {
+        "tracking": { "$value": "0.01em", "$type": "letterSpacing", "$description": "Figma Text Small tracking (1% of font-size)." }
+      },
+      "tiny": {
+        "leading": { "$value": "{pui.primitive.leading.relaxed}", "$type": "lineHeights" },
+        "tracking": { "$value": "0.02em", "$type": "letterSpacing", "$description": "Figma Text XSmall (12px)." }
+      },
+      "extra-tiny": {
+        "leading": { "$value": "{pui.primitive.leading.relaxed}", "$type": "lineHeights" },
+        "tracking": { "$value": "0.03em", "$type": "letterSpacing", "$description": "Figma Text XXSmall (10px)." }
+      },
+      "button": {
+        "$description": "Microbird buttons: normal-case, normal-weight, larger than Acorn.",
+        "size": { "$value": "{pui.primitive.font.size.xl}", "$type": "fontSizes" },
+        "leading": { "$value": "{pui.primitive.leading.relaxed}", "$type": "lineHeights" },
+        "weight": { "$value": "{pui.primitive.font.weight.normal}", "$type": "fontWeights" },
+        "tracking": { "$value": "0", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "tagline": {
+        "$description": "Maps to Figma Eyebrows style.",
+        "leading": { "$value": "{pui.primitive.leading.relaxed}", "$type": "lineHeights" },
+        "tracking": { "$value": "0.02em", "$type": "letterSpacing" }
+      },
+      "amount": {
+        "$description": "Maps to Figma Data Small (Geist Mono, 14px).",
+        "size": { "$value": "{pui.primitive.font.size.sm}", "$type": "fontSizes" },
+        "leading": { "$value": "{pui.primitive.leading.relaxed}", "$type": "lineHeights" },
+        "tracking": { "$value": "0.01em", "$type": "letterSpacing" },
+        "family": { "$value": "{pui.primitive.font.mono}", "$type": "fontFamilies" }
       }
     },
     "color": {

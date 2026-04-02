@@ -7,11 +7,57 @@
     --pui-primitive-color-overlay-1: #FDFDFD;
     --pui-primitive-color-overlay-3: #F4F4F4;
     --pui-primitive-color-overlay-12: #222222;
+    --pui-primitive-font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --pui-primitive-font-display: 'Big Shoulders Text', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --pui-primitive-font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
   }
 }
 
 @layer pui.semantic {
   [data-pui-brand='microbird-school'] {
     --pui-color-fg-link-active: var(--pui-primitive-color-overlay-12);
+    --pui-typo-heading-1-size: 6.25rem;
+    --pui-typo-heading-1-weight: var(--pui-primitive-font-weight-semibold);
+    --pui-typo-heading-1-tracking: -0.01em;
+    --pui-typo-heading-1-transform: uppercase;
+    --pui-typo-heading-1-family: var(--pui-primitive-font-display);
+    --pui-typo-heading-2-size: 5rem;
+    --pui-typo-heading-2-leading: 1.05;
+    --pui-typo-heading-2-weight: var(--pui-primitive-font-weight-semibold);
+    --pui-typo-heading-2-tracking: -0.01em;
+    --pui-typo-heading-2-transform: uppercase;
+    --pui-typo-heading-2-family: var(--pui-primitive-font-display);
+    --pui-typo-heading-3-size: var(--pui-primitive-font-size-3xl);
+    --pui-typo-heading-3-leading: var(--pui-primitive-leading-tight);
+    --pui-typo-heading-3-weight: var(--pui-primitive-font-weight-semibold);
+    --pui-typo-heading-3-tracking: -0.01em;
+    --pui-typo-heading-3-transform: uppercase;
+    --pui-typo-heading-3-family: var(--pui-primitive-font-display);
+    --pui-typo-heading-4-leading: var(--pui-primitive-leading-snug);
+    --pui-typo-heading-4-weight: var(--pui-primitive-font-weight-semibold);
+    --pui-typo-heading-4-tracking: -0.01em;
+    --pui-typo-heading-5-size: var(--pui-primitive-font-size-xl);
+    --pui-typo-heading-5-weight: var(--pui-primitive-font-weight-semibold);
+    --pui-typo-heading-5-tracking: -0.01em;
+    --pui-typo-tagline-leading: var(--pui-primitive-leading-relaxed);
+    --pui-typo-tagline-tracking: 0.02em;
+    --pui-typo-large-size: var(--pui-primitive-font-size-xl);
+    --pui-typo-large-leading: 1.6;
+    --pui-typo-medium-size: var(--pui-primitive-font-size-lg);
+    --pui-typo-medium-leading: 1.6;
+    --pui-typo-button-size: var(--pui-primitive-font-size-xl);
+    --pui-typo-button-leading: var(--pui-primitive-leading-relaxed);
+    --pui-typo-button-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-button-tracking: 0;
+    --pui-typo-button-transform: none;
+    --pui-typo-base-tracking: 0.01em;
+    --pui-typo-tiny-leading: var(--pui-primitive-leading-relaxed);
+    --pui-typo-tiny-tracking: 0.02em;
+    --pui-typo-amount-size: var(--pui-primitive-font-size-sm);
+    --pui-typo-amount-leading: var(--pui-primitive-leading-relaxed);
+    --pui-typo-amount-tracking: 0.01em;
+    --pui-typo-amount-family: var(--pui-primitive-font-mono);
+    --pui-typo-extra-tiny-leading: var(--pui-primitive-leading-relaxed);
+    --pui-typo-extra-tiny-tracking: 0.03em;
   }
 }

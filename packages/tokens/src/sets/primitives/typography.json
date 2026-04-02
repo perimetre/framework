@@ -5,7 +5,17 @@
         "sans": {
           "$value": "'Arial', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
           "$type": "fontFamilies",
-          "$description": "Default sans-serif font stack. Brands override this (e.g., Sprig uses Gotham)."
+          "$description": "Default sans-serif font stack. Brands override this (e.g., Sprig uses Gotham, Microbird uses Geist)."
+        },
+        "display": {
+          "$value": "{pui.primitive.font.sans}",
+          "$type": "fontFamilies",
+          "$description": "Display/heading font stack. Defaults to sans. Brands override for distinct heading typography (e.g., Microbird uses Big Shoulders Text)."
+        },
+        "mono": {
+          "$value": "'Courier New', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace",
+          "$type": "fontFamilies",
+          "$description": "Monospace font stack for data display. Brands override (e.g., Microbird uses Geist Mono)."
         },
         "size": {
           "$type": "fontSizes",
