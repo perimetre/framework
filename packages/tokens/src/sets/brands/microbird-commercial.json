@@ -1,0 +1,13 @@
+{
+  "pui": {
+    "primitive": {
+      "color": {
+        "$type": "color",
+        "primary": {
+          "$description": "Microbird Commercial — 12-step primary scale.",
+          "6": { "$value": "#004883" }
+        }
+      }
+    }
+  }
+}

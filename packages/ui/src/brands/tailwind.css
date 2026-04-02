@@ -239,6 +239,8 @@
 @custom-variant pui-acorn (&:where([data-pui-brand=acorn], [data-pui-brand=acorn] *));
 @custom-variant pui-sprig (&:where([data-pui-brand=sprig], [data-pui-brand=sprig] *));
 @custom-variant pui-stelpro (&:where([data-pui-brand=stelpro], [data-pui-brand=stelpro] *));
+@custom-variant pui-microbird-commercial (&:where([data-pui-brand=microbird-commercial], [data-pui-brand=microbird-commercial] *));
+@custom-variant pui-microbird-school (&:where([data-pui-brand=microbird-school], [data-pui-brand=microbird-school] *));
 
 /* ========================================
  * CUSTOM VARIANTS FOR FORM ELEMENT STATES (using native group-has)
