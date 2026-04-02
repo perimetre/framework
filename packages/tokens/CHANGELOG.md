@@ -1,5 +1,11 @@
 # @perimetre/tokens
 
+## 0.0.5
+
+### Patch Changes
+
+- 2471a6b: Adding theme colors to microbird brands
+
 ## 0.0.4
 
 ### Patch Changes
