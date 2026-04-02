@@ -4,8 +4,25 @@
       "color": {
         "$type": "color",
         "primary": {
-          "$description": "Microbird School — 12-step primary scale.",
-          "6": { "$value": "#FEE44E" }
+          "$description": "Microbird School Yellow — limited palette from Figma. Steps 1, 9, 10 mapped; others inherit from Acorn base.",
+          "1": { "$value": "#FFFEF9", "$description": "Warm-tinted light background (Figma: Background)." },
+          "9": { "$value": "#FEE44E", "$description": "Hero yellow (Figma: bg dark / lighter highlight)." },
+          "10": { "$value": "#FFB700", "$description": "Darker yellow for hover/active states (Figma: darker highlight)." }
+        },
+        "overlay": {
+          "$description": "Microbird shared neutral gray (from Generic palette). Pure neutral — no warm sand tint like Acorn. Only steps 1, 3, 12 provided; others inherit from Acorn.",
+          "1": { "$value": "#FDFDFD", "$description": "Background (Figma: Generic Background)." },
+          "3": { "$value": "#F4F4F4", "$description": "Medium background (Figma: Generic bg med)." },
+          "12": { "$value": "#222222", "$description": "Darkest neutral (Figma: Generic bg dark / Text dark)." }
+        }
+      }
+    },
+    "color": {
+      "$type": "color",
+      "fg": {
+        "link-active": {
+          "$value": "{pui.primitive.color.overlay.12}",
+          "$description": "Active links use neutral dark (#222222). Yellow primary has insufficient contrast for accessible link text."
         }
       }
     }

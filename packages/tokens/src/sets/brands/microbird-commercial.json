@@ -4,8 +4,33 @@
       "color": {
         "$type": "color",
         "primary": {
-          "$description": "Microbird Commercial — 12-step primary scale.",
-          "6": { "$value": "#004883" }
+          "$description": "Microbird Commercial Blue — limited palette from Figma. Steps 1, 9-12 mapped; steps 2-8 inherit from Acorn base. Steps 9=11 and 10=12 share values — expected for limited palettes.",
+          "1": { "$value": "#FCFDFF", "$description": "Brand-tinted light background (Figma: Background / lighter highlight)." },
+          "9": { "$value": "#004883", "$description": "Hero blue (Figma: bg dark)." },
+          "10": { "$value": "#001527", "$description": "Hover/active blue (Figma: darker highlight)." },
+          "11": { "$value": "#004883", "$description": "Accessible text blue — same as hero (Figma: Text dark). High contrast on white." },
+          "12": { "$value": "#001527", "$description": "Darkest blue (Figma: darker highlight). Same as step 10 for limited palette." }
+        },
+        "overlay": {
+          "$description": "Microbird shared neutral gray (from Generic palette). Pure neutral — no warm sand tint like Acorn. Only steps 1, 3, 12 provided; others inherit from Acorn.",
+          "1": { "$value": "#FDFDFD", "$description": "Background (Figma: Generic Background)." },
+          "3": { "$value": "#F4F4F4", "$description": "Medium background (Figma: Generic bg med)." },
+          "12": { "$value": "#222222", "$description": "Darkest neutral (Figma: Generic bg dark / Text dark)." }
+        }
+      }
+    },
+    "color": {
+      "$type": "color",
+      "interactive": {
+        "on-primary": {
+          "$value": "{pui.primitive.color.primary.1}",
+          "$description": "Light text on dark blue primary. Figma: Text light = #FCFDFF on #004883."
+        }
+      },
+      "alertbar": {
+        "first-fg": {
+          "$value": "{pui.primitive.color.primary.1}",
+          "$description": "Light text on blue alertbar."
         }
       }
     }
