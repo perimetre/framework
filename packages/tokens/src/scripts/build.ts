@@ -18,7 +18,14 @@ import type { TransformedToken } from 'style-dictionary/types';
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(currentDir, '../..');
 
-const BRANDS = ['acorn', 'sprig', 'stelpro', 'cima'] as const;
+const BRANDS = [
+  'acorn',
+  'sprig',
+  'stelpro',
+  'cima',
+  'microbird-commercial',
+  'microbird-school'
+] as const;
 
 // Register Tokens Studio transforms into Style Dictionary
 void register(StyleDictionary);

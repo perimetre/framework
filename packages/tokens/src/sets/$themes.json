@@ -53,5 +53,33 @@
       "semantic/base": "enabled",
       "brands/cima": "enabled"
     }
+  },
+  {
+      "id": "microbird-commercial",
+      "name": "Microbird Commercial",
+      "group": "brand",
+      "selectedTokenSets": {
+        "primitives/colors": "source",
+        "primitives/typography": "source",
+        "primitives/shape": "source",
+        "primitives/shadow": "source",
+        "primitives/motion": "source",
+        "semantic/base": "enabled",
+        "brands/newbrand": "enabled"
+    }
+  },
+  {
+    "id": "microbird-school",
+    "name": "Microbird School",
+    "group": "brand",
+    "selectedTokenSets": {
+      "primitives/colors": "source",
+      "primitives/typography": "source",
+      "primitives/shape": "source",
+      "primitives/shadow": "source",
+      "primitives/motion": "source",
+      "semantic/base": "enabled",
+      "brands/newbrand": "enabled"
+    }
   }
 ]
