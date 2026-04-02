@@ -1,5 +1,11 @@
 # @perimetre/tokens
 
+## 0.1.0
+
+### Minor Changes
+
+- e4c7add: Microbird initial color and typography
+
 ## 0.0.5
 
 ### Patch Changes
