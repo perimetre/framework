@@ -1,5 +1,16 @@
 # @perimetre/ui
 
+## 14.2.0
+
+### Minor Changes
+
+- e4c7add: Microbird initial color and typography
+
+### Patch Changes
+
+- Updated dependencies [e4c7add]
+  - @perimetre/tokens@0.1.0
+
 ## 14.1.4
 
 ### Patch Changes
