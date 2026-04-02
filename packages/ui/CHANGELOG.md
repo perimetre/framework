@@ -1,5 +1,12 @@
 # @perimetre/ui
 
+## 14.1.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @perimetre/tokens@0.0.4
+
 ## 14.1.2
 
 ### Patch Changes
