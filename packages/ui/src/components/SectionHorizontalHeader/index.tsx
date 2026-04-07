@@ -39,15 +39,19 @@ const SectionHorizontalHeader: React.FC<SectionHorizontalHeaderProps> = ({
       {...props}
     >
       <div>
-        {eyebrow && <p>{eyebrow}</p>}
-        {title && (
-          <Slot.Slottable>
-            <TitleTag>{title}</TitleTag>
-          </Slot.Slottable>
-        )}
-        {extra && <div>{extra}</div>}
+        <div>
+          {eyebrow && <p>{eyebrow}</p>}
+          {title && (
+            <Slot.Slottable>
+              <TitleTag className="pui:text-[100px] pui:uppercase">
+                {title}
+              </TitleTag>
+            </Slot.Slottable>
+          )}
+          {extra && <div>{extra}</div>}
+        </div>
       </div>
-      {content && <div>{content}</div>}
+      {content && <div className="pui:max-w-[325px]">{content}</div>}
     </div>
   );
 };

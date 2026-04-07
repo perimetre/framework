@@ -8,6 +8,17 @@
           "6": { "$value": "#004883" }
         }
       }
+    },
+    "color": {
+      "interactive": {
+        "$type": "color",
+        "primary": {
+          "$value": "{pui.primitive.color.primary.6}"
+        },
+        "on-primary": {
+          "$value": "#F4F4F4"
+        }
+      }
     }
   }
 }

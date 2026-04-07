@@ -1,3 +1,4 @@
+import Button from '@/components/Button';
 import type { Story, StoryDefault } from '@ladle/react';
 import SectionHorizontalHeader, {
   type SectionHorizontalHeaderProps
@@ -17,10 +18,14 @@ export default {
 export const H1: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
     eyebrow="Eyebrow text"
-    title="Page Title as H1"
+    title="CT-Series"
     variant="h1"
     content={
-      <p>This is the content displayed on the right side of the header.</p>
+      <p>
+        The CT-Series combines Ford Transit's proven reliability with Micro
+        Bird's purpose-built body design, delivering exceptional fuel economy,
+        panoramic visibility, and passenger comfort for commercial fleets.
+      </p>
     }
   />
 );
@@ -28,10 +33,14 @@ export const H1: Story<SectionHorizontalHeaderProps> = () => (
 export const Default: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
     eyebrow="Eyebrow text"
-    title="Section Title as H2"
+    title="CT-Series"
     variant="default"
     content={
-      <p>This is the content displayed on the right side of the header.</p>
+      <p>
+        The CT-Series combines Ford Transit's proven reliability with Micro
+        Bird's purpose-built body design, delivering exceptional fuel economy,
+        panoramic visibility, and passenger comfort for commercial fleets.
+      </p>
     }
   />
 );
@@ -39,19 +48,23 @@ export const Default: Story<SectionHorizontalHeaderProps> = () => (
 export const WithExtra: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
     eyebrow="Eyebrow text"
-    title="Section Title with Extra"
+    title="CT-Series"
     variant="default"
     content={
-      <p>This is the content displayed on the right side of the header.</p>
+      <p>
+        The CT-Series combines Ford Transit's proven reliability with Micro
+        Bird's purpose-built body design, delivering exceptional fuel economy,
+        panoramic visibility, and passenger comfort for commercial fleets.
+      </p>
     }
     extra={
       <div className="pui:flex pui:gap-2 pui:mt-4">
-        <button className="pui:rounded pui:bg-pui-interactive-primary pui:px-4 pui:py-2 pui:text-pui-interactive-on-primary pui:font-bold">
+        <Button className="pui:rounded pui:bg-pui-interactive-primary pui:text-pui-interactive-on-primary pui:px-4 pui:py-2 pui:text-white pui:font-bold pui:hover:bg-[#000] pui:normal-case">
           Primary Action
-        </button>
-        <button className="pui:rounded pui:border pui:border-pui-interactive-primary pui:px-4 pui:py-2">
+        </Button>
+        <Button className="pui:rounded pui:border pui:hover:bg-pui-interactive-primary pui:text-pui-interactive-primary pui:px-4 pui:py-2 pui:normal-case">
           Secondary Action
-        </button>
+        </Button>
       </div>
     }
   />

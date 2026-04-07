@@ -4,3 +4,9 @@
     --pui-primitive-color-primary-6: #004883;
   }
 }
+
+@layer pui.semantic {
+  [data-pui-brand='microbird-commercial'] {
+    --pui-color-interactive-primary: var(--pui-primitive-color-primary-6);
+  }
+}
