@@ -1,30 +1,17 @@
-import { FlatCompat } from '@eslint/eslintrc';
+import nextPlugin from '@next/eslint-plugin-next';
 import reactCompiler from 'eslint-plugin-react-compiler';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname
-});
+import { defineConfig } from 'eslint/config';
 
 /**
- * Next.js 15 ESLint configuration
- * Extends Next.js official ESLint config and adds React Compiler rules
- * @type {import('eslint').Linter.Config[]}
+ * Next.js ESLint configuration
+ * Uses @next/eslint-plugin-next directly (flat config) to avoid plugin conflicts
+ * with eslint-config-react (which registers react-hooks separately).
  */
-const config = [
-  ...compat.extends('next/core-web-vitals'),
-  {
-    plugins: {
-      'react-compiler': reactCompiler
-    },
-    rules: {
-      'react-compiler/react-compiler': 'error'
-    }
+export default defineConfig(nextPlugin.configs['core-web-vitals'], {
+  plugins: {
+    'react-compiler': reactCompiler
+  },
+  rules: {
+    'react-compiler/react-compiler': 'error'
   }
-];
-
-export default config;
+});

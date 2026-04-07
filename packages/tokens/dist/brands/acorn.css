@@ -58,6 +58,8 @@
     --pui-primitive-radius-lg: 0.5rem;
     --pui-primitive-radius-full: 9999px;
     --pui-primitive-font-sans: 'Arial', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --pui-primitive-font-display: var(--pui-primitive-font-sans);
+    --pui-primitive-font-mono: 'Courier New', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
     --pui-primitive-font-size-xs: 0.75rem;
     --pui-primitive-font-size-sm: 0.875rem;
     --pui-primitive-font-size-base: 1rem;

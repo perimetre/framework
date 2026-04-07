@@ -65,7 +65,7 @@
         "primitives/shadow": "source",
         "primitives/motion": "source",
         "semantic/base": "enabled",
-        "brands/newbrand": "enabled"
+        "brands/microbird-commercial": "enabled"
     }
   },
   {
@@ -79,7 +79,7 @@
       "primitives/shadow": "source",
       "primitives/motion": "source",
       "semantic/base": "enabled",
-      "brands/newbrand": "enabled"
+      "brands/microbird-school": "enabled"
     }
   }
 ]
