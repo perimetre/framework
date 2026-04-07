@@ -1,4 +1,5 @@
 import type { Story, StoryDefault } from '@ladle/react';
+import { ActivityIcon } from 'lucide-react';
 import StatItem from './index';
 
 export default {
@@ -14,14 +15,7 @@ export const EyebrowWithIcon: Story = () => (
     content="1,284"
     eyebrow={
       <span className="pui:flex pui:items-center pui:gap-1">
-        <svg
-          className="pui:size-4"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm-1-5h2v2h-2zm0-8h2v6h-2z" />
-        </svg>
+        <ActivityIcon className="pui:size-4" />
         Active Sessions
       </span>
     }
