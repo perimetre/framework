@@ -1,10 +1,10 @@
 import { cva } from '@/lib/cva';
 
 /**
- * Microbird brand override for StatItem content.
+ * Microbird brand override for StatItem.
  * Overrides the font family to use the display font (Big Shoulders Text)
- * instead of the default sans font (Geist).
+ * instead of the default sans font.
  */
-export const statItemContentMicrobirdVariants = cva({
-  base: ['pui:font-pui-display']
+export const statItemMicrobirdVariants = cva({
+  base: []
 });

@@ -1,12 +1,5 @@
 import { getBrandVariant } from '@/lib/brand-registry';
-import {
-  statItemContentBrandVariants,
-  statItemContentRowBrandVariants,
-  statItemExtraBrandVariants,
-  statItemEyebrowBrandVariants,
-  statItemPrependBrandVariants,
-  statItemWrapperBrandVariants
-} from './brands';
+import { statItemBrandVariants, type StatItemVariantProps } from './brands';
 
 export type StatItemProps = {
   className?: string;
@@ -18,8 +11,9 @@ export type StatItemProps = {
   eyebrow?: React.ReactNode;
   /** Normal-sized text shown beside the content, to its right — baseline aligned */
   prepend?: React.ReactNode;
-};
+} & StatItemVariantProps;
 
+/** Stat display block with eyebrow, large content, optional prepend, and extra text. */
 const StatItem: React.FC<StatItemProps> = ({
   className,
   content,
@@ -27,21 +21,24 @@ const StatItem: React.FC<StatItemProps> = ({
   eyebrow,
   prepend
 }) => {
-  const wrapperVariants = getBrandVariant(statItemWrapperBrandVariants);
-  const eyebrowVariants = getBrandVariant(statItemEyebrowBrandVariants);
-  const contentRowVariants = getBrandVariant(statItemContentRowBrandVariants);
-  const contentVariants = getBrandVariant(statItemContentBrandVariants);
-  const prependVariants = getBrandVariant(statItemPrependBrandVariants);
-  const extraVariants = getBrandVariant(statItemExtraBrandVariants);
+  const statItemVariants = getBrandVariant(statItemBrandVariants);
 
   return (
-    <div className={wrapperVariants({ className })}>
-      {eyebrow && <p className={eyebrowVariants()}>{eyebrow}</p>}
-      <div className={contentRowVariants()}>
-        <span className={contentVariants()}>{content}</span>
-        {prepend && <span className={prependVariants()}>{prepend}</span>}
+    <div className={statItemVariants({ className })}>
+      {eyebrow && (
+        <p className="pui:typo-tagline pui:text-pui-fg-muted">{eyebrow}</p>
+      )}
+      <div className="pui:flex pui:items-baseline pui:gap-2">
+        <span className="pui:typo-heading-1 pui:text-pui-fg-default">
+          {content}
+        </span>
+        {prepend && (
+          <span className="pui:typo-large pui:text-pui-fg-muted">
+            {prepend}
+          </span>
+        )}
       </div>
-      {extra && <p className={extraVariants()}>{extra}</p>}
+      {extra && <p className="pui:typo-small pui:text-pui-fg-muted">{extra}</p>}
     </div>
   );
 };
