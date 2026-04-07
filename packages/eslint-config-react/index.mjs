@@ -20,7 +20,14 @@ export default defineConfig(
     }
   },
 
-  // Acessibility rules
+  // Accessibility rules
+  // NOTE: `plugins: {}` intentionally empties the jsx-a11y plugin registration
+  // from the spread. Re-registering it here would cause "Cannot redefine plugin"
+  // errors when consumers also register jsx-a11y in their own config. Consumers
+  // must register the plugin themselves before spreading this config:
+  //   import jsxA11y from 'eslint-plugin-jsx-a11y';
+  //   { plugins: { 'jsx-a11y': jsxA11y } },
+  //   ...perimetreReact,
   {
     files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
     ...jsxA11y.flatConfigs.recommended,

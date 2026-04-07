@@ -26,14 +26,19 @@ pnpm add -D @perimetre/eslint-config-react
 import baseConfig from '@perimetre/eslint-config-base';
 import reactConfig from '@perimetre/eslint-config-react';
 import endConfig from '@perimetre/eslint-config-base/end';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 export default [
   ...baseConfig,
+  // Register jsx-a11y plugin before React config (see note below)
+  { plugins: { 'jsx-a11y': jsxA11y } },
   ...reactConfig,
   // Your custom rules here
   ...endConfig
 ];
 ```
+
+> **Note:** The React config applies jsx-a11y _rules_ but does not register the plugin itself (to avoid "Cannot redefine plugin" errors when consumers also use jsx-a11y). You must register it once before spreading `reactConfig`.
 
 ## Requirements
 
