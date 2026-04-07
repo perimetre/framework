@@ -1,0 +1,41 @@
+name: Slack PR Notifications
+
+# Sends Slack notifications for PR interactions:
+# - New PRs opened
+# - Code review requested (tags the requested reviewer)
+# - New comments from humans (non-bots) on PRs
+# - Code review submissions (approved, changes requested, commented)
+# - Sends messages AS the GitHub user (uses their Slack avatar and name)
+#
+# Prerequisites:
+# - SLACK_BOT_TOKEN secret (organization or repository)
+#   Required scopes: chat:write.customize, users:read, users:read.email
+# - SLACK_CHANNEL_ID variable (organization or repository)
+# - SLACK_USER_MAPPING variable (optional)
+#   JSON mapping of GitHub username to Slack user ID for manual overrides
+#   Example: {"singithi-kandage": "U12345678", "assisrmatheus": "U87654321"}
+#   To get Slack user IDs: Click user profile > More > Copy member ID
+#
+# This workflow calls the reusable workflow from the perimetre/actions repository.
+
+on:
+  # Triggers when a new PR is opened or review is requested
+  pull_request:
+    types: [opened, review_requested]
+
+  # Triggers when a comment is posted (filters for PRs and non-bots in job conditions)
+  issue_comment:
+    types: [created]
+
+  # Triggers when a code review is submitted
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  slack-notifications:
+    uses: perimetre/actions/.github/workflows/slack-pr-notifications.yml@master
+    with:
+      slack_channel_id: ${{ vars.SLACK_CHANNEL_ID }}
+      slack_user_mapping: ${{ vars.SLACK_USER_MAPPING }}
+    secrets:
+      slack_bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
