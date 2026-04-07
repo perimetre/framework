@@ -19,6 +19,7 @@ const Button: React.FC<PropsWithChildren<ButtonProps>> = ({
   children,
   className,
   size,
+  variant,
   ...props
 }) => {
   const Comp = asChild ? Slot.Slot : 'button';
@@ -27,7 +28,7 @@ const Button: React.FC<PropsWithChildren<ButtonProps>> = ({
   const buttonVariants = getBrandVariant(buttonBrandVariants);
 
   return (
-    <Comp className={buttonVariants({ size, className })} {...props}>
+    <Comp className={buttonVariants({ size, variant, className })} {...props}>
       {children}
     </Comp>
   );

@@ -6,6 +6,7 @@
  *
  * Note: This imports ALL brand styles for switching between them in Ladle.
  */
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Text:wght@600&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
 @import './preflight.css';
 @import './base.css';
 @import '@perimetre/tokens/brands/acorn.css';

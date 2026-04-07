@@ -8,5 +8,23 @@ import { cva } from '@/lib/cva';
  * No JS overrides needed unless there are structural differences.
  */
 export const buttonMicroBirdSchoolVariants = cva({
-  base: []
+  base: ['pui:normal-case', 'pui:font-light'],
+  variants: {
+    variant: {
+      primary: [
+        'pui:bg-pui-overlay-12',
+        'pui:text-pui-primary-9',
+        'pui:hover:bg-pui-primary-9',
+        'pui:hover:text-pui-overlay-12'
+      ],
+      outline: [
+        'pui:bg-transparent',
+        'pui:border-[#22222233]',
+        'pui:text-pui-pui-overlay-12',
+        'pui:hover:bg-pui-primary-9',
+        'pui:hover:text-pui-interactive-on-primary'
+      ],
+      primaryLight: ['pui:text-pui-primary-9']
+    }
+  }
 });

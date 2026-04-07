@@ -8,7 +8,7 @@ export default {
   title: 'Components/SectionHorizontalHeader',
   argTypes: {
     variant: {
-      options: ['default', 'h1'],
+      options: ['default', 'h1', 'compact'],
       control: { type: 'select' },
       defaultValue: 'default'
     }
@@ -17,7 +17,7 @@ export default {
 
 export const H1: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
-    eyebrow="Eyebrow text"
+    eyebrow="Built on Ford Transit Chassis"
     title="CT-Series"
     variant="h1"
     content={
@@ -32,7 +32,7 @@ export const H1: Story<SectionHorizontalHeaderProps> = () => (
 
 export const Default: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
-    eyebrow="Eyebrow text"
+    eyebrow="Built on Ford Transit Chassis"
     title="CT-Series"
     variant="default"
     content={
@@ -47,7 +47,7 @@ export const Default: Story<SectionHorizontalHeaderProps> = () => (
 
 export const WithExtra: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
-    eyebrow="Eyebrow text"
+    eyebrow="Built on Ford Transit Chassis"
     title="CT-Series"
     variant="default"
     content={
@@ -59,11 +59,59 @@ export const WithExtra: Story<SectionHorizontalHeaderProps> = () => (
     }
     extra={
       <div className="pui:flex pui:gap-2 pui:mt-4">
-        <Button className="pui:rounded pui:bg-pui-interactive-primary pui:text-pui-interactive-on-primary pui:px-4 pui:py-2 pui:text-white pui:font-bold pui:hover:bg-[#000] pui:normal-case">
-          Primary Action
-        </Button>
-        <Button className="pui:rounded pui:border pui:hover:bg-pui-interactive-primary pui:text-pui-interactive-primary pui:px-4 pui:py-2 pui:normal-case">
-          Secondary Action
+        <Button variant="primary">Primary Action</Button>
+        <Button variant="outline">Secondary Action</Button>
+      </div>
+    }
+  />
+);
+
+export const Compact: Story<SectionHorizontalHeaderProps> = () => (
+  <SectionHorizontalHeader
+    eyebrow="Key Advantages"
+    variant="compact"
+    content={
+      <p>
+        Designed for commercial operations that value long-term reliability,
+        efficiency, and passenger comfort.
+      </p>
+    }
+    title={
+      <>
+        Why Operators Choose
+        <br />
+        <span className="pui:text-pui-primary-9">The CT-Series</span>
+      </>
+    }
+  />
+);
+
+export const WithDownload: Story<SectionHorizontalHeaderProps> = () => (
+  <SectionHorizontalHeader
+    eyebrow="Key Advantages"
+    title="Specifications"
+    variant="compact"
+    content={
+      <div>
+        <p>
+          Designed for commercial operations that value long-term reliability,
+          efficiency, and passenger comfort.
+        </p>
+        <Button className="pui:mt-4" variant="primary">
+          Download Brochure
+          <svg
+            className="pui:size-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </Button>
       </div>
     }

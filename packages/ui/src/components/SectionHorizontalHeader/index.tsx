@@ -2,6 +2,7 @@ import { getBrandVariant } from '@/lib/brand-registry';
 import { Slot } from 'radix-ui';
 import {
   sectionHorizontalHeaderBrandVariants,
+  sectionHorizontalHeaderTitleBrandVariants,
   type SectionHorizontalHeaderVariantProps
 } from './brands';
 
@@ -14,7 +15,7 @@ export type SectionHorizontalHeaderProps = {
   eyebrow?: React.ReactNode;
   /** Main heading text. Renders as h1 when variant="h1", otherwise h2 */
   title?: React.ReactNode;
-} & React.ComponentProps<'div'> &
+} & Omit<React.ComponentProps<'div'>, 'content' | 'title'> &
   SectionHorizontalHeaderVariantProps;
 
 /** Horizontal section header with eyebrow, title, content, and optional extra elements. */
@@ -30,28 +31,37 @@ const SectionHorizontalHeader: React.FC<SectionHorizontalHeaderProps> = ({
   const sectionHorizontalHeaderVariants = getBrandVariant(
     sectionHorizontalHeaderBrandVariants
   );
+  const titleVariants = getBrandVariant(
+    sectionHorizontalHeaderTitleBrandVariants
+  );
 
-  const TitleTag = variant === 'h1' ? 'h1' : 'h2';
+  const TitleTag =
+    variant === 'h1' ? 'h1' : variant === 'compact' ? 'h3' : 'h2';
 
   return (
     <div
       className={sectionHorizontalHeaderVariants({ variant, className })}
       {...props}
     >
-      <div>
+      {eyebrow && <p className="pui:mb-5">{eyebrow}</p>}
+      <div className="pui:justify-between pui:flex pui:flex-wrap">
         <div>
-          {eyebrow && <p>{eyebrow}</p>}
           {title && (
             <Slot.Slottable>
-              <TitleTag className="pui:text-[100px] pui:uppercase">
+              <TitleTag className={titleVariants({ variant })}>
                 {title}
               </TitleTag>
             </Slot.Slottable>
           )}
           {extra && <div>{extra}</div>}
         </div>
+
+        {content && (
+          <div className="pui:w-full pui:mt-5 pui:xl:mt-0 pui:xl:max-w-81.25 pui:leading-[160%]">
+            {content}
+          </div>
+        )}
       </div>
-      {content && <div className="pui:max-w-[325px]">{content}</div>}
     </div>
   );
 };
