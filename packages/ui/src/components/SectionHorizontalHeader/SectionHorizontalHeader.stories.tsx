@@ -17,9 +17,10 @@ export default {
 
 export const H1: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
+    as="h1"
     eyebrow="Built on Ford Transit Chassis"
     title="CT-Series"
-    variant="h1"
+    variant="default"
     content={
       <p>
         The CT-Series combines Ford Transit's proven reliability with Micro
@@ -32,6 +33,7 @@ export const H1: Story<SectionHorizontalHeaderProps> = () => (
 
 export const Default: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
+    as="h1"
     eyebrow="Built on Ford Transit Chassis"
     title="CT-Series"
     variant="default"
@@ -47,6 +49,7 @@ export const Default: Story<SectionHorizontalHeaderProps> = () => (
 
 export const WithExtra: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
+    as="h1"
     eyebrow="Built on Ford Transit Chassis"
     title="CT-Series"
     variant="default"
@@ -68,6 +71,7 @@ export const WithExtra: Story<SectionHorizontalHeaderProps> = () => (
 
 export const Compact: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
+    as="h3"
     eyebrow="Key Advantages"
     variant="compact"
     content={
@@ -88,6 +92,7 @@ export const Compact: Story<SectionHorizontalHeaderProps> = () => (
 
 export const WithDownload: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
+    as="h3"
     eyebrow="Key Advantages"
     title="Specifications"
     variant="compact"

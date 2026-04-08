@@ -18,8 +18,6 @@ export const buttonAcornVariants = cva({
     'pui:transition-shadow pui:duration-pui-normal',
     // Structural styles
     'pui:inline-flex pui:items-center pui:justify-center pui:gap-2',
-    // Sizing
-    'pui:px-4 pui:py-2',
     // Typography
     'pui:leading-[1.335rem] pui:font-bold pui:uppercase'
   ],
@@ -29,7 +27,7 @@ export const buttonAcornVariants = cva({
         'pui:bg-pui-interactive-primary',
         'pui:text-pui-interactive-on-primary',
         'pui:shadow-pui-button',
-        'pui:hover:shadow-pui-button-hover'
+        'pui:hover:bg-pui-button-hover'
       ],
       outline: [
         'pui:bg-transparent',

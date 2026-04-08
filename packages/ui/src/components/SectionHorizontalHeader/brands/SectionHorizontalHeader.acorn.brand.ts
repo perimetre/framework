@@ -16,21 +16,11 @@ export const sectionHorizontalHeaderAcornVariants = cva({
 });
 
 export const sectionHorizontalHeaderTitleAcornVariants = cva({
-  base: [
-    'pui:uppercase',
-    'pui:font-pui-display',
-    'pui:leading-none',
-    'pui:tracking-[-1px]'
-  ],
+  base: ['pui:font-pui-display'],
   variants: {
     variant: {
-      h1: ['pui:text-[6.25rem]'],
-      default: ['pui:text-[6.25rem]'],
-      compact: [
-        'pui:text-[3.75rem]',
-        'pui:leading-[105%]',
-        'pui:tracking-[-0.6px]'
-      ]
+      default: ['pui:typo-heading-1'],
+      compact: ['pui:typo-heading-2']
     }
   },
   defaultVariants: { variant: 'default' }

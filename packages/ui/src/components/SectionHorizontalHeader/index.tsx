@@ -1,12 +1,20 @@
 import { getBrandVariant } from '@/lib/brand-registry';
-import { Slot } from 'radix-ui';
 import {
   sectionHorizontalHeaderBrandVariants,
   sectionHorizontalHeaderTitleBrandVariants,
   type SectionHorizontalHeaderVariantProps
 } from './brands';
 
-export type SectionHorizontalHeaderProps = {
+export type SectionHorizontalHeaderProps<E extends React.ElementType = 'h2'> =
+  Omit<
+    React.ComponentPropsWithoutRef<E>,
+    keyof SectionHorizontalHeaderOwnProps
+  > &
+    SectionHorizontalHeaderOwnProps<E>;
+
+type SectionHorizontalHeaderOwnProps<E extends React.ElementType = 'h2'> = {
+  /** HTML element for the title tag (e.g. 'h1', 'h2', 'h3'). Defaults to 'h2'. */
+  as?: E;
   /** Content displayed on the right side */
   content?: React.ReactNode;
   /** Extra elements rendered below the title (e.g. call to actions) */
@@ -14,23 +22,24 @@ export type SectionHorizontalHeaderProps = {
   /** Small label displayed above the title */
   eyebrow?: React.ReactNode;
   /** Custom class name for the eyebrow element */
-  eyebrowClassname?: string;
-  /** Main heading text. Renders as h1 when variant="h1", otherwise h2 */
+  eyebrowClassName?: string;
+  /** Main heading text */
   title?: React.ReactNode;
 } & Omit<React.ComponentProps<'div'>, 'content' | 'title'> &
   SectionHorizontalHeaderVariantProps;
 
 /** Horizontal section header with eyebrow, title, content, and optional extra elements. */
-const SectionHorizontalHeader: React.FC<SectionHorizontalHeaderProps> = ({
+function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
+  as,
   className,
   content,
   extra,
   eyebrow,
-  eyebrowClassname,
+  eyebrowClassName,
   title,
   variant,
   ...props
-}) => {
+}: SectionHorizontalHeaderProps<E>) {
   const sectionHorizontalHeaderVariants = getBrandVariant(
     sectionHorizontalHeaderBrandVariants
   );
@@ -38,25 +47,22 @@ const SectionHorizontalHeader: React.FC<SectionHorizontalHeaderProps> = ({
     sectionHorizontalHeaderTitleBrandVariants
   );
 
-  const TitleTag =
-    variant === 'h1' ? 'h1' : variant === 'compact' ? 'h3' : 'h2';
+  const TitleTag = as ?? 'h2';
 
   return (
     <div
       className={sectionHorizontalHeaderVariants({ variant, className })}
       {...props}
     >
-      {eyebrow && <p className={eyebrowClassname}>{eyebrow}</p>}
+      {eyebrow && <p className={eyebrowClassName}>{eyebrow}</p>}
       <div className="pui:justify-between pui:flex pui:flex-wrap">
         <div>
           {title && (
-            <Slot.Slottable>
-              <TitleTag
-                className={sectionHorizontalHeaderTitleVariants({ variant })}
-              >
-                {title}
-              </TitleTag>
-            </Slot.Slottable>
+            <TitleTag
+              className={sectionHorizontalHeaderTitleVariants({ variant })}
+            >
+              {title}
+            </TitleTag>
           )}
           {extra && <div>{extra}</div>}
         </div>
@@ -69,6 +75,6 @@ const SectionHorizontalHeader: React.FC<SectionHorizontalHeaderProps> = ({
       </div>
     </div>
   );
-};
+}
 
 export default SectionHorizontalHeader;
