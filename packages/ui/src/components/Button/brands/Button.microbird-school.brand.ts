@@ -26,6 +26,7 @@ export const buttonMicroBirdSchoolVariants = cva({
       primaryLight: ['pui:text-pui-primary-9']
     },
     size: {
+      small: '',
       default: 'pui:tracking-[-0.16px]'
     }
   },
