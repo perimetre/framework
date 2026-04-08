@@ -11,6 +11,7 @@ export const buttonMicroBirdCommercialVariants = cva({
   base: ['pui:normal-case', 'pui:font-light', 'pui:text-[1rem]', 'pui:px-5'],
   variants: {
     variant: {
+      primary: [],
       outline: [
         'pui:border-pui-button-secondary-outline',
         'pui:text-pui-primary-9',

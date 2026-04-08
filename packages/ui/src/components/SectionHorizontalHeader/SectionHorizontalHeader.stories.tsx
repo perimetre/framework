@@ -8,7 +8,7 @@ export default {
   title: 'Components/SectionHorizontalHeader',
   argTypes: {
     variant: {
-      options: ['default', 'h1', 'compact'],
+      options: ['default', 'compact'],
       control: { type: 'select' },
       defaultValue: 'default'
     }

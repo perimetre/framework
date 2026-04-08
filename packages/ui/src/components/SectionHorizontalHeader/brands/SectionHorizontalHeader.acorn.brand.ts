@@ -7,7 +7,6 @@ export const sectionHorizontalHeaderAcornVariants = cva({
   base: ['pui:font-pui-sans pui:space-y-5'],
   variants: {
     variant: {
-      h1: [],
       default: [],
       compact: []
     }
