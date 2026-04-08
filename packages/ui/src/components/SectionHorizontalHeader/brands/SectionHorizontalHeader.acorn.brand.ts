@@ -4,7 +4,7 @@ import { cva } from '@/lib/cva';
  * Acorn brand SectionHorizontalHeader variants (default/base theme)
  */
 export const sectionHorizontalHeaderAcornVariants = cva({
-  base: ['pui:font-pui-sans'],
+  base: ['pui:font-pui-sans pui:space-y-5'],
   variants: {
     variant: {
       h1: [],
@@ -24,10 +24,10 @@ export const sectionHorizontalHeaderTitleAcornVariants = cva({
   ],
   variants: {
     variant: {
-      h1: ['pui:text-[100px]'],
-      default: ['pui:text-[100px]'],
+      h1: ['pui:text-[6.25rem]'],
+      default: ['pui:text-[6.25rem]'],
       compact: [
-        'pui:text-[60px]',
+        'pui:text-[3.75rem]',
         'pui:leading-[105%]',
         'pui:tracking-[-0.6px]'
       ]

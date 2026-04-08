@@ -17,8 +17,9 @@
 
 @layer pui.semantic {
   [data-pui-brand='microbird-commercial'] {
-    --pui-color-interactive-primary: var(--pui-primitive-color-primary-6);
-    --pui-color-interactive-on-primary: #F4F4F4;
+    --pui-color-interactive-on-primary: var(--pui-primitive-color-primary-1);
+    --pui-color-button-secondary-outline: #22222233;
+    --pui-color-alertbar-first-fg: var(--pui-primitive-color-primary-1);
     --pui-typo-heading-1-size: 6.25rem;
     --pui-typo-heading-1-weight: var(--pui-primitive-font-weight-semibold);
     --pui-typo-heading-1-tracking: -0.01em;

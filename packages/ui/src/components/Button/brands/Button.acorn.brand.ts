@@ -35,8 +35,7 @@ export const buttonAcornVariants = cva({
         'pui:bg-transparent',
         'pui:text-pui-interactive-primary',
         'pui:border',
-        'pui:border-pui-interactive-primary',
-        'pui:bg-pui-interactive-on-primary'
+        'pui:border-pui-interactive-primary'
       ],
       primaryLight: ['pui:bg-transparent', 'pui:text-pui-interactive-primary']
     },
@@ -46,6 +45,7 @@ export const buttonAcornVariants = cva({
     }
   },
   defaultVariants: {
-    variant: 'primary'
+    variant: 'primary',
+    size: 'default'
   }
 });

@@ -124,16 +124,11 @@
           "$value": "{pui.primitive.color.primary.1}",
           "$description": "Light text on blue alertbar."
         }
-      }
-    },
-    "color": {
-      "interactive": {
-        "$type": "color",
-        "primary": {
-          "$value": "{pui.primitive.color.primary.6}"
-        },
-        "on-primary": {
-          "$value": "#F4F4F4"
+      },
+      "button": {
+        "secondary-outline": {
+          "$value": "#22222233",
+          "$description": "Button outline border — overlay-12 at 20% opacity."
         }
       }
     }

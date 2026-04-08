@@ -13,6 +13,8 @@ export type SectionHorizontalHeaderProps = {
   extra?: React.ReactNode;
   /** Small label displayed above the title */
   eyebrow?: React.ReactNode;
+  /** Custom class name for the eyebrow element */
+  eyebrowClassname?: string;
   /** Main heading text. Renders as h1 when variant="h1", otherwise h2 */
   title?: React.ReactNode;
 } & Omit<React.ComponentProps<'div'>, 'content' | 'title'> &
@@ -24,6 +26,7 @@ const SectionHorizontalHeader: React.FC<SectionHorizontalHeaderProps> = ({
   content,
   extra,
   eyebrow,
+  eyebrowClassname,
   title,
   variant,
   ...props
@@ -31,7 +34,7 @@ const SectionHorizontalHeader: React.FC<SectionHorizontalHeaderProps> = ({
   const sectionHorizontalHeaderVariants = getBrandVariant(
     sectionHorizontalHeaderBrandVariants
   );
-  const titleVariants = getBrandVariant(
+  const sectionHorizontalHeaderTitleVariants = getBrandVariant(
     sectionHorizontalHeaderTitleBrandVariants
   );
 
@@ -43,12 +46,14 @@ const SectionHorizontalHeader: React.FC<SectionHorizontalHeaderProps> = ({
       className={sectionHorizontalHeaderVariants({ variant, className })}
       {...props}
     >
-      {eyebrow && <p className="pui:mb-5">{eyebrow}</p>}
+      {eyebrow && <p className={eyebrowClassname}>{eyebrow}</p>}
       <div className="pui:justify-between pui:flex pui:flex-wrap">
         <div>
           {title && (
             <Slot.Slottable>
-              <TitleTag className={titleVariants({ variant })}>
+              <TitleTag
+                className={sectionHorizontalHeaderTitleVariants({ variant })}
+              >
                 {title}
               </TitleTag>
             </Slot.Slottable>
@@ -57,7 +62,7 @@ const SectionHorizontalHeader: React.FC<SectionHorizontalHeaderProps> = ({
         </div>
 
         {content && (
-          <div className="pui:w-full pui:mt-5 pui:xl:mt-0 pui:xl:max-w-81.25 pui:leading-[160%]">
+          <div className="pui:w-full pui:xl:mt-0 pui:xl:max-w-81.25 pui:leading-[160%]">
             {content}
           </div>
         )}

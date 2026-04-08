@@ -6,7 +6,6 @@
  *
  * Note: Microbird Commercial extends Acorn (the base theme), so Acorn tokens are included.
  */
-@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Text:wght@600&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
 @import './base.css';
 @import '@perimetre/tokens/brands/acorn.css';
 @import '@perimetre/tokens/brands/microbird-commercial.css';
