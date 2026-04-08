@@ -16,6 +16,7 @@
 @layer pui.semantic {
   [data-pui-brand='microbird-school'] {
     --pui-color-fg-link-active: var(--pui-primitive-color-overlay-12);
+    --pui-color-button-secondary-outline: #22222233;
     --pui-typo-heading-1-size: 6.25rem;
     --pui-typo-heading-1-weight: var(--pui-primitive-font-weight-semibold);
     --pui-typo-heading-1-tracking: -0.01em;
