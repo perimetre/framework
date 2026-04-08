@@ -1,5 +1,16 @@
 # @perimetre/ui
 
+## 14.3.0
+
+### Minor Changes
+
+- 00b3faa: Created SectionHorizontalHeader component
+
+### Patch Changes
+
+- Updated dependencies [00b3faa]
+  - @perimetre/tokens@0.2.0
+
 ## 14.2.0
 
 ### Minor Changes
