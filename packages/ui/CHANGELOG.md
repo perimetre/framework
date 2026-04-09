@@ -1,5 +1,18 @@
 # @perimetre/ui
 
+## 14.4.0
+
+### Minor Changes
+
+- 496ae71: Changing p tag into span tag in eyebrow field
+- 496ae71: Created SectionHorizontalHeader component
+
+### Patch Changes
+
+- Updated dependencies [496ae71]
+- Updated dependencies [496ae71]
+  - @perimetre/tokens@0.3.0
+
 ## 14.3.0
 
 ### Minor Changes
