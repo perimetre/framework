@@ -54,7 +54,11 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
       className={sectionHorizontalHeaderVariants({ variant, className })}
       {...props}
     >
-      {eyebrow && <p className={eyebrowClassName}>{eyebrow}</p>}
+      {eyebrow && (
+        <span className={`pui:inline-block ${eyebrowClassName ?? ''}`}>
+          {eyebrow}
+        </span>
+      )}
       <div className="pui:justify-between pui:flex pui:flex-wrap">
         <div>
           {title && (
