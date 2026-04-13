@@ -30,6 +30,7 @@ type SectionHorizontalHeaderOwnProps<E extends React.ElementType = 'h2'> = {
 
 /** Horizontal section header with eyebrow, title, content, and optional extra elements. */
 function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
+  alignMobile,
   as,
   className,
   content,
@@ -51,29 +52,40 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
 
   return (
     <div
-      className={sectionHorizontalHeaderVariants({ variant, className })}
+      className={sectionHorizontalHeaderVariants({
+        alignMobile,
+        variant,
+        className
+      })}
       {...props}
     >
       {eyebrow && (
-        <span className={`pui:inline-block ${eyebrowClassName ?? ''}`}>
+        <span
+          className={`pui:inline-block pui:typo-tiny pui:lg:typo-base ${eyebrowClassName ?? ''}`}
+        >
           {eyebrow}
         </span>
       )}
-      <div className="pui:justify-between pui:flex pui:flex-wrap">
-        <div>
-          {title && (
-            <TitleTag
-              className={sectionHorizontalHeaderTitleVariants({ variant })}
-            >
-              {title}
-            </TitleTag>
-          )}
-          {extra && <div>{extra}</div>}
-        </div>
+      <div className="pui:grid pui:gap-y-5 pui:lg:grid-cols-[1fr_auto] pui:lg:gap-x-5 pui:lg:items-start">
+        {title && (
+          <TitleTag
+            className={sectionHorizontalHeaderTitleVariants({ variant })}
+          >
+            {title}
+          </TitleTag>
+        )}
 
         {content && (
-          <div className="pui:w-full pui:xl:mt-0 pui:xl:max-w-81.25 pui:leading-[160%]">
+          <div className="pui:text-sm pui:lg:typo-base pui:lg:row-span-2 pui:lg:max-w-81.25 pui:leading-[160%]">
             {content}
+          </div>
+        )}
+
+        {extra && (
+          <div
+            className={`pui:flex pui:lg:justify-start ${alignMobile === 'left' ? 'pui:justify-start' : 'pui:justify-center'}`}
+          >
+            {extra}
           </div>
         )}
       </div>
