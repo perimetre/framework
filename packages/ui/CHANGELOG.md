@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 15.0.0
+
+### Major Changes
+
+- ce62430: microbird brand variants for StatItem
+
 ## 14.4.0
 
 ### Minor Changes
