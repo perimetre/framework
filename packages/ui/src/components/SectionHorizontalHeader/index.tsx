@@ -1,4 +1,5 @@
 import { getBrandVariant } from '@/lib/brand-registry';
+import { cn } from '@perimetre/classnames';
 import {
   sectionHorizontalHeaderBrandVariants,
   sectionHorizontalHeaderTitleBrandVariants,
@@ -19,6 +20,8 @@ type SectionHorizontalHeaderOwnProps<E extends React.ElementType = 'h2'> = {
   content?: React.ReactNode;
   /** Extra elements rendered below the title (e.g. call to actions) */
   extra?: React.ReactNode;
+  /** Custom class name for the extra element wrapper */
+  extraClassName?: string;
   /** Small label displayed above the title */
   eyebrow?: React.ReactNode;
   /** Custom class name for the eyebrow element */
@@ -34,6 +37,7 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
   className,
   content,
   extra,
+  extraClassName,
   eyebrow,
   eyebrowClassName,
   title,
@@ -55,25 +59,38 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
       {...props}
     >
       {eyebrow && (
-        <span className={`pui:inline-block ${eyebrowClassName ?? ''}`}>
+        <span
+          className={cn(
+            'pui:inline-block pui:typo-tiny pui:lg:typo-base',
+            eyebrowClassName
+          )}
+        >
           {eyebrow}
         </span>
       )}
-      <div className="pui:justify-between pui:flex pui:flex-wrap">
-        <div>
-          {title && (
-            <TitleTag
-              className={sectionHorizontalHeaderTitleVariants({ variant })}
-            >
-              {title}
-            </TitleTag>
-          )}
-          {extra && <div>{extra}</div>}
-        </div>
+      <div className="pui:grid pui:gap-y-5 pui:lg:grid-cols-[1fr_auto] pui:lg:gap-x-5 pui:lg:items-start">
+        {title && (
+          <TitleTag
+            className={sectionHorizontalHeaderTitleVariants({ variant })}
+          >
+            {title}
+          </TitleTag>
+        )}
 
         {content && (
-          <div className="pui:w-full pui:xl:mt-0 pui:xl:max-w-81.25 pui:leading-[160%]">
+          <div className="pui:text-sm pui:lg:typo-base pui:lg:row-span-2 pui:lg:max-w-81.25 pui:leading-[160%]">
             {content}
+          </div>
+        )}
+
+        {extra && (
+          <div
+            className={cn(
+              'pui:flex pui:justify-center pui:lg:justify-start',
+              extraClassName
+            )}
+          >
+            {extra}
           </div>
         )}
       </div>

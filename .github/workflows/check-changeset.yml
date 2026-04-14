@@ -1,0 +1,17 @@
+name: Check Changeset
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-changeset:
+    # Skip bot PRs (e.g. dependabot, changeset bot, renovate)
+    if: ${{ github.actor_type != 'Bot' }}
+    uses: perimetre/actions/.github/workflows/check-directory-files-changed.yml@master
+    with:
+      directoryPath: '.changeset'
+      ignoreFiles: 'README.md,config.json'
+      failMessage: >-
+        No changeset found. Please run `pnpm changeset` to add a changeset describing your changes.
+        If this PR does not require a release, run `pnpm changeset --empty` to add an empty changeset.
