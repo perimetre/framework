@@ -2,10 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { cn } from '@perimetre/classnames';
+
 export type MagnifyImageProps = {
   className?: string;
   /** Lens radius in pixels. Defaults to 80. */
   lensRadius?: number;
+  /** Extra classes applied to the circular magnifying lens. Use to override ring, shadow, size, etc. */
+  magnifierClassName?: string;
   /** The image to render and magnify. Accepts any image element — native img, Next.js Image, Hydrogen Image, etc. */
   renderImage: React.ReactNode;
   /** Zoom scale factor. Defaults to 2. */
@@ -20,15 +24,21 @@ export type MagnifyImageProps = {
 function MagnifyImage({
   className,
   lensRadius = 80,
+  magnifierClassName,
   renderImage,
   scale = 2,
   ...props
 }: MagnifyImageProps) {
   const [isActive, setIsActive] = useState(false);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
   // Container size tracked via ResizeObserver to avoid reading refs during render.
   const [containerSize, setContainerSize] = useState({ h: 0, w: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Raw pointer coords buffered between rAF ticks — never triggers a re-render.
+  const pendingCoords = useRef<{ clientX: number; clientY: number } | null>(
+    null
+  );
+  const rafId = useRef<null | number>(null);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -45,28 +55,68 @@ function MagnifyImage({
     };
   }, []);
 
-  const computePos = useCallback((clientX: number, clientY: number) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    setPos({
-      x: Math.max(0, Math.min(rect.width, clientX - rect.left)),
-      y: Math.max(0, Math.min(rect.height, clientY - rect.top))
-    });
+  // Cancel any pending frame on unmount.
+  useEffect(() => {
+    return () => {
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current);
+    };
   }, []);
 
-  const handleMouseEnter = useCallback(() => {
-    setIsActive(true);
+  /**
+   * Runs inside the rAF callback — once per frame at most.
+   * Reads the rect here (post-layout, pre-paint) and writes CSS vars directly,
+   * bypassing React state so no re-render is triggered.
+   */
+  const flushPos = useCallback(() => {
+    rafId.current = null;
+    const coords = pendingCoords.current;
+    const el = containerRef.current;
+    if (!coords || !el) return;
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty(
+      '--posX',
+      String(Math.max(0, Math.min(rect.width, coords.clientX - rect.left)))
+    );
+    el.style.setProperty(
+      '--posY',
+      String(Math.max(0, Math.min(rect.height, coords.clientY - rect.top)))
+    );
   }, []);
+
+  /**
+   * Called on every pointer event. Stores the latest coords and schedules a
+   * single rAF flush. Multiple events in the same frame collapse into one write.
+   */
+  const schedulePos = useCallback(
+    (clientX: number, clientY: number) => {
+      pendingCoords.current = { clientX, clientY };
+      rafId.current ??= requestAnimationFrame(flushPos);
+    },
+    [flushPos]
+  );
+
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent) => {
+      // Schedule position eagerly so CSS vars are set before the first paint.
+      schedulePos(e.clientX, e.clientY);
+      setIsActive(true);
+    },
+    [schedulePos]
+  );
 
   const handleMouseLeave = useCallback(() => {
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+    }
     setIsActive(false);
   }, []);
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
-      computePos(e.clientX, e.clientY);
+      schedulePos(e.clientX, e.clientY);
     },
-    [computePos]
+    [schedulePos]
   );
 
   const handleTouchEnd = useCallback(() => {
@@ -76,24 +126,27 @@ function MagnifyImage({
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
       const touch = e.touches[0];
-      computePos(touch.clientX, touch.clientY);
+      schedulePos(touch.clientX, touch.clientY);
       setIsActive(true);
     },
-    [computePos]
+    [schedulePos]
   );
 
   const handleTouchMove = useCallback(
     (e: React.TouchEvent) => {
       const touch = e.touches[0];
-      computePos(touch.clientX, touch.clientY);
+      schedulePos(touch.clientX, touch.clientY);
     },
-    [computePos]
+    [schedulePos]
   );
 
   return (
     <div
       ref={containerRef}
-      className={`pui:relative pui:overflow-hidden pui:cursor-crosshair pui:touch-none pui:select-none ${className ?? ''}`}
+      className={cn(
+        'pui:relative pui:overflow-hidden pui:cursor-crosshair pui:touch-none pui:select-none',
+        className
+      )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
@@ -101,6 +154,13 @@ function MagnifyImage({
       onTouchMove={handleTouchMove}
       onTouchStart={handleTouchStart}
       {...props}
+      style={
+        {
+          '--lensRadius': lensRadius,
+          '--posX': 0,
+          '--posY': 0
+        } as React.CSSProperties
+      }
     >
       {/* Normal image */}
       {renderImage}
@@ -109,18 +169,13 @@ function MagnifyImage({
       {isActive && (
         <div
           aria-hidden
-          style={{
-            borderRadius: '50%',
-            boxShadow:
-              '0 0 0 2px rgba(255,255,255,0.6), 0 0 0 3px rgba(0,0,0,0.15), 0 4px 20px rgba(0,0,0,0.25)',
-            height: lensRadius * 2,
-            left: pos.x - lensRadius,
-            overflow: 'hidden',
-            pointerEvents: 'none',
-            position: 'absolute',
-            top: pos.y - lensRadius,
-            width: lensRadius * 2
-          }}
+          className={cn(
+            'pui:absolute pui:rounded-full pui:overflow-hidden pui:pointer-events-none',
+            'pui:h-[calc(var(--lensRadius)*2px)] pui:w-[calc(var(--lensRadius)*2px)]',
+            'pui:left-[calc(var(--posX)*1px-var(--lensRadius)*1px)] pui:top-[calc(var(--posY)*1px-var(--lensRadius)*1px)]',
+            'pui:shadow-[0_0_0_2px_rgba(255,255,255,0.6),0_0_0_3px_rgba(0,0,0,0.15),0_4px_20px_rgba(0,0,0,0.25)]',
+            magnifierClassName
+          )}
         >
           {/*
            * Inner image: same dimensions as the container, offset so that
@@ -129,16 +184,19 @@ function MagnifyImage({
            * Math: inner div at (lensRadius - pos.x, lensRadius - pos.y) in lens space.
            * scale(S) with transform-origin at (pos.x, pos.y) keeps that point stationary,
            * which is already at the lens center. QED.
+           *
+           * CSS vars (--posX, --posY) are written directly by flushPos without
+           * going through React state, so no re-render is needed per frame.
            */}
           <div
             style={{
               height: containerSize.h,
-              left: lensRadius - pos.x,
+              left: 'calc(' + String(lensRadius) + 'px - var(--posX) * 1px)',
               position: 'absolute',
-              top: lensRadius - pos.y,
-              transform: 'scale(' + scale.toString() + ')',
+              top: 'calc(' + String(lensRadius) + 'px - var(--posY) * 1px)',
+              transform: 'scale(' + String(scale) + ')',
               transformOrigin:
-                pos.x.toString() + 'px ' + pos.y.toString() + 'px',
+                'calc(var(--posX) * 1px) calc(var(--posY) * 1px)',
               width: containerSize.w
             }}
           >
