@@ -1,5 +1,11 @@
 # @perimetre/tokens
 
+## 0.4.1
+
+### Patch Changes
+
+- 5e03749: Adds more microbird colors
+
 ## 0.4.0
 
 ### Minor Changes

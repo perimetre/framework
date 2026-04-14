@@ -1,5 +1,12 @@
 # @perimetre/ui
 
+## 15.2.1
+
+### Patch Changes
+
+- Updated dependencies [5e03749]
+  - @perimetre/tokens@0.4.1
+
 ## 15.2.0
 
 ### Minor Changes
