@@ -4,18 +4,14 @@ import { cva } from '@/lib/cva';
  * Acorn brand SectionHorizontalHeader variants (default/base theme)
  */
 export const sectionHorizontalHeaderAcornVariants = cva({
-  base: ['pui:font-pui-sans pui:space-y-5 pui:lg:text-left'],
+  base: ['pui:font-pui-sans pui:space-y-5 pui:text-center pui:lg:text-left'],
   variants: {
     variant: {
       default: [],
       compact: []
-    },
-    alignMobile: {
-      center: ['pui:text-center'],
-      left: ['pui:text-left']
     }
   },
-  defaultVariants: { variant: 'default', alignMobile: 'center' }
+  defaultVariants: { variant: 'default' }
 });
 
 export const sectionHorizontalHeaderTitleAcornVariants = cva({

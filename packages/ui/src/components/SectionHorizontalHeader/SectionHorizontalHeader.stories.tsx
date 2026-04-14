@@ -11,11 +11,6 @@ export default {
       options: ['default', 'compact'],
       control: { type: 'select' },
       defaultValue: 'default'
-    },
-    alignMobile: {
-      options: ['center', 'left'],
-      control: { type: 'select' },
-      defaultValue: 'center'
     }
   }
 } satisfies StoryDefault<SectionHorizontalHeaderProps>;
@@ -54,29 +49,6 @@ export const Default: Story<SectionHorizontalHeaderProps> = () => (
 
 export const WithExtra: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
-    as="h1"
-    eyebrow="Built on Ford Transit Chassis"
-    title="CT-Series"
-    variant="default"
-    content={
-      <p>
-        The CT-Series combines Ford Transit's proven reliability with Micro
-        Bird's purpose-built body design, delivering exceptional fuel economy,
-        panoramic visibility, and passenger comfort for commercial fleets.
-      </p>
-    }
-    extra={
-      <div className="pui:flex pui:gap-2">
-        <Button variant="primary">Primary Action</Button>
-        <Button variant="outline">Secondary Action</Button>
-      </div>
-    }
-  />
-);
-
-export const LeftAligned: Story<SectionHorizontalHeaderProps> = () => (
-  <SectionHorizontalHeader
-    alignMobile="left"
     as="h1"
     eyebrow="Built on Ford Transit Chassis"
     title="CT-Series"

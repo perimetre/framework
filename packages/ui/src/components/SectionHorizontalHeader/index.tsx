@@ -1,4 +1,5 @@
 import { getBrandVariant } from '@/lib/brand-registry';
+import { cn } from '@perimetre/classnames';
 import {
   sectionHorizontalHeaderBrandVariants,
   sectionHorizontalHeaderTitleBrandVariants,
@@ -19,6 +20,8 @@ type SectionHorizontalHeaderOwnProps<E extends React.ElementType = 'h2'> = {
   content?: React.ReactNode;
   /** Extra elements rendered below the title (e.g. call to actions) */
   extra?: React.ReactNode;
+  /** Custom class name for the extra element wrapper */
+  extraClassName?: string;
   /** Small label displayed above the title */
   eyebrow?: React.ReactNode;
   /** Custom class name for the eyebrow element */
@@ -30,11 +33,11 @@ type SectionHorizontalHeaderOwnProps<E extends React.ElementType = 'h2'> = {
 
 /** Horizontal section header with eyebrow, title, content, and optional extra elements. */
 function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
-  alignMobile,
   as,
   className,
   content,
   extra,
+  extraClassName,
   eyebrow,
   eyebrowClassName,
   title,
@@ -52,16 +55,15 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
 
   return (
     <div
-      className={sectionHorizontalHeaderVariants({
-        alignMobile,
-        variant,
-        className
-      })}
+      className={sectionHorizontalHeaderVariants({ variant, className })}
       {...props}
     >
       {eyebrow && (
         <span
-          className={`pui:inline-block pui:typo-tiny pui:lg:typo-base ${eyebrowClassName ?? ''}`}
+          className={cn(
+            'pui:inline-block pui:typo-tiny pui:lg:typo-base',
+            eyebrowClassName
+          )}
         >
           {eyebrow}
         </span>
@@ -83,7 +85,10 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
 
         {extra && (
           <div
-            className={`pui:flex pui:lg:justify-start ${alignMobile === 'left' ? 'pui:justify-start' : 'pui:justify-center'}`}
+            className={cn(
+              'pui:flex pui:justify-center pui:lg:justify-start',
+              extraClassName
+            )}
           >
             {extra}
           </div>
