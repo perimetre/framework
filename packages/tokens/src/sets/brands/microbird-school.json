@@ -116,6 +116,12 @@
           "$value": "{pui.primitive.color.overlay.12}",
           "$description": "Active links use neutral dark (#222222). Yellow primary has insufficient contrast for accessible link text."
         }
+      },
+      "button": {
+        "secondary-outline": {
+          "$value": "#22222233",
+          "$description": "Button outline border — overlay-12 at 20% opacity."
+        }
       }
     }
   }
