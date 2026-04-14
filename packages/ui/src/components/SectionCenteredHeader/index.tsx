@@ -5,27 +5,32 @@ import {
   type SectionCenteredHeaderVariantProps
 } from './brands';
 
-export type SectionCenteredHeaderProps = SectionCenteredHeaderOwnProps;
+export type SectionCenteredHeaderProps<E extends React.ElementType = 'h2'> =
+  Omit<React.ComponentPropsWithoutRef<E>, keyof SectionCenteredHeaderOwnProps> &
+    SectionCenteredHeaderOwnProps<E>;
 
-type SectionCenteredHeaderOwnProps = {
+type SectionCenteredHeaderOwnProps<E extends React.ElementType = 'h2'> = {
+  /** HTML element for the title tag (e.g. 'h1', 'h2', 'h3'). Defaults to 'h2'. */
+  as?: E;
   /** Content displayed below the title */
   content?: React.ReactNode;
   /** Small label displayed above the title */
   eyebrow?: React.ReactNode;
-  /** Main heading text. Renders as h1 when variant is 'h1', otherwise h2. */
+  /** Main heading text */
   title?: React.ReactNode;
 } & Omit<React.ComponentProps<'div'>, 'content' | 'title'> &
   SectionCenteredHeaderVariantProps;
 
 /** Centered section header with eyebrow, title, and content. */
-function SectionCenteredHeader({
+function SectionCenteredHeader<E extends React.ElementType = 'h2'>({
+  as,
   className,
   content,
   eyebrow,
   title,
   variant,
   ...props
-}: SectionCenteredHeaderProps) {
+}: SectionCenteredHeaderProps<E>) {
   const sectionCenteredHeaderVariants = getBrandVariant(
     sectionCenteredHeaderBrandVariants
   );
@@ -33,7 +38,7 @@ function SectionCenteredHeader({
     sectionCenteredHeaderTitleBrandVariants
   );
 
-  const TitleTag = variant === 'h1' ? 'h1' : 'h2';
+  const TitleTag = as ?? 'h2';
 
   return (
     <div

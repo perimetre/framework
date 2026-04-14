@@ -31,6 +31,7 @@ export const Default: Story<SectionCenteredHeaderProps> = () => (
 
 export const WithExtra: Story<SectionCenteredHeaderProps> = () => (
   <SectionCenteredHeader
+    as="h1"
     eyebrow="Built on Ford Transit Chassis"
     variant="h1"
     content={
