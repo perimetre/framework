@@ -2,6 +2,7 @@
 @layer pui.primitive {
   [data-pui-brand='microbird-school'] {
     --pui-primitive-color-primary-1: #FFFEF9;
+    --pui-primitive-color-primary-2: #FEF6DE;
     --pui-primitive-color-primary-9: #FEE44E;
     --pui-primitive-color-primary-10: #FFB700;
     --pui-primitive-color-overlay-1: #FDFDFD;

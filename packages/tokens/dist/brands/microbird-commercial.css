@@ -2,6 +2,8 @@
 @layer pui.primitive {
   [data-pui-brand='microbird-commercial'] {
     --pui-primitive-color-primary-1: #FCFDFF;
+    --pui-primitive-color-primary-2: #E2ECFF;
+    --pui-primitive-color-primary-8: #007FE4;
     --pui-primitive-color-primary-9: #004883;
     --pui-primitive-color-primary-10: #001527;
     --pui-primitive-color-primary-11: #004883;
