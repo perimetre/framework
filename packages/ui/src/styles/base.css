@@ -34,3 +34,23 @@
     @apply pui:font-sans;
   }
 }
+
+/* Radix Tabs: visually hide inactive content while keeping it in the DOM for SEO */
+@layer pui.components {
+  [data-pui-brand] [role='tab'][data-state='active'] {
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--color-pui-overlay-12);
+    color: var(--color-pui-overlay-12);
+  }
+
+  [data-pui-brand] [role='tabpanel'][data-state='inactive'] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
