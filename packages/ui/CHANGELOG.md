@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 15.2.2
+
+### Patch Changes
+
+- 88e724a: fix SectionCenteredHeader : remove <p> for a <div>
+
 ## 15.2.1
 
 ### Patch Changes
