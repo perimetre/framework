@@ -69,6 +69,29 @@ export const WithExtra: Story<SectionHorizontalHeaderProps> = () => (
   />
 );
 
+export const WithContentImage: Story<SectionHorizontalHeaderProps> = () => (
+  <SectionHorizontalHeader
+    as="h1"
+    eyebrow="Built on Ford Transit Chassis"
+    title="CT-Series"
+    variant="default"
+    content={
+      <p>
+        The CT-Series combines Ford Transit's proven reliability with Micro
+        Bird's purpose-built body design, delivering exceptional fuel economy,
+        panoramic visibility, and passenger comfort for commercial fleets.
+      </p>
+    }
+    contentImage={
+      <img
+        alt="Micro Bird logo"
+        className="pui:h-full pui:w-auto"
+        src="https://placehold.co/120x40"
+      />
+    }
+  />
+);
+
 export const Compact: Story<SectionHorizontalHeaderProps> = () => (
   <SectionHorizontalHeader
     as="h3"

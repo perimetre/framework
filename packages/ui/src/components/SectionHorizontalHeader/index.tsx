@@ -18,6 +18,8 @@ type SectionHorizontalHeaderOwnProps<E extends React.ElementType = 'h2'> = {
   as?: E;
   /** Content displayed on the right side */
   content?: React.ReactNode;
+  /** Image displayed above the content text (rendered at 40px height) */
+  contentImage?: React.ReactNode;
   /** Extra elements rendered below the title (e.g. call to actions) */
   extra?: React.ReactNode;
   /** Custom class name for the extra element wrapper */
@@ -36,6 +38,7 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
   as,
   className,
   content,
+  contentImage,
   extra,
   extraClassName,
   eyebrow,
@@ -77,9 +80,16 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
           </TitleTag>
         )}
 
-        {content && (
-          <div className="pui:text-sm pui:lg:typo-base pui:lg:row-span-2 pui:lg:max-w-81.25 pui:leading-[160%]">
-            {content}
+        {(content ?? contentImage) && (
+          <div className="pui:lg:row-span-2 pui:lg:max-w-81.25">
+            {contentImage && (
+              <div className="pui:mb-6 pui:h-10">{contentImage}</div>
+            )}
+            {content && (
+              <div className="pui:text-sm pui:lg:typo-base pui:leading-[160%]">
+                {content}
+              </div>
+            )}
           </div>
         )}
 
