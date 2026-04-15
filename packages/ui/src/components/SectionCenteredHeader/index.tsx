@@ -45,7 +45,7 @@ function SectionCenteredHeader<E extends React.ElementType = 'h2'>({
       className={sectionCenteredHeaderVariants({ variant, className })}
       {...props}
     >
-      {eyebrow && <p>{eyebrow}</p>}
+      {eyebrow && <div>{eyebrow}</div>}
       {title && (
         <TitleTag className={sectionCenteredHeaderTitleVariants({ variant })}>
           {title}
