@@ -27,6 +27,9 @@ jobs:
       packages: write
       pull-requests: write
       id-token: write
+    outputs:
+      published: ${{ steps.changesets.outputs.published }}
+      publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -71,3 +74,107 @@ jobs:
           commit: 'chore(release): version packages'
           title: 'chore(release): version packages'
           createGithubReleases: false
+
+  # Notify Slack when packages are actually published
+  notify-release:
+    name: Notify Slack of Release
+    needs: release
+    runs-on: ubuntu-latest
+    if: needs.release.outputs.published == 'true'
+    steps:
+      - name: Build Slack message
+        id: message
+        uses: actions/github-script@v8
+        env:
+          PUBLISHED_PACKAGES: ${{ needs.release.outputs.publishedPackages }}
+          REPO: ${{ github.repository }}
+          SERVER_URL: ${{ github.server_url }}
+          RUN_ID: ${{ github.run_id }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const packages = JSON.parse(process.env.PUBLISHED_PACKAGES);
+            const repo = process.env.REPO;
+            const serverUrl = process.env.SERVER_URL;
+            const runId = process.env.RUN_ID;
+            const npmToken = process.env.NPM_TOKEN;
+
+            // Determine semver bump type by comparing against the previous version on the registry
+            function getBumpType(previousVersion, newVersion) {
+              if (!previousVersion) return 'New';
+              const [oldMajor, oldMinor] = previousVersion.split('.').map(Number);
+              const [newMajor, newMinor] = newVersion.split('.').map(Number);
+              if (newMajor !== oldMajor) return 'Major';
+              if (newMinor !== oldMinor) return 'Minor';
+              return 'Patch';
+            }
+
+            async function getPreviousVersion(packageName, currentVersion) {
+              try {
+                const url = `https://npm.pkg.github.com/${packageName}`;
+                const res = await fetch(url, {
+                  headers: { Authorization: `Bearer ${npmToken}` }
+                });
+                if (!res.ok) return null;
+                const data = await res.json();
+                const allVersions = Object.keys(data.versions || {});
+                // Filter out the just-published version and get the latest remaining
+                const previous = allVersions
+                  .filter(v => v !== currentVersion)
+                  .sort((a, b) => {
+                    const pa = a.split('.').map(Number);
+                    const pb = b.split('.').map(Number);
+                    return pa[0] - pb[0] || pa[1] - pb[1] || pa[2] - pb[2];
+                  })
+                  .pop();
+                return previous || null;
+              } catch {
+                return null;
+              }
+            }
+
+            const lines = [];
+            for (const pkg of packages) {
+              const prev = await getPreviousVersion(pkg.name, pkg.version);
+              const bump = getBumpType(prev, pkg.version);
+              lines.push(`• \`${pkg.name}\` — *${bump}*: \`${pkg.version}\``);
+            }
+
+            const summary = lines.join('\n');
+            const title = packages.length === 1
+              ? '📦 New package version published'
+              : `📦 ${packages.length} new package versions published`;
+
+            const blocks = [
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*${title}*\n${summary}`
+                }
+              },
+              {
+                type: 'context',
+                elements: [
+                  {
+                    type: 'mrkdwn',
+                    text: `<${serverUrl}/${repo}|${repo}> • <${serverUrl}/${repo}/actions/runs/${runId}|View workflow run>`
+                  }
+                ]
+              }
+            ];
+
+            core.setOutput('title', title);
+            core.setOutput('blocks', JSON.stringify(blocks));
+
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            {
+              "channel": "${{ vars.SLACK_CHANNEL_ID }}",
+              "text": "${{ steps.message.outputs.title }}",
+              "blocks": ${{ steps.message.outputs.blocks }}
+            }

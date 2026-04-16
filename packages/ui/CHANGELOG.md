@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 15.3.0
+
+### Minor Changes
+
+- 58a4e5c: Created Tabs Component
+
 ## 15.2.2
 
 ### Patch Changes
