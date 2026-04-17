@@ -1,5 +1,16 @@
 # @perimetre/ui
 
+## 15.4.0
+
+### Minor Changes
+
+- 748797c: Created Tabs Component
+- 866bb37: add PaginatedCarousel component to framework
+
+### Patch Changes
+
+- 748797c: Moved tab styles from base.css to tailwind.css
+
 ## 15.3.0
 
 ### Minor Changes
