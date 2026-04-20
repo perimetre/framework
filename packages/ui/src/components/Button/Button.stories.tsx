@@ -18,7 +18,7 @@ export default {
       defaultValue: 'default'
     },
     variant: {
-      options: ['primary', 'outline', 'primaryLight', 'transparent'],
+      options: ['primary', 'outline', 'primaryLight'],
       control: { type: 'select' },
       defaultValue: 'primary'
     }
@@ -49,12 +49,6 @@ PrimaryLight.args = {
   variant: 'primaryLight'
 };
 
-export const Transparent = DefaultComp.bind({});
-Transparent.args = {
-  label: 'Cancel',
-  variant: 'transparent'
-};
-
 export const Small = Default.bind({});
 Small.args = {
   label: 'Shop',
@@ -77,9 +71,6 @@ export const AllVariants: Story<Props> = ({ label = 'Shop Now', ...props }) => (
       {label}
     </Button>
     <Button {...props} variant="primaryLight">
-      {label}
-    </Button>
-    <Button {...props} variant="transparent">
       {label}
     </Button>
   </div>

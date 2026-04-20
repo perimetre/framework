@@ -42,12 +42,6 @@ export const buttonAcornVariants = cva({
         'pui:bg-pui-primary-2',
         'pui:hover:bg-pui-primary-10',
         'pui:hover:text-pui-primary-2'
-      ],
-      transparent: [
-        'pui:bg-transparent',
-        'pui:border',
-        'pui:border-pui-overlay-3',
-        'pui:text-pui-primary-2'
       ]
     },
     size: {
