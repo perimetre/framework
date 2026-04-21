@@ -17,6 +17,11 @@ import { getBrandVariant } from '@/lib/brand-registry';
 import { imageSequence360BrandVariants } from './brands';
 
 export type ImageSequence360Props = {
+  /**
+   * Accessible name for the viewer (e.g. product name + "360° view"). Rendered
+   * on the outer `role="slider"` element — consumers must provide this.
+   */
+  'aria-label': string;
   className?: string;
   /**
    * Pixels of horizontal drag required to advance one full rotation.
@@ -39,6 +44,7 @@ export type ImageSequence360Props = {
  * React wrapper — the wrapper bundles React 18 internals that break on React 19.
  */
 const ImageSequence360: React.FC<ImageSequence360Props> = ({
+  'aria-label': ariaLabel,
   className,
   dragDistanceForFullRotation,
   loop = true,
@@ -110,7 +116,7 @@ const ImageSequence360: React.FC<ImageSequence360Props> = ({
     <div
       ref={containerRef}
       {...bind()}
-      aria-label="360° product viewer — use left and right arrow keys to rotate"
+      aria-label={ariaLabel}
       aria-valuemax={100}
       aria-valuemin={0}
       aria-valuenow={Math.round((sequence?.progress ?? 0) * 100)}

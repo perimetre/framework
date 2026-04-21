@@ -16,6 +16,7 @@ export const Default: Story<ImageSequence360Props> = () => (
     <ImageSequence360
       clearCanvas
       loop
+      aria-label="Micro Bird D-Series G5 bus — 360° view"
       frames={FRAME_COUNT}
       src={{ imageURL, maxCachedImages: 6 }}
     />
