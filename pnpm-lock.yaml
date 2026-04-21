@@ -307,6 +307,9 @@ importers:
       '@ladle/react':
         specifier: ^5.1.1
         version: 5.1.1(@types/node@24.10.13)(@types/react@18.3.28)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.1)
+      '@mediamonks/fast-image-sequence':
+        specifier: ^2.0.1
+        version: 2.0.1(react@19.2.4)
       '@perimetre/classnames':
         specifier: workspace:*
         version: link:../classnames
@@ -334,6 +337,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(rolldown-vite@7.3.1(@types/node@24.10.13)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))
+      '@use-gesture/react':
+        specifier: ^10.3.1
+        version: 10.3.1(react@19.2.4)
       cva:
         specifier: 1.0.0-beta.4
         version: 1.0.0-beta.4(typescript@5.9.3)
@@ -2603,6 +2609,18 @@ packages:
     peerDependencies:
       '@types/react': '>=16'
       react: '>=16'
+
+  '@mediamonks/fast-image-sequence@2.0.1':
+    resolution:
+      {
+        integrity: sha512-NNZXJVrEkmdj4TM8l3QVc4BTwz5k69o49uESoSGZ0J6D5alZZns4iYcWiD+KE8w2KIenHeBcaIJnVZ0rtcuY4g==
+      }
+    engines: { node: '>=16.0.0' }
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   '@microsoft/api-extractor-model@7.32.2':
     resolution:
@@ -5423,6 +5441,20 @@ packages:
       }
     cpu: [x64]
     os: [win32]
+
+  '@use-gesture/core@10.3.1':
+    resolution:
+      {
+        integrity: sha512-WcINiDt8WjqBdUXye25anHiNxPc0VOrlT8F6LLkU6cycrOGUDyY/yyFmsg3k8i5OLvv25llc0QC45GhR/C8llw==
+      }
+
+  '@use-gesture/react@10.3.1':
+    resolution:
+      {
+        integrity: sha512-Yy19y6O2GJq8f7CHf7L0nxL8bf4PZCPaVOCgJrusOeFHY1LvHgYXnmnXg6N5iwAnbgbZCDjo60SiM6IPJi9C5g==
+      }
+    peerDependencies:
+      react: '>= 16.8.0'
 
   '@vitejs/plugin-react-swc@3.11.0':
     resolution:
@@ -14248,6 +14280,10 @@ snapshots:
       '@types/react': 18.3.28
       react: 19.2.4
 
+  '@mediamonks/fast-image-sequence@2.0.1(react@19.2.4)':
+    optionalDependencies:
+      react: 19.2.4
+
   '@microsoft/api-extractor-model@7.32.2(@types/node@24.10.13)':
     dependencies:
       '@microsoft/tsdoc': 0.16.0
@@ -16127,6 +16163,13 @@ snapshots:
 
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
+
+  '@use-gesture/core@10.3.1': {}
+
+  '@use-gesture/react@10.3.1(react@19.2.4)':
+    dependencies:
+      '@use-gesture/core': 10.3.1
+      react: 19.2.4
 
   '@vitejs/plugin-react-swc@3.11.0(vite@6.4.1(@types/node@24.10.13)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))':
     dependencies:
