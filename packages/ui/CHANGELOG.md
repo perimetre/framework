@@ -1,5 +1,13 @@
 # @perimetre/ui
 
+## 15.5.0
+
+### Minor Changes
+
+- 658e1d6: Adding updated button colors
+- 53b6d19: Add `ImageSequence360` component — a 360° product spin viewer built on `@mediamonks/fast-image-sequence` and `@use-gesture/react`. Supports mouse drag, touch, and touchpad with axis-locked horizontal gestures, and resizes responsively with its container.
+- 658e1d6: Removed transparent variant
+
 ## 15.4.0
 
 ### Minor Changes
