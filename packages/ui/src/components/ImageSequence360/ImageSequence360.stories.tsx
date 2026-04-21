@@ -12,7 +12,7 @@ const imageURL = (i: number) =>
   `/bus/mic2026-01_Dseries_G5_studio_360_${String(i).padStart(5, '0')}.png`;
 
 export const Default: Story<ImageSequence360Props> = () => (
-  <div style={{ height: 480, width: 640 }}>
+  <div style={{ aspectRatio: '4 / 3', maxWidth: 640, width: '100%' }}>
     <ImageSequence360
       clearCanvas
       loop
