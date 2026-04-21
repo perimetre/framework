@@ -33,9 +33,16 @@ export const buttonAcornVariants = cva({
         'pui:bg-transparent',
         'pui:text-pui-interactive-primary',
         'pui:border',
-        'pui:border-pui-interactive-primary'
+        'pui:border-pui-interactive-primary',
+        'pui:hover:border-pui-overlay-12',
+        'pui:hover:text-pui-overlay-12'
       ],
-      primaryLight: ['pui:bg-transparent', 'pui:text-pui-interactive-primary']
+      primaryLight: [
+        'pui:text-pui-primary-9',
+        'pui:bg-pui-primary-2',
+        'pui:hover:bg-pui-primary-10',
+        'pui:hover:text-pui-primary-2'
+      ]
     },
     size: {
       small: 'pui:px-5 pui:py-1.5 pui:text-base pui:tracking-widest',
