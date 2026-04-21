@@ -14,7 +14,10 @@ import { cn } from '@perimetre/classnames';
 
 import { getBrandVariant } from '@/lib/brand-registry';
 
-import { imageSequence360BrandVariants } from './brands';
+import {
+  imageSequence360BadgeBrandVariants,
+  imageSequence360IconBrandVariants
+} from './brands';
 
 export type ImageSequence360Props = {
   /**
@@ -55,7 +58,8 @@ const ImageSequence360: React.FC<ImageSequence360Props> = ({
   const [sequence, setSequence] = useState<FastImageSequence | null>(null);
   const [didInteract, setDidInteract] = useState(false);
   const shouldReduceMotion = useReducedMotion();
-  const variants = getBrandVariant(imageSequence360BrandVariants);
+  const badgeVariants = getBrandVariant(imageSequence360BadgeBrandVariants);
+  const iconVariants = getBrandVariant(imageSequence360IconBrandVariants);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -143,25 +147,22 @@ const ImageSequence360: React.FC<ImageSequence360Props> = ({
             initial={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
           >
-            <div className={variants({ slot: 'badge' })}>
+            <div className={badgeVariants()}>
               <ArrowLeft
                 aria-hidden
-                className={variants({
-                  slot: 'icon',
+                className={iconVariants({
                   className: 'pui:size-3 pui:sm:size-4'
                 })}
               />
               <Hand
                 aria-hidden
-                className={variants({
-                  slot: 'icon',
+                className={iconVariants({
                   className: 'pui:size-4 pui:sm:size-5'
                 })}
               />
               <ArrowRight
                 aria-hidden
-                className={variants({
-                  slot: 'icon',
+                className={iconVariants({
                   className: 'pui:size-3 pui:sm:size-4'
                 })}
               />
