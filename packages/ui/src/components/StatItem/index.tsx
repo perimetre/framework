@@ -29,7 +29,7 @@ const StatItem: React.FC<StatItemProps> = ({
         <p className="pui:typo-tagline pui:text-pui-fg-muted">{eyebrow}</p>
       )}
       <div className="pui:flex pui:items-baseline pui:gap-2">
-        <span className="pui:typo-heading-2 pui:text-pui-fg-default">
+        <span className="pui:typo-heading-3 pui:sm:typo-heading-2 pui:text-pui-fg-default">
           {content}
         </span>
         {prepend && (

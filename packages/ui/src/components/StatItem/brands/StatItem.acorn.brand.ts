@@ -1,5 +1,13 @@
 import { cva } from '@/lib/cva';
 
 export const statItemAcornVariants = cva({
-  base: ['pui:flex', 'pui:flex-col', 'pui:gap-1']
+  base: [
+    'pui:flex',
+    'pui:flex-row',
+    'pui:gap-5',
+    'pui:justify-between',
+    'pui:md:flex-col',
+    'pui:md:gap-1',
+    'pui:md:justify-start'
+  ]
 });
