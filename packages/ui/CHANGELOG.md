@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.0.1
+
+### Patch Changes
+
+- 3bbc646: Bump version
+
 ## 16.0.0
 
 ### Major Changes
