@@ -61,14 +61,14 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
       {eyebrow && (
         <span
           className={cn(
-            'pui:inline-block pui:typo-tiny pui:lg:typo-base',
+            'pui:inline-block pui:typo-tiny pui:lg:typo-base pui:mb-5',
             eyebrowClassName
           )}
         >
           {eyebrow}
         </span>
       )}
-      <div className="pui:grid pui:gap-y-5 pui:lg:grid-cols-[1fr_auto] pui:lg:gap-x-5 pui:lg:items-start">
+      <div className="pui:grid pui:lg:grid-cols-[1fr_auto] pui:lg:gap-x-5 pui:lg:items-start">
         {title && (
           <TitleTag
             className={sectionHorizontalHeaderTitleVariants({ variant })}
