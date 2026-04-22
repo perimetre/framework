@@ -18,8 +18,8 @@ export const sectionCenteredHeaderTitleAcornVariants = cva({
   base: ['pui:font-pui-display'],
   variants: {
     variant: {
-      default: ['pui:typo-heading-2'],
-      h1: ['pui:typo-heading-1']
+      default: ['pui:text-[2.125rem] pui:md:typo-heading-2'],
+      h1: ['pui:text-[2.5rem] pui:md:typo-heading-1']
     }
   },
   defaultVariants: { variant: 'default' }
