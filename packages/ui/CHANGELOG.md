@@ -1,5 +1,17 @@
 # @perimetre/ui
 
+## 16.0.0
+
+### Major Changes
+
+- aa7061c: microbird brand variants for StatItem
+
+### Minor Changes
+
+- 0f87278: Add responsive font size to SectionCenteredHeader title
+- 1f47436: StatItem responsive layout
+- acfab60: Fixing mobile styles for section horizontal header
+
 ## 15.5.0
 
 ### Minor Changes
