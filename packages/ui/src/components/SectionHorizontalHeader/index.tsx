@@ -61,14 +61,14 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
       {eyebrow && (
         <span
           className={cn(
-            'pui:inline-block pui:typo-tiny pui:lg:typo-base pui:mb-5',
+            'pui:inline-block pui:typo-tiny pui:md:typo-base pui:mb-5',
             eyebrowClassName
           )}
         >
           {eyebrow}
         </span>
       )}
-      <div className="pui:grid pui:lg:grid-cols-[1fr_auto] pui:lg:gap-x-5 pui:lg:items-start">
+      <div className="pui:grid pui:md:grid-cols-[1fr_auto] pui:md:gap-x-5 pui:md:items-start">
         {title && (
           <TitleTag
             className={sectionHorizontalHeaderTitleVariants({ variant })}
@@ -78,7 +78,7 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
         )}
 
         {content && (
-          <div className="pui:text-sm pui:lg:typo-base pui:lg:row-span-2 pui:lg:max-w-81.25 pui:leading-[160%]">
+          <div className="pui:text-sm pui:md:typo-base pui:md:row-span-2 pui:md:max-w-81.25 pui:leading-[160%]">
             {content}
           </div>
         )}
@@ -86,7 +86,7 @@ function SectionHorizontalHeader<E extends React.ElementType = 'h2'>({
         {extra && (
           <div
             className={cn(
-              'pui:flex pui:justify-center pui:lg:justify-start',
+              'pui:flex pui:justify-center pui:md:justify-start',
               extraClassName
             )}
           >
