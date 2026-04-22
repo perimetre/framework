@@ -48,7 +48,7 @@
         "family": { "$value": "{pui.primitive.font.display}", "$type": "fontFamilies" }
       },
       "heading-2": {
-        "size": { "$value": "5rem", "$type": "fontSizes", "$description": "80px — Figma H2." },
+        "size": { "$value": "3.75rem", "$type": "fontSizes", "$description": "60px — Figma H2." },
         "leading": { "$value": "1.05", "$type": "lineHeights" },
         "weight": { "$value": "{pui.primitive.font.weight.semibold}", "$type": "fontWeights" },
         "tracking": { "$value": "-0.01em", "$type": "letterSpacing" },
