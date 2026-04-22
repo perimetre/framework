@@ -4,10 +4,6 @@ on:
   workflow_dispatch:
   pull_request:
     branches: [main]
-    paths:
-      - 'packages/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/ci.yml'
   push:
     branches: [main]
     paths:

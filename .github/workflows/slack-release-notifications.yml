@@ -1,0 +1,128 @@
+name: Slack Release Notifications
+
+# Sends Slack notifications for release lifecycle events:
+# - When the changeset bot opens a version candidate PR (needs approval to publish)
+#
+# Prerequisites:
+# - SLACK_BOT_TOKEN secret (organization or repository)
+#   Required scopes: chat:write.customize, users:read, users:read.email
+# - SLACK_CHANNEL_ID variable (organization or repository)
+
+on:
+  pull_request:
+    types: [opened]
+    branches:
+      - main
+
+jobs:
+  notify-version-candidate:
+    name: Notify Version Candidate PR
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+    # Only run for the changeset bot's version PR
+    if: |
+      github.event.pull_request.user.login == 'github-actions[bot]' &&
+      github.event.pull_request.head.ref == 'changeset-release/main'
+    steps:
+      - name: Build Slack message
+        id: message
+        uses: actions/github-script@v8
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          SERVER_URL: ${{ github.server_url }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const body = process.env.PR_BODY || '';
+            const prUrl = process.env.PR_URL;
+            const prNumber = process.env.PR_NUMBER;
+            const repo = process.env.REPO;
+            const serverUrl = process.env.SERVER_URL;
+            const npmToken = process.env.NPM_TOKEN;
+
+            // Determine semver bump type by comparing against the current registry version
+            function getBumpType(currentVersion, candidateVersion) {
+              if (!currentVersion) return 'New';
+              const [curMajor, curMinor] = currentVersion.split('.').map(Number);
+              const [newMajor, newMinor] = candidateVersion.split('.').map(Number);
+              if (newMajor !== curMajor) return 'Major';
+              if (newMinor !== curMinor) return 'Minor';
+              return 'Patch';
+            }
+
+            async function getLatestVersion(packageName) {
+              try {
+                const url = `https://npm.pkg.github.com/${packageName}`;
+                const res = await fetch(url, {
+                  headers: { Authorization: `Bearer ${npmToken}` }
+                });
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data['dist-tags']?.latest || null;
+              } catch {
+                return null;
+              }
+            }
+
+            // Parse the changeset PR body for package version bumps
+            // Actual format from changesets/action:
+            //   ## @perimetre/ui@15.3.0
+            const lines = body.split('\n');
+            const packages = [];
+
+            for (const line of lines) {
+              const match = line.match(/^## (@perimetre\/[\w-]+)@(\d+\.\d+\.\d+)/);
+              if (match) {
+                packages.push({ name: match[1], version: match[2] });
+              }
+            }
+
+            let summary;
+            if (packages.length > 0) {
+              const parts = [];
+              for (const p of packages) {
+                const current = await getLatestVersion(p.name);
+                const bump = getBumpType(current, p.version);
+                parts.push(`• \`${p.name}\` — *${bump}*: \`${p.version}\``);
+              }
+              summary = parts.join('\n');
+            } else {
+              summary = '_Check the PR for package version details._';
+            }
+
+            const blocks = [
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*🚀 New version candidate PR — <${prUrl}|approve to publish>*\n${summary}`
+                }
+              },
+              {
+                type: 'context',
+                elements: [
+                  {
+                    type: 'mrkdwn',
+                    text: `<${prUrl}|#${prNumber}> • \`changeset-release/main\` → \`main\` • <${serverUrl}/${repo}|${repo}>`
+                  }
+                ]
+              }
+            ];
+
+            core.setOutput('blocks', JSON.stringify(blocks));
+
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            {
+              "channel": "${{ vars.SLACK_CHANNEL_ID }}",
+              "text": "🚀 New version candidate PR — approve to publish",
+              "blocks": ${{ steps.message.outputs.blocks }}
+            }

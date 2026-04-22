@@ -1,5 +1,69 @@
 # @perimetre/ui
 
+## 15.5.0
+
+### Minor Changes
+
+- 658e1d6: Adding updated button colors
+- 53b6d19: Add `ImageSequence360` component — a 360° product spin viewer built on `@mediamonks/fast-image-sequence` and `@use-gesture/react`. Supports mouse drag, touch, and touchpad with axis-locked horizontal gestures, and resizes responsively with its container.
+- 658e1d6: Removed transparent variant
+
+## 15.4.0
+
+### Minor Changes
+
+- 748797c: Created Tabs Component
+- 866bb37: add PaginatedCarousel component to framework
+
+### Patch Changes
+
+- 748797c: Moved tab styles from base.css to tailwind.css
+
+## 15.3.0
+
+### Minor Changes
+
+- 58a4e5c: Created Tabs Component
+
+## 15.2.2
+
+### Patch Changes
+
+- 88e724a: fix SectionCenteredHeader : remove <p> for a <div>
+
+## 15.2.1
+
+### Patch Changes
+
+- Updated dependencies [5e03749]
+  - @perimetre/tokens@0.4.1
+
+## 15.2.0
+
+### Minor Changes
+
+- d683e3c: Add MagnifyImage component — wraps any image element and overlays a circular magnifying lens on hover/tap. Supports lensRadius, scale, className, and magnifierClassName props. Lens position is driven by CSS custom properties updated via rAF, bypassing React state for smooth per-frame tracking.
+
+## 15.1.0
+
+### Minor Changes
+
+- a3ab7d8: Changing p tag into span tag in eyebrow field
+- a3ab7d8: Created SectionHorizontalHeader component
+- a3ab7d8: Added mobile styles to SectionHorizontalHeader
+
+### Patch Changes
+
+- Updated dependencies [a3ab7d8]
+- Updated dependencies [a3ab7d8]
+  - @perimetre/tokens@0.4.0
+
+## 15.0.0
+
+### Major Changes
+
+- ce62430: microbird brand variants for StatItem
+
 ## 14.4.0
 
 ### Minor Changes

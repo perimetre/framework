@@ -2,6 +2,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@ladle/react": "^5.1.1",
+    "@mediamonks/fast-image-sequence": "^2.0.1",
     "@perimetre/classnames": "workspace:*",
     "@perimetre/helpers": "workspace:*",
     "@perimetre/icons": "workspace:*",
@@ -11,6 +12,7 @@
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
+    "@use-gesture/react": "^10.3.1",
     "cva": "1.0.0-beta.4",
     "embla-carousel": "^8.6.0",
     "embla-carousel-class-names": "^8.6.0",
@@ -120,5 +122,5 @@
   ],
   "type": "module",
   "types": "./dist/index.d.ts",
-  "version": "14.4.0"
+  "version": "15.5.0"
 }

@@ -61,7 +61,7 @@ export const WithExtra: Story<SectionHorizontalHeaderProps> = () => (
       </p>
     }
     extra={
-      <div className="pui:flex pui:gap-2 pui:mt-4">
+      <div className="pui:flex pui:gap-2">
         <Button variant="primary">Primary Action</Button>
         <Button variant="outline">Secondary Action</Button>
       </div>

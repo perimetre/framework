@@ -21,10 +21,11 @@
       "color": {
         "$type": "color",
         "primary": {
-          "$description": "Microbird School Yellow — limited palette from Figma. Steps 1, 9, 10 mapped; others inherit from Acorn base.",
+          "$description": "Microbird School Yellow — limited palette from Figma. Steps 1-2, 9-10 mapped; others inherit from Acorn base.",
           "1": { "$value": "#FFFEF9", "$description": "Warm-tinted light background (Figma: Background)." },
-          "9": { "$value": "#FEE44E", "$description": "Hero yellow (Figma: bg dark / lighter highlight)." },
-          "10": { "$value": "#FFB700", "$description": "Darker yellow for hover/active states (Figma: darker highlight)." }
+          "2": { "$value": "#FEF6DE", "$description": "Subtle warm cream (Figma: Light brand)." },
+          "9": { "$value": "#FEE44E", "$description": "Hero yellow (Figma: Highlight light)." },
+          "10": { "$value": "#FFB700", "$description": "Darker yellow for hover/active states (Figma: Highlight medium)." }
         },
         "overlay": {
           "$description": "Microbird shared neutral gray (from Generic palette). Pure neutral — no warm sand tint like Acorn. Only steps 1, 3, 12 provided; others inherit from Acorn.",
