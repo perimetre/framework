@@ -12,6 +12,15 @@ import FieldUpper, { type FieldUpperProps } from '../FieldUpper';
 
 export type FieldGooglePlacesAutocompleteProps = {
   containerClassName?: string;
+  /**
+   * Pre-fill the input with a string. The SSR placeholder renders this value
+   * immediately so it paints before the Google Places library finishes loading;
+   * once the web component mounts, the same value is written into its shadow
+   * DOM input. The user can still clear or overwrite it to trigger autocomplete.
+   *
+   * Only applied on initial mount — not a controlled value.
+   */
+  defaultValue?: string;
   disabled?: boolean;
   /**
    * Fields to fetch from the selected place.
@@ -477,6 +486,7 @@ const FieldGooglePlacesAutocomplete: React.FC<
 > = ({
   containerClassName,
   corner,
+  defaultValue,
   description,
   disabled,
   error,
@@ -610,6 +620,23 @@ const FieldGooglePlacesAutocomplete: React.FC<
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
+
+  // Mirror `defaultValue` into the shadow DOM input once the web component
+  // is ready, so pre-filled text (e.g. an existing saved address) shows
+  // in the interactive input after Google's library takes over. Only runs
+  // on mount — later prop changes are ignored, matching HTML semantics.
+  const didApplyDefaultValueRef = useRef(false);
+  useEffect(() => {
+    if (didApplyDefaultValueRef.current) return;
+    if (!isLoaded || !autocompleteRef.current || !defaultValue) return;
+    const shadowInput =
+      autocompleteRef.current.shadowRoot?.querySelector('input');
+    if (!shadowInput) return;
+    if (!shadowInput.value) {
+      shadowInput.value = defaultValue;
+    }
+    didApplyDefaultValueRef.current = true;
+  }, [isLoaded, defaultValue]);
 
   // Handle place selection events
   useEffect(() => {
@@ -770,11 +797,15 @@ const FieldGooglePlacesAutocomplete: React.FC<
           })}
         >
           {/* Placeholder input — defines the container height and shows
-              during SSR / before Google API loads */}
+              during SSR / before Google API loads. When a defaultValue is
+              supplied we render it visibly so pre-filled text paints on
+              first render; the gmp web component overlays this input
+              once it mounts. */}
           <input
             aria-hidden
             disabled
-            className="pui:invisible"
+            className={isLoaded || !defaultValue ? 'pui:invisible' : undefined}
+            defaultValue={defaultValue}
             placeholder={isLoaded ? undefined : placeholder}
             tabIndex={-1}
             style={{

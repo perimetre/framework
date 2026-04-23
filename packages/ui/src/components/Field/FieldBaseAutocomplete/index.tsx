@@ -165,6 +165,11 @@ function FieldBaseAutocomplete<T extends AutocompleteItem>({
     <Combobox<T> {...comboboxProps}>
       <ComboboxInput<T>
         aria-invalid={!!error || undefined}
+        // HeadlessUI only resolves displayValue on the client, so SSR
+        // renders the input with no value attribute even when a selection
+        // is known. Passing defaultValue here lets the server-rendered
+        // HTML carry the label, eliminating the hydration flash.
+        defaultValue={getDisplayValue(value ?? defaultValue ?? null)}
         displayValue={getDisplayValue}
         id={`${name}-input`}
         placeholder={placeholder}
