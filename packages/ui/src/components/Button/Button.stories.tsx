@@ -18,7 +18,7 @@ export default {
       defaultValue: 'default'
     },
     variant: {
-      options: ['primary', 'outline', 'primaryLight'],
+      options: ['primary', 'secondary', 'outline', 'primaryLight'],
       control: { type: 'select' },
       defaultValue: 'primary'
     }
@@ -35,6 +35,12 @@ export const Primary = DefaultComp.bind({});
 Primary.args = {
   label: 'Shop Now',
   variant: 'primary'
+};
+
+export const Secondary = DefaultComp.bind({});
+Secondary.args = {
+  label: 'Shop Now',
+  variant: 'secondary'
 };
 
 export const Outline = DefaultComp.bind({});
@@ -65,6 +71,9 @@ export const AllVariants: Story<Props> = ({ label = 'Shop Now', ...props }) => (
     }}
   >
     <Button {...props} variant="primary">
+      {label}
+    </Button>
+    <Button {...props} variant="secondary">
       {label}
     </Button>
     <Button {...props} variant="outline">
