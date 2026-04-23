@@ -19,7 +19,6 @@ Always anchor on these files. They are the source of truth — if this skill dis
 
 | When you need to…                                                  | Read                                                            |
 | ------------------------------------------------------------------ | --------------------------------------------------------------- |
-| Understand the token architecture philosophy                       | `packages/ui/docs/design-token-guide.md`                        |
 | See the narrative design-token doc (what designers/devs both read) | `packages/ui/src/docs/DesignTokens.stories.mdx`                 |
 | Check the naming conventions (`pui` namespace, hierarchy)          | `packages/ui/src/docs/TokenNamingConventions.stories.mdx`       |
 | Understand the tokens package architecture & build pipeline        | `packages/tokens/README.md`                                     |
