@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.2.2
+
+### Patch Changes
+
+- 1a6e40f: Adds defaultValue to fields
+
 ## 16.2.1
 
 ### Patch Changes
