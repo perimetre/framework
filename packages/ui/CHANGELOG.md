@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.1.0
+
+### Minor Changes
+
+- 5b6b747: Update StatItem Styling and add secondary variant button
+
 ## 16.0.1
 
 ### Patch Changes
