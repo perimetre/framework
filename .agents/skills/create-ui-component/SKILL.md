@@ -22,7 +22,8 @@ These files are the source of truth. Read them before designing the component â€
 | When you need toâ€¦                                              | Read                                                            |
 | -------------------------------------------------------------- | --------------------------------------------------------------- |
 | Understand the overall UI contribution workflow                | `packages/ui/CONTRIBUTING.md`                                   |
-| Understand the three-tier token architecture                   | `packages/ui/docs/design-token-guide.md`                        |
+| Understand the three-tier token architecture (narrative)       | `packages/ui/src/docs/DesignTokens.stories.mdx`                 |
+| Check naming conventions (`pui` namespace, hierarchy)          | `packages/ui/src/docs/TokenNamingConventions.stories.mdx`       |
 | Check existing semantic token vocabulary                       | `packages/ui/src/brands/tailwind.css` (`@theme inline` block)   |
 | Check the current brand list                                   | `packages/ui/src/brands/index.ts`                               |
 | Review the CVA wrapper (`cva`, `compose`, twMerge hook)        | `packages/ui/src/lib/cva/index.ts`                              |
