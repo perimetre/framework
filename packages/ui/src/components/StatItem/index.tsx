@@ -24,11 +24,7 @@ const StatItem: React.FC<StatItemProps> = ({
   const statItemVariants = getBrandVariant(statItemBrandVariants);
 
   return (
-    <div
-      className={statItemVariants({
-        className: `pui:py-3.5 pui:border-b pui:border-pui-overlay-12/20 pui:md:border-b-0 ${className ?? ''}`
-      })}
-    >
+    <div className={statItemVariants({ className })}>
       {eyebrow && (
         <p className="pui:typo-tagline pui:text-pui-fg-muted">{eyebrow}</p>
       )}
