@@ -139,7 +139,7 @@ function FieldBaseAutocomplete<T extends AutocompleteItem>({
   /** Renders a single combobox option row. */
   const renderOptions = (item: T) => (
     <ComboboxOption key={item.id} className={optionVariants()} value={item}>
-      {renderItem ? renderItem(item) : getDisplayValue(item)}
+      <>{renderItem ? renderItem(item) : getDisplayValue(item)}</>
     </ComboboxOption>
   );
 
@@ -179,23 +179,31 @@ function FieldBaseAutocomplete<T extends AutocompleteItem>({
         }
       />
 
-      <ComboboxOptions {...optionsPanelProps}>
-        {isLoading ? (
+      {isLoading ? (
+        <ComboboxOptions {...optionsPanelProps}>
           <div className="pui:flex pui:items-center pui:justify-center pui:py-4">
             <Loader2 className="pui:size-5 pui:animate-spin pui:text-pui-fg-muted" />
           </div>
-        ) : isVirtual ? (
-          ({ option }: { option: T }) => renderOptions(option)
-        ) : items.length === 0 ? (
-          (emptyState ?? (
-            <div className="pui:px-3 pui:py-2 pui:text-sm pui:text-pui-fg-muted">
-              No results found
-            </div>
-          ))
-        ) : (
-          items.map((item) => renderOptions(item))
-        )}
-      </ComboboxOptions>
+        </ComboboxOptions>
+      ) : isVirtual ? (
+        <ComboboxOptions {...optionsPanelProps}>
+          {({ option }: { option: T }) => renderOptions(option)}
+        </ComboboxOptions>
+      ) : items.length === 0 ? (
+        <ComboboxOptions {...optionsPanelProps}>
+          <>
+            {emptyState ?? (
+              <div className="pui:px-3 pui:py-2 pui:text-sm pui:text-pui-fg-muted">
+                No results found
+              </div>
+            )}
+          </>
+        </ComboboxOptions>
+      ) : (
+        <ComboboxOptions {...optionsPanelProps}>
+          {items.map((item) => renderOptions(item))}
+        </ComboboxOptions>
+      )}
     </Combobox>
   );
 }
