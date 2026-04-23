@@ -14,16 +14,7 @@
  */
 
 import { type Brand, BRANDS, DEFAULT_BRAND } from '@/brands';
-import * as React from 'react';
-
-// `cache` is stable in React 19 but not yet declared in @types/react 18.
-// Resolve it defensively so the module also no-ops under older React.
-const cache =
-  (
-    React as unknown as {
-      cache?: <T extends (...args: never[]) => unknown>(fn: T) => T;
-    }
-  ).cache ?? (<T extends (...args: never[]) => unknown>(fn: T): T => fn);
+import { cache } from 'react';
 
 export type BrandVariants<T> = { acorn: T } & Partial<
   Record<Exclude<Brand, 'acorn'>, T>
