@@ -30,7 +30,7 @@ export const buttonAcornVariants = cva({
         'pui:hover:bg-pui-button-hover'
       ],
       secondary: [
-        'pui:bg-pui-overlay-12',
+        'pui:bg-black',
         'pui:text-pui-interactive-on-primary',
         'pui:shadow-pui-button',
         'pui:hover:bg-pui-interactive-primary'
