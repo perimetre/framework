@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.2.0
+
+### Minor Changes
+
+- 8bcbdda: fix(ui/button): use bg-black for secondary variant
+
 ## 16.1.0
 
 ### Minor Changes
