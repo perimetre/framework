@@ -29,6 +29,12 @@ export const buttonAcornVariants = cva({
         'pui:shadow-pui-button',
         'pui:hover:bg-pui-button-hover'
       ],
+      secondary: [
+        'pui:bg-pui-overlay-12',
+        'pui:text-pui-interactive-on-primary',
+        'pui:shadow-pui-button',
+        'pui:hover:bg-pui-interactive-primary'
+      ],
       outline: [
         'pui:bg-transparent',
         'pui:text-pui-interactive-primary',
