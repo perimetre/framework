@@ -167,9 +167,11 @@ function FieldBaseAutocomplete<T extends AutocompleteItem>({
         aria-invalid={!!error || undefined}
         // HeadlessUI only resolves displayValue on the client, so SSR
         // renders the input with no value attribute even when a selection
-        // is known. Passing defaultValue here lets the server-rendered
-        // HTML carry the label, eliminating the hydration flash.
-        defaultValue={getDisplayValue(value ?? defaultValue ?? null)}
+        // is known. ComboboxInput's resolution prefers a non-null prop
+        // `defaultValue` over running displayValue itself, so we precompute
+        // the display string here. The cast is needed because the prop is
+        // typed as `T` even though the value forwarded to the underlying
+        // <input> ends up as a string.
         displayValue={getDisplayValue}
         id={`${name}-input`}
         placeholder={placeholder}
@@ -179,6 +181,9 @@ function FieldBaseAutocomplete<T extends AutocompleteItem>({
           leading,
           trailing
         })}
+        defaultValue={
+          getDisplayValue(value ?? defaultValue ?? null) as unknown as T
+        }
         onChange={
           isReadOnly ? undefined : (e) => onQueryChange?.(e.target.value)
         }
