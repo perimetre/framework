@@ -1,38 +1,46 @@
 /**
- * RSC-compatible brand registry.
+ * Brand registry that's safe for concurrent server rendering AND for the
+ * client-component SSR pass.
  *
- * Concurrent server rendering (Next.js RSC, Cache Components, parallel
- * prerenders) runs many requests through the same JS module instance.
- * A plain module-level `activeBrand` variable races across those requests
- * and produces HTML whose Button/CVA classes don't match the body's
- * `data-pui-brand` attribute. To avoid that we keep the mutable brand
- * inside a `cache()`-scoped ref on the server (per-request) and a plain
- * module variable on the client (single-threaded per tab).
+ * Why not `react`'s `cache()` ref?
+ *   - `cache()` only has a working scope inside an active React Server
+ *     Component render. The SSR pass for client components — and module-load
+ *     code — runs outside that scope, so `setActiveBrand` is silently dropped
+ *     and `getActiveBrand` returns the default. This caused hydration
+ *     mismatches: the RSC tree saw the brand, but the SSR'd HTML for client
+ *     components rendered with the default brand and the client hydration
+ *     used the real one.
  *
- * Public API is unchanged — `setActiveBrand`/`getActiveBrand`/
- * `getBrandVariant` still work as before, they're just concurrency-safe.
+ * Why `AsyncLocalStorage`?
+ *   - It propagates through the whole server request — RSC render, client
+ *     component SSR, and any awaited code in between — so every render sees
+ *     the same brand. It's also concurrency-safe across simultaneous
+ *     requests, which is the property the `cache()` ref was added to provide.
+ *
+ * On the client we keep a plain module variable: each tab is single-threaded.
  */
 
 import { type Brand, BRANDS, DEFAULT_BRAND } from '@/brands';
-import { cache } from 'react';
+import { AsyncLocalStorage } from 'node:async_hooks';
 
 export type BrandVariants<T> = { acorn: T } & Partial<
   Record<Exclude<Brand, 'acorn'>, T>
 >;
 
-type BrandRef = { current: Brand };
-
 const IS_SERVER = typeof window === 'undefined';
 
-// Per-request ref on the server. React dedupes this call within a single
-// request, so every caller in that render sees the same object.
-const getServerBrandRef: () => BrandRef = cache(
-  (): BrandRef => ({ current: DEFAULT_BRAND })
-);
+type BrandStore = { current: Brand };
 
-// Client bundle singleton. `cache()` is server-only (it throws when invoked
-// from a client render), so on the client we keep the active brand in a
-// plain module variable — safe because each tab is single-threaded.
+// One ALS instance per server module instance. Each request enters its own
+// store via `setActiveBrand`, so concurrent requests don't see each other.
+const serverStorage: AsyncLocalStorage<BrandStore> | null = IS_SERVER
+  ? new AsyncLocalStorage<BrandStore>()
+  : null;
+
+// Fallback for code that runs before any `setActiveBrand` enters a store
+// (module-load on the server, or a request that never set a brand).
+let serverFallbackBrand: Brand = DEFAULT_BRAND;
+
 let clientBrand: Brand = DEFAULT_BRAND;
 
 /**
@@ -40,7 +48,8 @@ let clientBrand: Brand = DEFAULT_BRAND;
  * Works in both Server and Client Components.
  */
 export function getActiveBrand(): Brand {
-  return IS_SERVER ? getServerBrandRef().current : clientBrand;
+  if (!IS_SERVER) return clientBrand;
+  return serverStorage?.getStore()?.current ?? serverFallbackBrand;
 }
 
 /**
@@ -61,9 +70,13 @@ export function isValidBrand(brand?: string): brand is Brand {
 /**
  * Set the active brand for this render/request.
  *
- * Call from the brand-scoped layout before rendering children. On the
- * server this scopes to the current request via `cache()`; on the client
- * this updates a module singleton.
+ * Server: writes into the current AsyncLocalStorage store, or — if there is
+ * no store yet for this request — enters a new one so subsequent renders in
+ * the same async context observe the brand. Also updates a module-level
+ * fallback so module-load callers (which run outside any request) don't
+ * silently get the default.
+ *
+ * Client: updates a module singleton.
  */
 export function setActiveBrand(brand?: Brand) {
   const valid = isValidBrand(brand);
@@ -74,8 +87,16 @@ export function setActiveBrand(brand?: Brand) {
     );
   }
   if (IS_SERVER) {
-    const ref: BrandRef = getServerBrandRef();
-    ref.current = resolved;
+    serverFallbackBrand = resolved;
+    const existing = serverStorage?.getStore();
+    if (existing) {
+      existing.current = resolved;
+    } else {
+      // Enter a store for the rest of this async context. Synchronous code
+      // immediately after this call will observe the new brand; awaited
+      // code propagates the store automatically.
+      serverStorage?.enterWith({ current: resolved });
+    }
   } else {
     clientBrand = resolved;
   }
