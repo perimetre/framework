@@ -21,7 +21,6 @@
  */
 
 import { type Brand, BRANDS, DEFAULT_BRAND } from '@/brands';
-import { AsyncLocalStorage } from 'node:async_hooks';
 
 export type BrandVariants<T> = { acorn: T } & Partial<
   Record<Exclude<Brand, 'acorn'>, T>
@@ -29,13 +28,30 @@ export type BrandVariants<T> = { acorn: T } & Partial<
 
 const IS_SERVER = typeof window === 'undefined';
 
+type AsyncLocalStorageLike<T> = {
+  enterWith(store: T): void;
+  getStore(): T | undefined;
+};
+
 type BrandStore = { current: Brand };
 
-// One ALS instance per server module instance. Each request enters its own
-// store via `setActiveBrand`, so concurrent requests don't see each other.
-const serverStorage: AsyncLocalStorage<BrandStore> | null = IS_SERVER
-  ? new AsyncLocalStorage<BrandStore>()
-  : null;
+// Resolve `node:async_hooks` lazily through `Function('return require')` so
+// browser bundlers (Ladle/Vite client builds) don't try to resolve it at
+// static analysis time and replace it with their empty browser shim. On the
+// client we don't need ALS — module state is single-threaded per tab.
+const serverStorage: AsyncLocalStorageLike<BrandStore> | null = (() => {
+  if (!IS_SERVER) return null;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    const req = new Function('m', 'return require(m)') as (id: string) => {
+      AsyncLocalStorage: new <T>() => AsyncLocalStorageLike<T>;
+    };
+    const mod = req('node:async_hooks');
+    return new mod.AsyncLocalStorage<BrandStore>();
+  } catch {
+    return null;
+  }
+})();
 
 // Fallback for code that runs before any `setActiveBrand` enters a store
 // (module-load on the server, or a request that never set a brand).

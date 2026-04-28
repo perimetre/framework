@@ -97,10 +97,7 @@ export default defineConfig({
         ...externalDeps.map(
           (dep) =>
             new RegExp(`^${dep.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\/`)
-        ),
-        // Keep Node built-ins (e.g. `node:async_hooks`) as real imports so
-        // they aren't replaced with vite's empty browser-external shim.
-        /^node:/
+        )
       ],
       output: [
         {
