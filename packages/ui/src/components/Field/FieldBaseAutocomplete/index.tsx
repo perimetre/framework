@@ -167,10 +167,11 @@ function FieldBaseAutocomplete<T extends AutocompleteItem>({
         aria-invalid={!!error || undefined}
         // HeadlessUI only resolves displayValue on the client, so SSR
         // renders the input with no value attribute even when a selection
-        // is known. Forward the resolved display string to the underlying
-        // <input>'s `defaultValue` attribute via the typed prop — the cast
-        // is needed because `ComboboxInput<T>` types `defaultValue` as `T`,
-        // but at runtime it's passed straight through to the HTML input.
+        // is known. ComboboxInput's resolution prefers a non-null prop
+        // `defaultValue` over running displayValue itself, so we precompute
+        // the display string here. The cast is needed because the prop is
+        // typed as `T` even though the value forwarded to the underlying
+        // <input> ends up as a string.
         displayValue={getDisplayValue}
         id={`${name}-input`}
         placeholder={placeholder}
