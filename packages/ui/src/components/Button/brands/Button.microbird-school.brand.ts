@@ -20,8 +20,7 @@ export const buttonMicroBirdSchoolVariants = cva({
       secondary: [
         'pui:bg-black',
         'pui:text-pui-primary-2',
-        'pui:hover:bg-pui-interactive-primary',
-        'pui:hover:text-pui-overlay-12'
+        'pui:hover:bg-pui-interactive-primary'
       ],
       outline: [
         'pui:border-pui-button-secondary-outline',
