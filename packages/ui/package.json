@@ -122,5 +122,5 @@
   ],
   "type": "module",
   "types": "./dist/index.d.ts",
-  "version": "16.2.3"
+  "version": "16.2.5"
 }
