@@ -18,8 +18,8 @@ export const sectionHorizontalHeaderTitleAcornVariants = cva({
   base: ['pui:font-pui-display pui:uppercase pui:mb-2'],
   variants: {
     variant: {
-      default: ['pui:text-[2.5rem] pui:md:typo-heading-1'],
-      compact: ['pui:text-[2.125rem] pui:md:typo-heading-2']
+      default: ['pui:text-[2.5rem] pui:md:typo-heading-1 pui:leading-[1.05]'],
+      compact: ['pui:text-[2.125rem] pui:md:typo-heading-2  pui:leading-[1.05]']
     }
   },
   defaultVariants: { variant: 'default' }

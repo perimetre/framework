@@ -15,11 +15,11 @@ export const sectionCenteredHeaderAcornVariants = cva({
 });
 
 export const sectionCenteredHeaderTitleAcornVariants = cva({
-  base: ['pui:font-pui-display'],
+  base: ['pui:font-pui-display pui:uppercase'],
   variants: {
     variant: {
-      default: ['pui:text-[2.125rem] pui:md:typo-heading-2'],
-      h1: ['pui:text-[2.5rem] pui:md:typo-heading-1']
+      default: ['pui:text-[2.125rem] pui:leading-[1.05] pui:md:typo-heading-2'],
+      h1: ['pui:text-[2.5rem] pui:leading-[1.05] pui:md:typo-heading-1']
     }
   },
   defaultVariants: { variant: 'default' }
