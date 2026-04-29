@@ -11,7 +11,12 @@ export const buttonMicroBirdCommercialVariants = cva({
   base: 'pui:normal-case pui:font-light pui:text-xs pui:lg:text-sm pui:px-5',
   variants: {
     variant: {
-      primary: [],
+      primary: [
+        'pui:bg-pui-primary-9',
+        'pui:text-pui-overlay-1',
+        'pui:hover:bg-pui-primary-10',
+        'pui:hover:text-pui-overlay-1'
+      ],
       secondary: [
         'pui:bg-black',
         'pui:text-pui-interactive-on-primary',
@@ -21,7 +26,11 @@ export const buttonMicroBirdCommercialVariants = cva({
         'pui:border-pui-button-secondary-outline',
         'pui:text-pui-primary-9'
       ],
-      primaryLight: []
+      primaryLight: [
+        'pui:bg-pui-overlay-1',
+        'pui:text-pui-primary-9',
+        'pui:hover:bg-pui-primary-2'
+      ]
     },
     size: {
       small: '',
