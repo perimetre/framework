@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.2.5
+
+### Patch Changes
+
+- adee8b5: fix(button): fill in microbird-commercial primary and primaryLight variants so buttons render correctly instead of unstyled
+
 ## 16.2.4
 
 ### Patch Changes
