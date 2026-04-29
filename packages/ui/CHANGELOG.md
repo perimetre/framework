@@ -1,5 +1,13 @@
 # @perimetre/ui
 
+## 16.2.6
+
+### Patch Changes
+
+- b129d90: Standardizing button font sizes for both commercial and school brands
+- b129d90: Added line-height styling for mobile on Section Headers
+- b129d90: Fixing tabs border spacing
+
 ## 16.2.5
 
 ### Patch Changes
