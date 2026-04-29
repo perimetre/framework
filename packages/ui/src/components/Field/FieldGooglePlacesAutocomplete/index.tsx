@@ -530,6 +530,11 @@ const FieldGooglePlacesAutocomplete: React.FC<
   useLayoutEffect(() => {
     if (disabled || autocompleteRef.current) return;
 
+    // Track whether this effect run has been cleaned up. Under StrictMode (and
+    // any remount race) the async setup may resolve after cleanup, which would
+    // otherwise append an orphan element with no ref to remove it.
+    let cancelled = false;
+
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const originalAttachShadow = Element.prototype.attachShadow;
     originalAttachShadowRef.current = originalAttachShadow;
@@ -565,7 +570,7 @@ const FieldGooglePlacesAutocomplete: React.FC<
 
         await importLibrary('places');
 
-        if (!containerRef.current) return;
+        if (cancelled || !containerRef.current) return;
 
         const element = new window.google.maps.places.PlaceAutocompleteElement({
           ...(requestedLanguage && { requestedLanguage }),
@@ -610,9 +615,17 @@ const FieldGooglePlacesAutocomplete: React.FC<
 
     void setup();
 
+    const container = containerRef.current;
+
     return () => {
+      cancelled = true;
       autocompleteRef.current?.remove();
       autocompleteRef.current = null;
+      // Belt-and-braces: also drop any orphan gmp-place-autocomplete nodes
+      // that a racing setup() may have appended after the ref was cleared.
+      container?.querySelectorAll('gmp-place-autocomplete').forEach((el) => {
+        el.remove();
+      });
       setIsLoaded(false);
       if (originalAttachShadowRef.current) {
         Element.prototype.attachShadow = originalAttachShadowRef.current;
