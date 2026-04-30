@@ -1,0 +1,53 @@
+/**
+ * Animations for the Collapse component.
+ * Hooks into Radix Accordion's --radix-accordion-content-height CSS variable
+ * so we can animate from 0 → measured intrinsic height (and back) without JS.
+ */
+
+@keyframes pui-collapse-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes pui-collapse-up {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+.pui-collapse-content {
+  overflow: hidden;
+}
+
+.pui-collapse-content[data-state='open'] {
+  animation: pui-collapse-down 300ms cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.pui-collapse-content[data-state='closed'] {
+  animation: pui-collapse-up 300ms cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+/* Plus → minus icon: rotate the vertical bar to align with the horizontal one. */
+.pui-collapse-icon-bar {
+  transform-origin: center;
+  transition:
+    transform 300ms cubic-bezier(0.215, 0.61, 0.355, 1),
+    opacity 300ms cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+[data-state='open'] > .pui-collapse-icon-bar,
+[data-state='open'] .pui-collapse-icon-bar {
+  transform: rotate(90deg);
+  opacity: 0;
+}
