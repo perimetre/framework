@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.2.8
+
+### Patch Changes
+
+- 7bba9c2: Fix avoid intercepting events on drawer
+
 ## 16.2.7
 
 ### Patch Changes
