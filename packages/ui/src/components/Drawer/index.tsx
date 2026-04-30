@@ -152,10 +152,6 @@ export const DrawerContent: React.FC<PropsWithChildren<DrawerContentProps>> = ({
               duration: 0.37,
               ease: cubicBezier(0.215, 0.61, 0.355, 1)
             }}
-            onClick={(e: React.MouseEvent) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
           >
             {children}
           </m.div>
