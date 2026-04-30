@@ -66,46 +66,6 @@ export const Default = DefaultComp.bind({});
 export const OpenByDefault = DefaultComp.bind({});
 OpenByDefault.args = { defaultOpen: true };
 
-export const StackedList: Story<Props> = () => (
-  <div className="pui:max-w-2xl pui:flex pui:flex-col">
-    {[
-      {
-        eyebrow: 'Shipping',
-        title: 'When will my order arrive?',
-        body: 'Orders ship within 1–2 business days and arrive in 3–5 business days.'
-      },
-      {
-        eyebrow: 'Returns',
-        title: 'What is your return policy?',
-        body: 'Free returns within 30 days of delivery. Items must be unworn with tags attached.'
-      },
-      {
-        eyebrow: 'Account',
-        title: 'How do I update my subscription?',
-        body: 'Sign in to your account and visit the Subscription page to pause, skip, or cancel.'
-      },
-      {
-        eyebrow: 'Support',
-        title: 'How do I contact customer service?',
-        body: 'Reach our team 7 days a week via the chat widget, or email support@example.com — we typically reply within a few hours.'
-      }
-    ].map((item) => (
-      <Collapse key={item.title}>
-        <CollapseTrigger>
-          <CollapseHeading>
-            <CollapseEyebrow>{item.eyebrow}</CollapseEyebrow>
-            <CollapseTitle>{item.title}</CollapseTitle>
-          </CollapseHeading>
-          <CollapseIcon />
-        </CollapseTrigger>
-        <CollapseContent>
-          <p>{item.body}</p>
-        </CollapseContent>
-      </Collapse>
-    ))}
-  </div>
-);
-
 export const RichTextBody: Story<Props> = () => (
   <div className="pui:max-w-2xl">
     <Collapse defaultOpen>
