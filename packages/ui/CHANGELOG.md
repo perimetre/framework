@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.2.7
+
+### Patch Changes
+
+- cadf667: keep black bg and switch text to white on hover for microbird secondary
+
 ## 16.2.6
 
 ### Patch Changes
