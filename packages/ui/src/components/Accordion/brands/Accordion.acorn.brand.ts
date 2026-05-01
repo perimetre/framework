@@ -5,7 +5,8 @@ import { cva } from '@/lib/cva';
  * Uses semantic tokens for themeable properties:
  * - text-pui-fg-*: title/body/eyebrow colors
  * - border-pui-border-accordion-*: per-position dividers (first / between / last)
- * - typo-accordion-*: title and content typography
+ * - --pui-typo-accordion-*: title and content typography (applied inline
+ *   below — these tokens are accordion-specific, so no `@utility` is needed)
  */
 export const accordionAcornVariants = cva({
   base: [
@@ -35,7 +36,15 @@ export const accordionEyebrowAcornVariants = cva({
 });
 
 export const accordionTitleAcornVariants = cva({
-  base: ['pui:typo-accordion-title pui:text-pui-fg-default']
+  base: [
+    'pui:text-pui-fg-default',
+    'pui:font-(family-name:--pui-typo-accordion-title-family,var(--pui-primitive-font-sans))',
+    'pui:text-(length:--pui-typo-accordion-title-size)',
+    'pui:leading-(--pui-typo-accordion-title-leading)',
+    'pui:font-(--pui-typo-accordion-title-weight)',
+    'pui:tracking-(--pui-typo-accordion-title-tracking)',
+    'pui:[text-transform:var(--pui-typo-accordion-title-transform)]'
+  ]
 });
 
 export const accordionIconAcornVariants = cva({
@@ -63,7 +72,13 @@ export const accordionContentAcornVariants = cva({
 
 export const accordionContentInnerAcornVariants = cva({
   base: [
-    'pui:typo-accordion-content pui:text-pui-fg-body pui:pb-4',
+    'pui:text-pui-fg-body pui:pb-4',
+    'pui:font-(family-name:--pui-typo-accordion-content-family,var(--pui-primitive-font-sans))',
+    'pui:text-(length:--pui-typo-accordion-content-size)',
+    'pui:leading-(--pui-typo-accordion-content-leading)',
+    'pui:font-(--pui-typo-accordion-content-weight)',
+    'pui:tracking-(--pui-typo-accordion-content-tracking)',
+    'pui:[text-transform:var(--pui-typo-accordion-content-transform)]',
     'pui:animate-in pui:fade-in pui:duration-pui-normal pui:delay-75 pui:fill-mode-both pui:ease-pui-out-quad',
     'pui:motion-reduce:animate-none'
   ]

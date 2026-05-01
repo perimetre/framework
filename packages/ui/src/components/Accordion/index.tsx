@@ -66,11 +66,11 @@ export type AccordionTriggerProps = {
 /**
  * Toggles the accordion item open/closed. Wraps the heading and icon.
  * Rendered inside an Accordion.Header. Pass `headingLevel` to align with
- * the surrounding document outline (defaults to `h3`).
+ * the surrounding document outline (defaults to `h4`).
  */
 export const AccordionTrigger: React.FC<
   PropsWithChildren<AccordionTriggerProps>
-> = ({ children, className, headingLevel = 'h3', ...props }) => {
+> = ({ children, className, headingLevel = 'h4', ...props }) => {
   const variants = getBrandVariant(accordionTriggerBrandVariants);
   const Heading = headingLevel;
   return (
