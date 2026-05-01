@@ -1,5 +1,4 @@
 import { type BrandVariants } from '@/lib/brand-registry';
-import { compose } from '@/lib/cva';
 import { type VariantProps } from 'cva';
 import {
   accordionAcornVariants,
@@ -12,135 +11,41 @@ import {
   accordionTitleAcornVariants,
   accordionTriggerAcornVariants
 } from './Accordion.acorn.brand';
-import {
-  accordionContentInnerMicroBirdCommercialVariants,
-  accordionContentMicroBirdCommercialVariants,
-  accordionEyebrowMicroBirdCommercialVariants,
-  accordionHeadingMicroBirdCommercialVariants,
-  accordionIconBarMicroBirdCommercialVariants,
-  accordionIconMicroBirdCommercialVariants,
-  accordionMicroBirdCommercialVariants,
-  accordionTitleMicroBirdCommercialVariants,
-  accordionTriggerMicroBirdCommercialVariants
-} from './Accordion.microbird-commercial.brand';
-import {
-  accordionContentInnerMicroBirdSchoolVariants,
-  accordionContentMicroBirdSchoolVariants,
-  accordionEyebrowMicroBirdSchoolVariants,
-  accordionHeadingMicroBirdSchoolVariants,
-  accordionIconBarMicroBirdSchoolVariants,
-  accordionIconMicroBirdSchoolVariants,
-  accordionMicroBirdSchoolVariants,
-  accordionTitleMicroBirdSchoolVariants,
-  accordionTriggerMicroBirdSchoolVariants
-} from './Accordion.microbird-school.brand';
 
 export const accordionBrandVariants = {
-  acorn: accordionAcornVariants,
-  'microbird-school': compose(
-    accordionAcornVariants,
-    accordionMicroBirdSchoolVariants
-  ),
-  'microbird-commercial': compose(
-    accordionAcornVariants,
-    accordionMicroBirdCommercialVariants
-  )
+  acorn: accordionAcornVariants
 } as const satisfies BrandVariants<typeof accordionAcornVariants>;
 
 export const accordionTriggerBrandVariants = {
-  acorn: accordionTriggerAcornVariants,
-  'microbird-school': compose(
-    accordionTriggerAcornVariants,
-    accordionTriggerMicroBirdSchoolVariants
-  ),
-  'microbird-commercial': compose(
-    accordionTriggerAcornVariants,
-    accordionTriggerMicroBirdCommercialVariants
-  )
+  acorn: accordionTriggerAcornVariants
 } as const satisfies BrandVariants<typeof accordionTriggerAcornVariants>;
 
 export const accordionHeadingBrandVariants = {
-  acorn: accordionHeadingAcornVariants,
-  'microbird-school': compose(
-    accordionHeadingAcornVariants,
-    accordionHeadingMicroBirdSchoolVariants
-  ),
-  'microbird-commercial': compose(
-    accordionHeadingAcornVariants,
-    accordionHeadingMicroBirdCommercialVariants
-  )
+  acorn: accordionHeadingAcornVariants
 } as const satisfies BrandVariants<typeof accordionHeadingAcornVariants>;
 
 export const accordionEyebrowBrandVariants = {
-  acorn: accordionEyebrowAcornVariants,
-  'microbird-school': compose(
-    accordionEyebrowAcornVariants,
-    accordionEyebrowMicroBirdSchoolVariants
-  ),
-  'microbird-commercial': compose(
-    accordionEyebrowAcornVariants,
-    accordionEyebrowMicroBirdCommercialVariants
-  )
+  acorn: accordionEyebrowAcornVariants
 } as const satisfies BrandVariants<typeof accordionEyebrowAcornVariants>;
 
 export const accordionTitleBrandVariants = {
-  acorn: accordionTitleAcornVariants,
-  'microbird-school': compose(
-    accordionTitleAcornVariants,
-    accordionTitleMicroBirdSchoolVariants
-  ),
-  'microbird-commercial': compose(
-    accordionTitleAcornVariants,
-    accordionTitleMicroBirdCommercialVariants
-  )
+  acorn: accordionTitleAcornVariants
 } as const satisfies BrandVariants<typeof accordionTitleAcornVariants>;
 
 export const accordionIconBrandVariants = {
-  acorn: accordionIconAcornVariants,
-  'microbird-school': compose(
-    accordionIconAcornVariants,
-    accordionIconMicroBirdSchoolVariants
-  ),
-  'microbird-commercial': compose(
-    accordionIconAcornVariants,
-    accordionIconMicroBirdCommercialVariants
-  )
+  acorn: accordionIconAcornVariants
 } as const satisfies BrandVariants<typeof accordionIconAcornVariants>;
 
 export const accordionIconBarBrandVariants = {
-  acorn: accordionIconBarAcornVariants,
-  'microbird-school': compose(
-    accordionIconBarAcornVariants,
-    accordionIconBarMicroBirdSchoolVariants
-  ),
-  'microbird-commercial': compose(
-    accordionIconBarAcornVariants,
-    accordionIconBarMicroBirdCommercialVariants
-  )
+  acorn: accordionIconBarAcornVariants
 } as const satisfies BrandVariants<typeof accordionIconBarAcornVariants>;
 
 export const accordionContentBrandVariants = {
-  acorn: accordionContentAcornVariants,
-  'microbird-school': compose(
-    accordionContentAcornVariants,
-    accordionContentMicroBirdSchoolVariants
-  ),
-  'microbird-commercial': compose(
-    accordionContentAcornVariants,
-    accordionContentMicroBirdCommercialVariants
-  )
+  acorn: accordionContentAcornVariants
 } as const satisfies BrandVariants<typeof accordionContentAcornVariants>;
 
 export const accordionContentInnerBrandVariants = {
-  acorn: accordionContentInnerAcornVariants,
-  'microbird-school': compose(
-    accordionContentInnerAcornVariants,
-    accordionContentInnerMicroBirdSchoolVariants
-  ),
-  'microbird-commercial': compose(
-    accordionContentInnerAcornVariants,
-    accordionContentInnerMicroBirdCommercialVariants
-  )
+  acorn: accordionContentInnerAcornVariants
 } as const satisfies BrandVariants<typeof accordionContentInnerAcornVariants>;
 
 export type AccordionVariantProps = VariantProps<typeof accordionAcornVariants>;
