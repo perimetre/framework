@@ -121,6 +121,11 @@
   --color-pui-border-rule-primary: var(--pui-color-border-rule-primary);
   --color-pui-border-rule-secondary: var(--pui-color-border-rule-secondary);
   --color-pui-border-input: var(--pui-color-border-input);
+  --color-pui-border-accordion-first: var(--pui-color-border-accordion-first);
+  --color-pui-border-accordion-last: var(--pui-color-border-accordion-last);
+  --color-pui-border-accordion-between: var(
+    --pui-color-border-accordion-between
+  );
 
   /* Interactive colors */
   --color-pui-interactive-primary: var(--pui-color-interactive-primary);
@@ -476,6 +481,30 @@
   font-weight: var(--pui-typo-extra-tiny-weight);
   letter-spacing: var(--pui-typo-extra-tiny-tracking);
   text-transform: var(--pui-typo-extra-tiny-transform);
+}
+
+@utility typo-accordion-title {
+  font-family: var(
+    --pui-typo-accordion-title-family,
+    var(--pui-primitive-font-sans)
+  );
+  font-size: var(--pui-typo-accordion-title-size);
+  line-height: var(--pui-typo-accordion-title-leading);
+  font-weight: var(--pui-typo-accordion-title-weight);
+  letter-spacing: var(--pui-typo-accordion-title-tracking);
+  text-transform: var(--pui-typo-accordion-title-transform);
+}
+
+@utility typo-accordion-content {
+  font-family: var(
+    --pui-typo-accordion-content-family,
+    var(--pui-primitive-font-sans)
+  );
+  font-size: var(--pui-typo-accordion-content-size);
+  line-height: var(--pui-typo-accordion-content-leading);
+  font-weight: var(--pui-typo-accordion-content-weight);
+  letter-spacing: var(--pui-typo-accordion-content-tracking);
+  text-transform: var(--pui-typo-accordion-content-transform);
 }
 
 /* ========================================
