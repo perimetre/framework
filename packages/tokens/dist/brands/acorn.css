@@ -105,6 +105,9 @@
     --pui-color-border-rule-primary: var(--pui-primitive-color-overlay-9);
     --pui-color-border-rule-secondary: var(--pui-primitive-color-overlay-5);
     --pui-color-border-input: var(--pui-color-border-default);
+    --pui-color-border-accordion-first: var(--pui-color-border-baseline);
+    --pui-color-border-accordion-last: var(--pui-color-border-baseline);
+    --pui-color-border-accordion-between: var(--pui-color-border-baseline);
     --pui-color-focus-outline: var(--pui-color-border-focus);
     --pui-color-interactive-primary: var(--pui-primitive-color-primary-9);
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-12);
@@ -266,6 +269,16 @@
     --pui-typo-navbar-transform: none;
     --pui-typo-alertbar-size: var(--pui-typo-small-size);
     --pui-typo-alertbar-weight: var(--pui-typo-small-weight);
+    --pui-typo-accordion-title-size: var(--pui-typo-heading-5-size);
+    --pui-typo-accordion-title-leading: var(--pui-typo-heading-5-leading);
+    --pui-typo-accordion-title-weight: var(--pui-typo-heading-5-weight);
+    --pui-typo-accordion-title-tracking: var(--pui-typo-heading-5-tracking);
+    --pui-typo-accordion-title-transform: var(--pui-typo-heading-5-transform);
+    --pui-typo-accordion-content-size: var(--pui-typo-base-size);
+    --pui-typo-accordion-content-leading: var(--pui-typo-base-leading);
+    --pui-typo-accordion-content-weight: var(--pui-typo-base-weight);
+    --pui-typo-accordion-content-tracking: var(--pui-typo-base-tracking);
+    --pui-typo-accordion-content-transform: var(--pui-typo-base-transform);
     --pui-duration-normal: var(--pui-primitive-duration-normal);
   }
 }

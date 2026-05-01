@@ -74,6 +74,18 @@
         },
         "input": {
           "$value": "{pui.color.border.default}"
+        },
+        "accordion-first": {
+          "$value": "{pui.color.border.baseline}",
+          "$description": "Top edge of the first Accordion item."
+        },
+        "accordion-last": {
+          "$value": "{pui.color.border.baseline}",
+          "$description": "Bottom edge of the last Accordion item."
+        },
+        "accordion-between": {
+          "$value": "{pui.color.border.baseline}",
+          "$description": "Divider between adjacent Accordion items."
         }
       },
       "focus-outline": {
@@ -750,6 +762,52 @@
         "weight": {
           "$value": "{pui.typo.small.weight}",
           "$type": "fontWeights"
+        }
+      },
+      "accordion-title": {
+        "$description": "Accordion trigger title typography. Defaults to heading-5 — brands can scale up/down or change family.",
+        "size": {
+          "$value": "{pui.typo.heading-5.size}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.typo.heading-5.leading}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.typo.heading-5.weight}",
+          "$type": "fontWeights"
+        },
+        "tracking": {
+          "$value": "{pui.typo.heading-5.tracking}",
+          "$type": "letterSpacing"
+        },
+        "transform": {
+          "$value": "{pui.typo.heading-5.transform}",
+          "$type": "textCase"
+        }
+      },
+      "accordion-content": {
+        "$description": "Accordion content/rich-text body typography. Defaults to base.",
+        "size": {
+          "$value": "{pui.typo.base.size}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.typo.base.leading}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.typo.base.weight}",
+          "$type": "fontWeights"
+        },
+        "tracking": {
+          "$value": "{pui.typo.base.tracking}",
+          "$type": "letterSpacing"
+        },
+        "transform": {
+          "$value": "{pui.typo.base.transform}",
+          "$type": "textCase"
         }
       }
     },

@@ -121,6 +121,11 @@
   --color-pui-border-rule-primary: var(--pui-color-border-rule-primary);
   --color-pui-border-rule-secondary: var(--pui-color-border-rule-secondary);
   --color-pui-border-input: var(--pui-color-border-input);
+  --color-pui-border-accordion-first: var(--pui-color-border-accordion-first);
+  --color-pui-border-accordion-last: var(--pui-color-border-accordion-last);
+  --color-pui-border-accordion-between: var(
+    --pui-color-border-accordion-between
+  );
 
   /* Interactive colors */
   --color-pui-interactive-primary: var(--pui-color-interactive-primary);
