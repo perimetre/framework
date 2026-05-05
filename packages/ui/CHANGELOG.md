@@ -1,5 +1,15 @@
 # @perimetre/ui
 
+## 16.3.0
+
+### Minor Changes
+
+- fec470e: Add `Collapse` component — a brand-aware, motion-animated disclosure with `CollapseTrigger`, `CollapseHeading`, `CollapseEyebrow`, `CollapseTitle`, `CollapseIcon`, and `CollapseContent` subcomponents for rich-text bodies.
+
+### Patch Changes
+
+- @perimetre/icons@0.0.3
+
 ## 16.2.8
 
 ### Patch Changes
