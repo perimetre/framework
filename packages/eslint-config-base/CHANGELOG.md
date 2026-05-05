@@ -1,5 +1,11 @@
 # @perimetre/eslint-config-base
 
+## 0.2.9
+
+### Patch Changes
+
+- 5e3344a: Bump `eslint-plugin-sort-destructure-keys` from `^2.0.0` to `^3.0.0`. v2 calls `context.getSourceCode()`, an API removed in ESLint 10, causing a `TypeError: context.getSourceCode is not a function` crash on every lint run. v3 uses `context.sourceCode` and declares `eslint: "5 - 10"`.
+
 ## 0.2.8
 
 ### Patch Changes
