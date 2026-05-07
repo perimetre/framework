@@ -1,5 +1,12 @@
 # @perimetre/eslint-config-trpc
 
+## 0.1.10
+
+### Patch Changes
+
+- Updated dependencies [5e3344a]
+  - @perimetre/eslint-config-base@0.2.9
+
 ## 0.1.9
 
 ### Patch Changes
