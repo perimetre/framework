@@ -4,15 +4,20 @@ import { cva } from '@/lib/cva';
  * Acorn brand Accordion variants (default/base theme).
  * Uses semantic tokens for themeable properties:
  * - text-pui-fg-*: title/body/eyebrow colors
- * - border-pui-border-accordion-*: per-position dividers (first / between / last)
+ * - border-pui-border-accordion-*: per-position dividers (between / last)
  * - --pui-typo-accordion-*: title and content typography (applied inline
  *   below — these tokens are accordion-specific, so no `@utility` is needed)
+ *
+ * No top border on the first row: an accordion is almost always nested
+ * inside a section or card whose own boundary already provides the top
+ * edge, and authors who do want a top border can re-add it through the
+ * `pui:first:border-t-pui-border-accordion-first` utility (the semantic
+ * token still ships in tailwind.css for that exact purpose).
  */
 export const accordionAcornVariants = cva({
   base: [
     'pui:flex pui:w-full pui:flex-col',
     'pui:border-b pui:border-pui-border-accordion-between',
-    'pui:first:border-t pui:first:border-t-pui-border-accordion-first',
     'pui:last:border-b-pui-border-accordion-last'
   ]
 });
