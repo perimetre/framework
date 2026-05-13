@@ -8,7 +8,7 @@ import { cva } from '@/lib/cva';
  * No JS overrides needed unless there are structural differences.
  */
 export const buttonMicroBirdCommercialVariants = cva({
-  base: 'pui:normal-case pui:font-light pui:text-xs pui:lg:text-sm pui:2xl:typo-base pui:px-5',
+  base: 'pui:normal-case pui:font-light pui:text-base pui:px-5',
   variants: {
     variant: {
       primary: [
