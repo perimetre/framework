@@ -132,6 +132,27 @@
           "$value": "#22222233",
           "$description": "Button outline border — overlay-12 at 20% opacity."
         }
+      },
+      "input": {
+        "bg": {
+          "$value": "#FFFFFF",
+          "$description": "Input background is pure white on microbird (vs Acorn's default surface)."
+        },
+        "border": {
+          "$value": "#22222233",
+          "$description": "Input border — overlay-12 at 20% opacity (matches button secondary-outline)."
+        },
+        "placeholder": {
+          "$value": "{pui.primitive.color.primary.9}",
+          "$description": "Placeholder uses the brand primary-9 navy so the gmp shadow-DOM input picks it up through CSS-custom-property inheritance."
+        }
+      }
+    },
+    "radius": {
+      "$type": "borderRadius",
+      "input": {
+        "$value": "2rem",
+        "$description": "Microbird inputs are pill-shaped (rounded-4xl). Cascades to the gmp shadow-DOM input via --pui-radius-input."
       }
     }
   }
