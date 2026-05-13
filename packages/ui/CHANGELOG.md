@@ -1,5 +1,18 @@
 # @perimetre/ui
 
+## 16.5.0
+
+### Minor Changes
+
+- 645d67c: Add microbird brand support to `FieldGooglePlacesAutocomplete`
+
+### Patch Changes
+
+- 1d02951: Fixed button sizes for extra large screens
+- 1d02951: Changed all buttons on micro bird to be 16px on all screen sizes
+- Updated dependencies [645d67c]
+  - @perimetre/tokens@0.5.0
+
 ## 16.4.1
 
 ### Patch Changes

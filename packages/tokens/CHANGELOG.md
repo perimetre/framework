@@ -1,5 +1,11 @@
 # @perimetre/tokens
 
+## 0.5.0
+
+### Minor Changes
+
+- 645d67c: Add microbird brand support to `FieldGooglePlacesAutocomplete`
+
 ## 0.4.1
 
 ### Patch Changes
