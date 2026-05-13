@@ -21,7 +21,11 @@
   [data-pui-brand='microbird-commercial'] {
     --pui-color-interactive-on-primary: var(--pui-primitive-color-primary-1);
     --pui-color-button-secondary-outline: #22222233;
+    --pui-color-input-bg: #FFFFFF;
+    --pui-color-input-border: #22222233;
+    --pui-color-input-placeholder: var(--pui-primitive-color-primary-9);
     --pui-color-alertbar-first-fg: var(--pui-primitive-color-primary-1);
+    --pui-radius-input: 2rem;
     --pui-typo-heading-1-size: 6.25rem;
     --pui-typo-heading-1-weight: var(--pui-primitive-font-weight-semibold);
     --pui-typo-heading-1-tracking: -0.01em;

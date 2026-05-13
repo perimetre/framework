@@ -1,6 +1,7 @@
 'use client';
 
 import { useGoogleContext } from '@/components/GoogleProvider';
+import { getBrandVariant } from '@/lib/brand-registry';
 import { cx } from '@/lib/cva';
 import { type ForceRequiredProps } from '@perimetre/helpers/types';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -9,6 +10,7 @@ import { inputVariants } from '../FieldBaseInput';
 import FieldContainer from '../FieldContainer';
 import FieldLower, { type FieldLowerProps } from '../FieldLower';
 import FieldUpper, { type FieldUpperProps } from '../FieldUpper';
+import { fieldGooglePlacesAutocompleteBrandVariants } from './brands';
 
 export type FieldGooglePlacesAutocompleteProps = {
   containerClassName?: string;
@@ -792,22 +794,17 @@ const FieldGooglePlacesAutocomplete: React.FC<
           aria-describedby={ariaDescribedBy}
           aria-invalid={!!error || undefined}
           id={`${name}-input`}
-          className={inputVariants({
-            className: cx(
-              'pui:flex pui:items-center',
-              disabled &&
-                'pui:cursor-not-allowed pui:bg-pui-bg-subtle pui:text-pui-fg-subtle pui:border-pui-bg-subtle',
-              !disabled &&
-                'pui:focus-within:outline-none pui:focus-within:border-pui-input-border-focus',
-              !disabled &&
-                (error
-                  ? 'pui:focus-within:shadow-[0_0_0_2px_var(--color-pui-feedback-error)]'
-                  : 'pui:focus-within:shadow-pui-input-focus')
-            ),
-            error: !!error,
-            leading: !!leading,
-            trailing: !!trailing
-          })}
+          className={cx(
+            inputVariants({
+              error: !!error,
+              leading: !!leading,
+              trailing: !!trailing
+            }),
+            getBrandVariant(fieldGooglePlacesAutocompleteBrandVariants)({
+              disabled: !!disabled,
+              error: !!error
+            })
+          )}
         >
           {/* Placeholder input — defines the container height and shows
               during SSR / before Google API loads. When a defaultValue is
@@ -817,10 +814,13 @@ const FieldGooglePlacesAutocomplete: React.FC<
           <input
             aria-hidden
             disabled
-            className={isLoaded || !defaultValue ? 'pui:invisible' : undefined}
             defaultValue={defaultValue}
             placeholder={isLoaded ? undefined : placeholder}
             tabIndex={-1}
+            className={cx(
+              'pui:placeholder:text-pui-input-placeholder',
+              (isLoaded || !defaultValue) && 'pui:invisible'
+            )}
             style={{
               background: 'transparent',
               border: 'none',
