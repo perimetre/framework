@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.4.1
+
+### Patch Changes
+
+- 9985c24: Fixed button sizes for extra large screens
+
 ## 16.4.0
 
 ### Minor Changes
