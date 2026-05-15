@@ -66,6 +66,9 @@ function MagnifyImage({
    * Runs inside the rAF callback — once per frame at most.
    * Reads the rect here (post-layout, pre-paint) and writes CSS vars directly,
    * bypassing React state so no re-render is triggered.
+   *
+   * The lens center is clamped to `[lensRadius, size - lensRadius]` so the
+   * entire lens stays inside the container instead of being clipped at edges.
    */
   const flushPos = useCallback(() => {
     rafId.current = null;
@@ -75,13 +78,23 @@ function MagnifyImage({
     const rect = el.getBoundingClientRect();
     el.style.setProperty(
       '--posX',
-      String(Math.max(0, Math.min(rect.width, coords.clientX - rect.left)))
+      String(
+        Math.max(
+          lensRadius,
+          Math.min(rect.width - lensRadius, coords.clientX - rect.left)
+        )
+      )
     );
     el.style.setProperty(
       '--posY',
-      String(Math.max(0, Math.min(rect.height, coords.clientY - rect.top)))
+      String(
+        Math.max(
+          lensRadius,
+          Math.min(rect.height - lensRadius, coords.clientY - rect.top)
+        )
+      )
     );
-  }, []);
+  }, [lensRadius]);
 
   /**
    * Called on every pointer event. Stores the latest coords and schedules a
