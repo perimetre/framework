@@ -335,6 +335,18 @@
  * Usage: class="pui:typo-heading-1"
  * ======================================== */
 
+@utility typo-display-xl {
+  font-family: var(
+    --pui-typo-display-xl-family,
+    var(--pui-primitive-font-display, var(--pui-primitive-font-sans))
+  );
+  font-size: var(--pui-typo-display-xl-size);
+  line-height: var(--pui-typo-display-xl-leading);
+  font-weight: var(--pui-typo-display-xl-weight);
+  letter-spacing: var(--pui-typo-display-xl-tracking);
+  text-transform: var(--pui-typo-display-xl-transform);
+}
+
 @utility typo-heading-1 {
   font-family: var(--pui-typo-heading-1-family, var(--pui-primitive-font-sans));
   font-size: var(--pui-typo-heading-1-size);

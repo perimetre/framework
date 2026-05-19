@@ -362,6 +362,29 @@
     },
     "typo": {
       "$description": "Semantic typography styles. Each style defines: size, leading, weight, tracking, transform. These power the pui:typo-* utility classes.",
+      "display-xl": {
+        "$description": "Display XL: largest hero/display heading, above heading-1. Defaults to heading-1 dimensions so brands without a distinct display style inherit gracefully. Brands override to introduce a larger hero size.",
+        "size": {
+          "$value": "{pui.primitive.font.size.6xl}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.none}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.medium}",
+          "$type": "fontWeights"
+        },
+        "tracking": {
+          "$value": "-0.07rem",
+          "$type": "letterSpacing"
+        },
+        "transform": {
+          "$value": "none",
+          "$type": "textCase"
+        }
+      },
       "heading-1": {
         "$description": "Heading 1: 3.5rem / 100% / medium / -0.07rem / none.",
         "size": {

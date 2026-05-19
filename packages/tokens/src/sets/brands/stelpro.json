@@ -1,13 +1,44 @@
 {
   "pui": {
     "primitive": {
+      "font": {
+        "sans": {
+          "$value": "'Aktiv Grotesk', 'AktivGrotesk-Regular', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+          "$type": "fontFamilies",
+          "$description": "Stelpro uses Aktiv Grotesk (Regular/Medium/Bold cuts) across all text. Weight is selected via CSS font-weight."
+        }
+      },
       "color": {
         "$type": "color",
         "primary": {
-          "9": {
-            "$value": "#fe322a",
-            "$description": "Stelpro Red — hero color at step 9 (Radix solid/accent)."
-          }
+          "$description": "Stelpro Red — official 12-step primary scale mapped from Figma's brand/red/* palette. red/500* = #cc0000 is the marked hero (step 9).",
+          "1": { "$value": "#fff0f0" },
+          "2": { "$value": "#fff0f0" },
+          "3": { "$value": "#ffdbdb" },
+          "4": { "$value": "#ffa8a8" },
+          "5": { "$value": "#ff5c5c" },
+          "6": { "$value": "#ff1a1a" },
+          "7": { "$value": "#e60000" },
+          "8": { "$value": "#d10000" },
+          "9": { "$value": "#cc0000" },
+          "10": { "$value": "#a30000" },
+          "11": { "$value": "#800000" },
+          "12": { "$value": "#330000" }
+        },
+        "overlay": {
+          "$description": "Stelpro neutral scale mapped from Figma's color/structural/neutral/* palette plus structural/white & black. Replaces acorn's sand-tinted overlay with Stelpro's pure-gray neutrals.",
+          "1": { "$value": "#ffffff" },
+          "2": { "$value": "#fafafa" },
+          "3": { "$value": "#f5f5f5" },
+          "4": { "$value": "#e5e5e5" },
+          "5": { "$value": "#d4d4d4" },
+          "6": { "$value": "#a3a3a3" },
+          "7": { "$value": "#8a8a8a" },
+          "8": { "$value": "#737373" },
+          "9": { "$value": "#525252" },
+          "10": { "$value": "#4a4a4a" },
+          "11": { "$value": "#2e2e2e" },
+          "12": { "$value": "#1a1a1a" }
         }
       }
     },
@@ -31,6 +62,190 @@
       "badge": {
         "$value": "{pui.primitive.radius.none}",
         "$description": "Stelpro uses no rounded corners for badges."
+      }
+    },
+    "typo": {
+      "$description": "Stelpro typography from Figma Design System — node 11:209. All styles use Aktiv Grotesk with appropriate weights (Regular=400, Medium=500, Bold=700).",
+      "display-xl": {
+        "$description": "Figma 'Display XL': Aktiv Grotesk Bold 64 / 140% / -2px tracking.",
+        "size": { "$value": "4rem", "$type": "fontSizes" },
+        "leading": {
+          "$value": "{pui.primitive.leading.relaxed}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.bold}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "-0.125rem", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "heading-1": {
+        "$description": "Figma 'Heading 1' (Title): Aktiv Grotesk Regular 48 / 140% / -2px tracking.",
+        "size": {
+          "$value": "{pui.primitive.font.size.5xl}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.relaxed}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "-0.125rem", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "heading-2": {
+        "$description": "Figma 'Heading 2' (Product Name): Aktiv Grotesk Medium 36 / 140% / -2px tracking.",
+        "size": {
+          "$value": "{pui.primitive.font.size.4xl}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.relaxed}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.medium}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "-0.125rem", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "heading-3": {
+        "$description": "Figma 'Heading 3' (Characteristics): Aktiv Grotesk Regular 28 / 110% / -2px tracking. 1.75rem is not in primitive scale — literal value used.",
+        "size": { "$value": "1.75rem", "$type": "fontSizes" },
+        "leading": {
+          "$value": "{pui.primitive.leading.tight}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "-0.125rem", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "heading-4": {
+        "$description": "Figma 'Heading 4' (Section Title): Aktiv Grotesk Bold 20 / 110% / 0 tracking.",
+        "size": {
+          "$value": "{pui.primitive.font.size.xl}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.tight}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.bold}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "label": {
+        "$description": "Figma 'Label': Aktiv Grotesk Bold 16 / 110% / 0 tracking. Acorn default was 0.5rem — Stelpro overrides to 1rem.",
+        "size": {
+          "$value": "{pui.primitive.font.size.base}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.tight}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.bold}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "large": {
+        "$description": "Figma 'Body - Large': Aktiv Grotesk Regular 20 / 150% / 0 tracking.",
+        "size": {
+          "$value": "{pui.primitive.font.size.xl}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.loose}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "base": {
+        "$description": "Figma 'Body - Medium': Aktiv Grotesk Regular 16 / 150% / 0 tracking.",
+        "size": {
+          "$value": "{pui.primitive.font.size.base}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.loose}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "small": {
+        "$description": "Figma 'Caption' and 'Utility': Aktiv Grotesk Regular 14 / 150% / 0 tracking.",
+        "size": {
+          "$value": "{pui.primitive.font.size.sm}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.loose}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "tagline": {
+        "$description": "Figma 'Eyebrow': Aktiv Grotesk Medium 14 / 100% / 2px tracking. Mapped to existing semantic 'tagline' — closest match for an eyebrow/kicker style.",
+        "size": {
+          "$value": "{pui.primitive.font.size.sm}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.none}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.medium}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0.125rem", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
+      "navbar": {
+        "$description": "Figma 'Nav - Primary': Aktiv Grotesk Medium 16 / 140% / 0 tracking.",
+        "size": {
+          "$value": "{pui.primitive.font.size.base}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.relaxed}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.medium}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
       }
     }
   }
