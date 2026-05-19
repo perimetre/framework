@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.5.1
+
+### Patch Changes
+
+- 7017688: Fix `MagnifyImage` lens being clipped at container edges. The lens center is now clamped to `[lensRadius, size - lensRadius]` so the full circle stays inside the container regardless of cursor position.
+
 ## 16.5.0
 
 ### Minor Changes
