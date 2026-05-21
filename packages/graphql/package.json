@@ -1,0 +1,71 @@
+{
+  "dependencies": {
+    "@graphql-typed-document-node/core": "^3.2.0",
+    "graphql": "^16.13.2",
+    "graphql-request": "^7.2.0"
+  },
+  "description": "Reusable GraphQL client toolkit for Perimetre WPGraphQL projects — graphql-request setup, TanStack Query bindings, WPGraphQL Smart Cache APQ routing, and codegen helpers.",
+  "devDependencies": {
+    "@perimetre/eslint-config-base": "workspace:*",
+    "@tanstack/react-query": "^5.0.0",
+    "@types/node": "^22.19.11",
+    "eslint": "^9.39.2",
+    "tsdown": "0.20.3",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/index.mjs",
+        "types": "./dist/index.d.mts"
+      },
+      "require": {
+        "default": "./dist/index.cjs",
+        "types": "./dist/index.d.cts"
+      },
+      "types": "./dist/index.d.ts"
+    },
+    "./*": {
+      "import": {
+        "default": "./dist/*.mjs",
+        "types": "./dist/*.d.mts"
+      },
+      "require": {
+        "default": "./dist/*.cjs",
+        "types": "./dist/*.d.cts"
+      },
+      "types": "./dist/*.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "main": "./dist/index.cjs",
+  "name": "@perimetre/graphql",
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/graphql",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "lint": "eslint .",
+    "typecheck": "tsc --project tsconfig.build.json --noEmit"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "version": "0.0.1"
+}

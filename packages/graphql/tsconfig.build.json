@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src"
+  },
+  "exclude": ["node_modules", "dist", "tsdown.config.ts"],
+  "extends": "./tsconfig.json"
+}
