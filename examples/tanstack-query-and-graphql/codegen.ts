@@ -49,11 +49,18 @@ const config: CodegenConfig = {
     // Generate types for client usage
     'src/server/graphql/__generated__/': {
       preset: 'client',
-      // config: {
-      //   documentMode: 'string'
-      // },
       // Ref: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#the-usefragment-helper
       presetConfig: {
+        // For a WPGraphQL project using wp-graphql-smart-cache, spread
+        // `wpGraphqlSmartCachePresetConfig()` here so persisted documents
+        // are emitted with hashes the server can resolve as `queryId`:
+        //
+        //   import { wpGraphqlSmartCachePresetConfig } from '@perimetre/graphql/codegen';
+        //   presetConfig: {
+        //     ...wpGraphqlSmartCachePresetConfig(),
+        //     fragmentMasking: { unmaskFunctionName: 'getFragmentData' }
+        //   }
+
         // Rename the default unmasking function as it's not a real hook
         fragmentMasking: { unmaskFunctionName: 'getFragmentData' }
       },

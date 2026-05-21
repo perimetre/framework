@@ -1,7 +1,9 @@
 import { fancyLog, LOG_COLOR } from '@/shared/lib/log';
-// This is the only file where this can be used
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { GraphQLClient } from 'graphql-request';
+import { createGraphqlClient, type GraphqlLogger } from '@perimetre/graphql';
+import {
+  withRequestLogger,
+  withResponseLogger
+} from '@perimetre/graphql/middlewares';
 import invariant from 'tiny-invariant';
 
 invariant(
@@ -11,43 +13,33 @@ invariant(
 
 const endpoint = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT;
 
-export const graphqlClient = new GraphQLClient(endpoint, {
-  headers: {
-    // Uncomment if authentication is required
-    // Authorization: `Bearer ${process.env.AUTH_TOKEN}`
-  },
-  ...(process.env.NEXT_PUBLIC_DEBUG_GRAPHQL
-    ? {
-        /**
-         * Middleware to log GraphQL requests for debugging purposes
-         */
-        requestMiddleware: (request) => {
-          if ('body' in request && typeof request.body === 'string') {
-            const body: unknown = JSON.parse(request.body);
-            if (
-              typeof body === 'object' &&
-              body !== null &&
-              'operationName' in body &&
-              'variables' in body &&
-              'query' in body &&
-              typeof body.operationName === 'string'
-            ) {
-              fancyLog(
-                'log',
-                `GRAPHQL: ${LOG_COLOR.green} ${body.operationName}`,
-                '\n',
-                'VARIABLES:',
-                body.variables,
-                '\n',
-                'QUERY:',
-                body.query,
-                '\n'
-              );
-            }
-          }
+/**
+ * Adapter that lets `@perimetre/graphql` drive this project's existing
+ * `fancyLog` helper. The logger interface is structural — any object
+ * implementing `{ debug, info, warn, error }` with the right signature
+ * works (Sentry's logger, `console`, `pino`, etc.).
+ */
+const logger: GraphqlLogger = {
+  debug: (message, attrs) =>
+    process.env.NEXT_PUBLIC_DEBUG_GRAPHQL
+      ? fancyLog('log', message, LOG_COLOR.gray, attrs ?? '')
+      : undefined,
+  info: (message, attrs) =>
+    fancyLog('log', message, LOG_COLOR.green, attrs ?? ''),
+  warn: (message, attrs) =>
+    fancyLog('log', message, LOG_COLOR.yellow, attrs ?? ''),
+  error: (message, attrs) =>
+    fancyLog('error', message, LOG_COLOR.red, attrs ?? '')
+};
 
-          return request;
-        }
-      }
-    : {})
+export const graphqlClient = createGraphqlClient({
+  endpoint,
+  plugins: [
+    withRequestLogger({
+      logger,
+      endpoint,
+      debug: !!process.env.NEXT_PUBLIC_DEBUG_GRAPHQL
+    }),
+    withResponseLogger({ logger })
+  ]
 });

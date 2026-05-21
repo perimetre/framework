@@ -22,13 +22,15 @@
 
 ## Important files to note for GraphQL:
 
+This example uses [`@perimetre/graphql`](../../packages/graphql) for the GraphQL client setup and the TanStack helpers. It demonstrates the Tier 2 + Tier 3 path (lean `graphql-request` + structured logging + TanStack helpers, no Smart Cache / APQ). For a project on `wp-graphql-smart-cache`, swap `createPassthroughExecutor` for `createApqExecutor` and spread `wpGraphqlSmartCachePresetConfig()` into your codegen — see the comments in `codegen.ts`.
+
 - [`./.env`](./env): Holds the GraphQL endpoint
 - [`./.graphqlrc.yml`](./.graphqlrc.yml): Declare what files will have GraphQL queries on them
-- [`./codegen.ts`](./codegen.ts): GraphQL codegen configuration file
+- [`./codegen.ts`](./codegen.ts): GraphQL codegen configuration file (with a commented-in path to opt into WPGraphQL Smart Cache persisted queries via `@perimetre/graphql/codegen`)
 - [`./tsconfig.json`](./tsconfig.json): TypeScript configuration file with GraphQL plugin
 - [`./package.json`](./package.json): Codegen commands under `scripts` section + concurrently setup for `dev` script that runs both Next.js and codegen in watch mode
-- [`./src/server/graphql/index.ts`](./src/server/graphql/index.ts): Sets up the GraphQL client for React Query
-- [`./src/shared/react-query/graphql.ts`](./src/shared/react-query/graphql.ts): Reusable, typed, React Query functions for GraphQL queries and mutations
+- [`./src/server/graphql/index.ts`](./src/server/graphql/index.ts): Builds the GraphQL client via `createGraphqlClient` from `@perimetre/graphql`, with `withRequestLogger` / `withResponseLogger` plugged in for structured logs
+- [`./src/shared/react-query/graphql.ts`](./src/shared/react-query/graphql.ts): Exports the project's `graphqlOptions` / `graphqlMutationOptions` helpers via `createGraphqlTanstack` from `@perimetre/graphql/tanstack`
 
 ## GraphQL Usage Examples:
 

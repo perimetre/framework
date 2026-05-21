@@ -1,35 +1,20 @@
 import { graphqlClient } from '@/server/graphql';
-import { type TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { mutationOptions, queryOptions } from '@tanstack/react-query';
+import { createPassthroughExecutor } from '@perimetre/graphql';
+import { createGraphqlTanstack } from '@perimetre/graphql/tanstack';
 
 /**
- * A helper to create a mutation option for a GraphQL mutation
+ * Project-wide TanStack helpers bound to our `graphqlClient`. Use the
+ * passthrough executor since this example doesn't use WPGraphQL Smart
+ * Cache / APQ — for a project that does, swap in `createApqExecutor` and
+ * a `persistedDocuments` JSON map.
+ *
+ * The returned helpers have the same shape as plain `queryOptions` /
+ * `mutationOptions`, so callers can spread them and override `staleTime`,
+ * `enabled`, `onMutate`, etc.
  */
-export function graphqlMutationOptions<TResult, TVariables>(
-  document: TypedDocumentNode<TResult, TVariables>
-) {
-  return mutationOptions({
-    /**
-     * Run the mutation
-     */
-    mutationFn: async (variables: TVariables) =>
-      graphqlClient.request(document, variables as object | undefined)
-  });
-}
-
-/**
- * A helper to create a query option for a GraphQL query
- */
-export function graphqlOptions<TResult, TVariables>(
-  document: TypedDocumentNode<TResult, TVariables>,
-  ...[variables]: TVariables extends Record<string, never> ? [] : [TVariables]
-) {
-  return queryOptions({
-    queryKey: [document, variables] as const,
-    /**
-     * Run the query
-     */
-    queryFn: async ({ queryKey }) =>
-      graphqlClient.request(queryKey[0], queryKey[1] as object | undefined)
-  });
-}
+export const { graphqlOptions, graphqlMutationOptions } = createGraphqlTanstack(
+  {
+    client: graphqlClient,
+    executor: createPassthroughExecutor(graphqlClient)
+  }
+);
