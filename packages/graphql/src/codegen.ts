@@ -2,18 +2,21 @@ import { Kind, parse, print } from 'graphql';
 import { createHash } from 'node:crypto';
 
 /**
- * Hashes a GraphQL operation the way WPGraphQL Smart Cache does:
- * `sha256(graphql-php Printer::doPrint(parsed))`. Mirrors that pipeline
- * using graphql-js's `print(parse(...))` (whose output matches graphql-php's
- * printer byte-for-byte for our documents) and reorders definitions so
- * operations come before fragments to match the canonical layout WPGraphQL
- * stores. Aligning the hashes lets the runtime client send
- * `queryId=<codegenHash>` and have Smart Cache resolve to the saved
- * document directly.
+ * Hashes a GraphQL operation roughly the way WPGraphQL Smart Cache does:
+ * `sha256(graphql-js print(parse(operation)))`, with operations reordered
+ * to come before fragments. Used as the codegen-side `__meta__.hash`.
+ *
+ * NOTE: `graphql-js` `print()` and `graphql-php` `Printer::doPrint()` do
+ * **not** match byte-for-byte on every document (description formatting,
+ * argument layout, and trailing whitespace can diverge), so the codegen
+ * hash is best treated as a stable client-side identifier rather than a
+ * guaranteed server lookup key. The runtime `createApqExecutor` handles
+ * the divergence by reading the server-assigned hash from the
+ * `x-graphql-query-id` header on the register POST and using it for the
+ * subsequent APQ GETs.
  *
  * Pass this as `presetConfig.persistedDocuments.hashAlgorithm` in your
- * `codegen.ts` so the embedded `__meta__.hash` lines up with what the
- * server computes on its side.
+ * `codegen.ts` to embed the hash on every generated document.
  */
 export const hashOperationForWpGraphqlSmartCache = (
   operation: string
