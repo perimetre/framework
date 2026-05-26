@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.5.3
+
+### Patch Changes
+
+- 06eb054: Fix MagnifyImage lens revealing the unmagnified image underneath when the source image has transparency. The lens now defaults to a white background, which can be overridden via `magnifierClassName`.
+
 ## 16.5.2
 
 ### Patch Changes
