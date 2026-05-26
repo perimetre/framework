@@ -8,7 +8,7 @@ export default {
 const sampleImage = (
   <img
     alt="A scenic mountain landscape"
-    src="https://picsum.photos/seed/magnify/800/600"
+    src="https://picsum.photos/seed/magnify/3200/2400"
     style={{
       display: 'block',
       height: '100%',
@@ -25,7 +25,7 @@ export const Default: Story<MagnifyImageProps> = () => (
 );
 
 export const LargeLens: Story<MagnifyImageProps> = () => (
-  <div style={{ height: 360, width: 480 }}>
+  <div style={{ height: 360 * 2, width: 480 * 2 }}>
     <MagnifyImage lensRadius={120} renderImage={sampleImage} scale={3} />
   </div>
 );
