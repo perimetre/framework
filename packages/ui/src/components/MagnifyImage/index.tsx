@@ -8,7 +8,7 @@ export type MagnifyImageProps = {
   className?: string;
   /** Lens radius in pixels. Defaults to 80. */
   lensRadius?: number;
-  /** Extra classes applied to the circular magnifying lens. Use to override ring, shadow, size, etc. */
+  /** Extra classes applied to the circular magnifying lens. Use to override background, ring, shadow, size, etc. The lens defaults to a white background so transparent images don't reveal the unmagnified image underneath. */
   magnifierClassName?: string;
   /** The image to render and magnify. Accepts any image element — native img, Next.js Image, Hydrogen Image, etc. */
   renderImage: React.ReactNode;
@@ -183,7 +183,7 @@ function MagnifyImage({
         <div
           aria-hidden
           className={cn(
-            'pui:absolute pui:rounded-full pui:overflow-hidden pui:pointer-events-none',
+            'pui:absolute pui:rounded-full pui:overflow-hidden pui:pointer-events-none pui:bg-white',
             'pui:h-[calc(var(--lensRadius)*2px)] pui:w-[calc(var(--lensRadius)*2px)]',
             'pui:left-[calc(var(--posX)*1px-var(--lensRadius)*1px)] pui:top-[calc(var(--posY)*1px-var(--lensRadius)*1px)]',
             'pui:shadow-[0_0_0_2px_rgba(255,255,255,0.6),0_0_0_3px_rgba(0,0,0,0.15),0_4px_20px_rgba(0,0,0,0.25)]',
