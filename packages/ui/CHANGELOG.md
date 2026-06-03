@@ -1,5 +1,23 @@
 # @perimetre/ui
 
+## 16.6.0
+
+### Minor Changes
+
+- 15fe670: Implement Stelpro Accordion from the STEL Figma design (Menu/Accordion).
+  - **tokens**: Stelpro overrides — `fg-default`/`fg-body` → overlay-11 (#2E2E2E, Figma `color/text/primary`), `typo-accordion-title` → Body/lg (Aktiv Grotesk Regular 20 / 150%).
+  - **ui**: new `Accordion.stelpro.brand.ts` — flat gray (`bg-subtle`) item cards with no dividers and 12px gaps, 12px/16px trigger padding, 24px icon box (dark when closed, brand red when open), and a white answer panel with 12px/32px padding.
+
+- 82bf993: Implement Stelpro primary and secondary buttons from the STEL Figma design system.
+  - **tokens**: new semantic tokens `--pui-color-button-inactive-label` (disabled button label), `--pui-color-button-secondary-hover`, `--pui-color-button-secondary-active`, and `--pui-color-button-secondary-label` (all default to existing Acorn values). Stelpro overrides: slate primary fills for default/hover/active/disabled states, white `on-primary` label, navy secondary hover/active fills with dark `text-primary` label, `radius-button: 0`, and `typo-button` weight/tracking/transform (Aktiv Grotesk Regular, no uppercase).
+  - **ui**: bridge the new button tokens to Tailwind; Stelpro Button brand variants now implement the Figma spec — min-height 44px, 8px/20px padding, 10px gap, Body/md typography, a 1px red inset focus frame, full hover/active/disabled state classes for `primary`, and a `secondary` variant (white fill, navy hover/active with white frame, focus state inverting to the primary dark fill).
+
+### Patch Changes
+
+- Updated dependencies [15fe670]
+- Updated dependencies [82bf993]
+  - @perimetre/tokens@0.7.0
+
 ## 16.5.4
 
 ### Patch Changes
