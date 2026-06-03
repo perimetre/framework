@@ -111,6 +111,18 @@
         "secondary-outline": {
           "$value": "{pui.primitive.color.overlay.8}"
         },
+        "secondary-hover": {
+          "$value": "{pui.color.interactive.primary}",
+          "$description": "Background of secondary buttons on hover. Mirrors the Acorn hover behavior; brands override (e.g. Stelpro navy-50)."
+        },
+        "secondary-active": {
+          "$value": "{pui.color.button.secondary-hover}",
+          "$description": "Background of secondary buttons while pressed. Defaults to the hover color."
+        },
+        "secondary-label": {
+          "$value": "{pui.color.interactive.on-primary}",
+          "$description": "Label color of secondary buttons. Defaults to the on-primary label; brands override (e.g. Stelpro text-primary)."
+        },
         "hover": {
           "$value": "{pui.primitive.color.primary.10}"
         },
@@ -119,6 +131,10 @@
         },
         "inactive": {
           "$value": "{pui.primitive.color.overlay.8}"
+        },
+        "inactive-label": {
+          "$value": "{pui.color.interactive.on-primary}",
+          "$description": "Label color for disabled buttons. Defaults to the regular on-primary label; brands can dim it (e.g. Stelpro)."
         }
       },
       "input": {

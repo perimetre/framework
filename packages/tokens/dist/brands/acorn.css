@@ -114,9 +114,13 @@
     --pui-color-button-primary-fill: var(--pui-color-interactive-primary);
     --pui-color-button-secondary-fill: var(--pui-color-bg-default);
     --pui-color-button-secondary-outline: var(--pui-primitive-color-overlay-8);
+    --pui-color-button-secondary-hover: var(--pui-color-interactive-primary);
+    --pui-color-button-secondary-active: var(--pui-color-button-secondary-hover);
+    --pui-color-button-secondary-label: var(--pui-color-interactive-on-primary);
     --pui-color-button-hover: var(--pui-primitive-color-primary-10);
     --pui-color-button-active: var(--pui-primitive-color-primary-10);
     --pui-color-button-inactive: var(--pui-primitive-color-overlay-8);
+    --pui-color-button-inactive-label: var(--pui-color-interactive-on-primary);
     --pui-color-input-bg: var(--pui-color-bg-default);
     --pui-color-input-border: var(--pui-color-border-default);
     --pui-color-input-border-focus: var(--pui-color-border-focus);

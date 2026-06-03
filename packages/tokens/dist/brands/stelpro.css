@@ -31,8 +31,17 @@
 
 @layer pui.semantic {
   [data-pui-brand='stelpro'] {
-    --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-5);
+    --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
+    --pui-color-button-primary-fill: #353c43;
+    --pui-color-button-secondary-hover: #e2e5e9;
+    --pui-color-button-secondary-active: #e2e5e9;
+    --pui-color-button-secondary-label: var(--pui-primitive-color-overlay-11);
+    --pui-color-button-hover: #25292c;
+    --pui-color-button-active: #16191d;
+    --pui-color-button-inactive: #9ca6af;
+    --pui-color-button-inactive-label: #6c767f;
     --pui-color-alertbar-first-fg: var(--pui-primitive-color-overlay-1);
+    --pui-radius-button: var(--pui-primitive-radius-none);
     --pui-radius-badge: var(--pui-primitive-radius-none);
     --pui-typo-display-xl-size: 4rem;
     --pui-typo-display-xl-leading: var(--pui-primitive-leading-relaxed);
@@ -69,6 +78,9 @@
     --pui-typo-large-weight: var(--pui-primitive-font-weight-normal);
     --pui-typo-large-tracking: 0;
     --pui-typo-large-transform: none;
+    --pui-typo-button-weight: var(--pui-primitive-font-weight-normal);
+    --pui-typo-button-tracking: 0;
+    --pui-typo-button-transform: none;
     --pui-typo-base-size: var(--pui-primitive-font-size-base);
     --pui-typo-base-leading: var(--pui-primitive-leading-loose);
     --pui-typo-base-weight: var(--pui-primitive-font-weight-normal);

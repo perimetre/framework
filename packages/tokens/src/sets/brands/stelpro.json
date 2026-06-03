@@ -46,8 +46,42 @@
       "$type": "color",
       "interactive": {
         "on-primary": {
-          "$value": "{pui.primitive.color.overlay.5}",
-          "$description": "Stelpro uses muted text on primary for better contrast with red. Acorn: overlay-12."
+          "$value": "{pui.primitive.color.overlay.1}",
+          "$description": "Figma color/buttons/primary/label/default — white label on Stelpro's slate button fill. Acorn: overlay-12."
+        }
+      },
+      "button": {
+        "primary-fill": {
+          "$value": "#353c43",
+          "$description": "Figma color/buttons/primary/background/default — Stelpro slate, not the red primary scale."
+        },
+        "hover": {
+          "$value": "#25292c",
+          "$description": "Figma color/buttons/primary/background/hover."
+        },
+        "active": {
+          "$value": "#16191d",
+          "$description": "Figma color/buttons/primary/background/active."
+        },
+        "inactive": {
+          "$value": "#9ca6af",
+          "$description": "Figma color/buttons/primary/background/disabled."
+        },
+        "inactive-label": {
+          "$value": "#6c767f",
+          "$description": "Figma color/buttons/primary/label/disabled."
+        },
+        "secondary-hover": {
+          "$value": "#e2e5e9",
+          "$description": "Figma color/brand/navy/50 — secondary button hover fill."
+        },
+        "secondary-active": {
+          "$value": "#e2e5e9",
+          "$description": "Figma color/brand/navy/100 — secondary button pressed fill. Currently the same value as navy/50 in the Figma file; kept as a separate token so a designer fix is value-only."
+        },
+        "secondary-label": {
+          "$value": "{pui.primitive.color.overlay.11}",
+          "$description": "Figma color/text/primary (#2E2E2E) — dark label on the white secondary fill."
         }
       },
       "alertbar": {
@@ -62,10 +96,23 @@
       "badge": {
         "$value": "{pui.primitive.radius.none}",
         "$description": "Stelpro uses no rounded corners for badges."
+      },
+      "button": {
+        "$value": "{pui.primitive.radius.none}",
+        "$description": "Figma Button/Primary — radius/none, square corners."
       }
     },
     "typo": {
       "$description": "Stelpro typography from Figma Design System — node 11:209. All styles use Aktiv Grotesk with appropriate weights (Regular=400, Medium=500, Bold=700).",
+      "button": {
+        "$description": "Figma Button/Primary label uses 'Body/md': Aktiv Grotesk Regular 16 / 150% / 0 tracking / no transform. Acorn: bold, uppercase, 0.02rem tracking.",
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" },
+        "transform": { "$value": "none", "$type": "textCase" }
+      },
       "display-xl": {
         "$description": "Figma 'Display XL': Aktiv Grotesk Bold 64 / 140% / -2px tracking.",
         "size": { "$value": "4rem", "$type": "fontSizes" },
