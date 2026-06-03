@@ -31,6 +31,8 @@
 
 @layer pui.semantic {
   [data-pui-brand='stelpro'] {
+    --pui-color-fg-default: var(--pui-primitive-color-overlay-11);
+    --pui-color-fg-body: var(--pui-primitive-color-overlay-11);
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
     --pui-color-button-primary-fill: #353c43;
     --pui-color-button-secondary-hover: #e2e5e9;
@@ -101,5 +103,10 @@
     --pui-typo-navbar-weight: var(--pui-primitive-font-weight-medium);
     --pui-typo-navbar-tracking: 0;
     --pui-typo-navbar-transform: none;
+    --pui-typo-accordion-title-size: var(--pui-typo-large-size);
+    --pui-typo-accordion-title-leading: var(--pui-typo-large-leading);
+    --pui-typo-accordion-title-weight: var(--pui-typo-large-weight);
+    --pui-typo-accordion-title-tracking: var(--pui-typo-large-tracking);
+    --pui-typo-accordion-title-transform: var(--pui-typo-large-transform);
   }
 }
