@@ -1,4 +1,5 @@
 import { type BrandVariants } from '@/lib/brand-registry';
+import { compose } from '@/lib/cva';
 import { type VariantProps } from 'cva';
 import {
   accordionAcornVariants,
@@ -11,15 +12,26 @@ import {
   accordionTitleAcornVariants,
   accordionTriggerAcornVariants
 } from './Accordion.acorn.brand';
+import {
+  accordionContentInnerStelproVariants,
+  accordionIconStelproVariants,
+  accordionStelproVariants,
+  accordionTriggerStelproVariants
+} from './Accordion.stelpro.brand';
 
 export const accordionBrandVariants = {
-  acorn: accordionAcornVariants
+  acorn: accordionAcornVariants,
+  stelpro: compose(accordionAcornVariants, accordionStelproVariants)
   // 'microbird-school': compose(accordionAcornVariants, accordionMicroBirdSchoolVariants),
   // 'microbird-commercial': compose(accordionAcornVariants, accordionMicroBirdCommercialVariants),
 } as const satisfies BrandVariants<typeof accordionAcornVariants>;
 
 export const accordionTriggerBrandVariants = {
-  acorn: accordionTriggerAcornVariants
+  acorn: accordionTriggerAcornVariants,
+  stelpro: compose(
+    accordionTriggerAcornVariants,
+    accordionTriggerStelproVariants
+  )
   // 'microbird-school': compose(accordionTriggerAcornVariants, accordionTriggerMicroBirdSchoolVariants),
   // 'microbird-commercial': compose(accordionTriggerAcornVariants, accordionTriggerMicroBirdCommercialVariants),
 } as const satisfies BrandVariants<typeof accordionTriggerAcornVariants>;
@@ -43,7 +55,8 @@ export const accordionTitleBrandVariants = {
 } as const satisfies BrandVariants<typeof accordionTitleAcornVariants>;
 
 export const accordionIconBrandVariants = {
-  acorn: accordionIconAcornVariants
+  acorn: accordionIconAcornVariants,
+  stelpro: compose(accordionIconAcornVariants, accordionIconStelproVariants)
   // 'microbird-school': compose(accordionIconAcornVariants, accordionIconMicroBirdSchoolVariants),
   // 'microbird-commercial': compose(accordionIconAcornVariants, accordionIconMicroBirdCommercialVariants),
 } as const satisfies BrandVariants<typeof accordionIconAcornVariants>;
@@ -61,7 +74,11 @@ export const accordionContentBrandVariants = {
 } as const satisfies BrandVariants<typeof accordionContentAcornVariants>;
 
 export const accordionContentInnerBrandVariants = {
-  acorn: accordionContentInnerAcornVariants
+  acorn: accordionContentInnerAcornVariants,
+  stelpro: compose(
+    accordionContentInnerAcornVariants,
+    accordionContentInnerStelproVariants
+  )
   // 'microbird-school': compose(accordionContentInnerAcornVariants, accordionContentInnerMicroBirdSchoolVariants),
   // 'microbird-commercial': compose(accordionContentInnerAcornVariants, accordionContentInnerMicroBirdCommercialVariants),
 } as const satisfies BrandVariants<typeof accordionContentInnerAcornVariants>;
