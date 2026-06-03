@@ -44,6 +44,16 @@
     },
     "color": {
       "$type": "color",
+      "fg": {
+        "default": {
+          "$value": "{pui.primitive.color.overlay.11}",
+          "$description": "Figma color/text/primary (#2E2E2E) — Stelpro's primary text color across both Figma files. Acorn: overlay-12."
+        },
+        "body": {
+          "$value": "{pui.primitive.color.overlay.11}",
+          "$description": "Figma color/text/primary (#2E2E2E) — body copy uses the same primary text color."
+        }
+      },
       "interactive": {
         "on-primary": {
           "$value": "{pui.primitive.color.overlay.1}",
@@ -104,6 +114,26 @@
     },
     "typo": {
       "$description": "Stelpro typography from Figma Design System — node 11:209. All styles use Aktiv Grotesk with appropriate weights (Regular=400, Medium=500, Bold=700).",
+      "accordion-title": {
+        "$description": "Figma Menu/Accordion question uses 'Body/lg': Aktiv Grotesk Regular 20 / 150% / 0 tracking. References Stelpro's 'large' body style.",
+        "size": { "$value": "{pui.typo.large.size}", "$type": "fontSizes" },
+        "leading": {
+          "$value": "{pui.typo.large.leading}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.typo.large.weight}",
+          "$type": "fontWeights"
+        },
+        "tracking": {
+          "$value": "{pui.typo.large.tracking}",
+          "$type": "letterSpacing"
+        },
+        "transform": {
+          "$value": "{pui.typo.large.transform}",
+          "$type": "textCase"
+        }
+      },
       "button": {
         "$description": "Figma Button/Primary label uses 'Body/md': Aktiv Grotesk Regular 16 / 150% / 0 tracking / no transform. Acorn: bold, uppercase, 0.02rem tracking.",
         "weight": {
