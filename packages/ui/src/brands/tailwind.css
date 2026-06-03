@@ -137,9 +137,13 @@
   --color-pui-button-secondary-outline: var(
     --pui-color-button-secondary-outline
   );
+  --color-pui-button-secondary-hover: var(--pui-color-button-secondary-hover);
+  --color-pui-button-secondary-active: var(--pui-color-button-secondary-active);
+  --color-pui-button-secondary-label: var(--pui-color-button-secondary-label);
   --color-pui-button-hover: var(--pui-color-button-hover);
   --color-pui-button-active: var(--pui-color-button-active);
   --color-pui-button-inactive: var(--pui-color-button-inactive);
+  --color-pui-button-inactive-label: var(--pui-color-button-inactive-label);
 
   /* Input field colors */
   --color-pui-input-bg: var(--pui-color-input-bg);
