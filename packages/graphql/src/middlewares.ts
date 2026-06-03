@@ -1,5 +1,4 @@
 import { ClientError } from 'graphql-request';
-import diagnosticsChannel from 'node:diagnostics_channel';
 import type { GraphqlClientPlugin } from './client.js';
 import {
   hostFromUrl,
@@ -159,22 +158,17 @@ export const withResponseLogger = ({
 // ---------------------------------------------------------------------------
 
 /**
- * Per-request timing checkpoints captured by the instrumented fetch. Each
- * field is filled in best-effort — non-Node runtimes (Edge, browser) will
- * see only `fetchMs` since the undici diagnostic channels aren't available
- * there.
+ * Per-request timing checkpoints captured by the instrumented fetch. Coarse,
+ * runtime-agnostic timings only — `fetchMs` (request settle), `bodyReadMs`
+ * (body drain), and `host`. No undici per-phase breakdown (DNS/connect/TLS):
+ * that required `node:diagnostics_channel`, which can't be bundled for
+ * browser/Edge and is dropped here.
  */
 export type GraphqlFetchTimings = {
-  beforeConnectMs?: number;
   beforeFirstByteMs?: number;
   bodyReadMs?: number;
-  connectMs?: number;
   fetchMs?: number;
-  headersToTtfbMs?: number;
   host?: string;
-  reusedConnection?: boolean;
-  sendHeadersMs?: number;
-  serverProcessingMs?: number;
 };
 
 /**
@@ -196,129 +190,10 @@ export type StartSpanFn = <T>(
 ) => Promise<T>;
 
 /**
- * Subscribes to undici diagnostic channels exactly once per Node process so
- * timings aren't double-emitted across repeated module loads. The returned
- * map is keyed by undici's per-request object.
- */
-const subscribeOnce = (() => {
-  let subscribed = false;
-  const undiciRequestTimings = new WeakMap<
-    object,
-    {
-      beforeConnectAt?: number;
-      bodySentAt?: number;
-      connectedAt?: number;
-      createdAt: number;
-      headersAt?: number;
-      reusedConnection?: boolean;
-      sendHeadersAt?: number;
-      target?: GraphqlFetchTimings;
-    }
-  >();
-
-  return {
-    /**
-     * Subscribes the diagnostic-channel handlers exactly once per process
-     * and returns the per-request timing map.
-     */
-    ensure: (logger?: GraphqlLogger) => {
-      if (subscribed) return undiciRequestTimings;
-      subscribed = true;
-
-      /**
-       * Subscribes to a named diagnostic channel; emits a warning if the
-       * channel is unavailable on the current Node runtime.
-       */
-      const subscribe = (
-        channel: string,
-        handler: (message: unknown) => void
-      ) => {
-        try {
-          diagnosticsChannel.subscribe(channel, handler);
-        } catch (error) {
-          logger?.warn('graphql.diagnostics.subscribe_failed', {
-            channel,
-            message: error instanceof Error ? error.message : String(error)
-          });
-        }
-      };
-
-      subscribe('undici:request:create', (message) => {
-        const m = message as { request?: object };
-        if (!m.request) return;
-        undiciRequestTimings.set(m.request, {
-          createdAt: performance.now()
-        });
-      });
-
-      subscribe('undici:client:beforeConnect', (message) => {
-        const m = message as { request?: object };
-        if (!m.request) return;
-        const entry = undiciRequestTimings.get(m.request);
-        if (!entry) return;
-        entry.beforeConnectAt = performance.now();
-      });
-
-      subscribe('undici:client:connected', (message) => {
-        const m = message as {
-          request?: object;
-          socket?: { reused?: boolean };
-        };
-        if (!m.request) return;
-        const entry = undiciRequestTimings.get(m.request);
-        if (!entry) return;
-        entry.connectedAt = performance.now();
-        entry.reusedConnection = m.socket?.reused ?? false;
-      });
-
-      subscribe('undici:client:sendHeaders', (message) => {
-        const m = message as { request?: object };
-        if (!m.request) return;
-        const entry = undiciRequestTimings.get(m.request);
-        if (!entry) return;
-        entry.sendHeadersAt = performance.now();
-      });
-
-      subscribe('undici:request:headers', (message) => {
-        const m = message as { request?: object };
-        if (!m.request) return;
-        const entry = undiciRequestTimings.get(m.request);
-        if (!entry) return;
-        entry.headersAt = performance.now();
-
-        const target = entry.target;
-        if (target) {
-          target.beforeConnectMs =
-            entry.beforeConnectAt != null
-              ? entry.beforeConnectAt - entry.createdAt
-              : undefined;
-          target.connectMs =
-            entry.beforeConnectAt != null && entry.connectedAt != null
-              ? entry.connectedAt - entry.beforeConnectAt
-              : undefined;
-          target.sendHeadersMs =
-            entry.sendHeadersAt != null
-              ? entry.sendHeadersAt - entry.createdAt
-              : undefined;
-          target.serverProcessingMs =
-            entry.sendHeadersAt != null
-              ? entry.headersAt - entry.sendHeadersAt
-              : undefined;
-          target.headersToTtfbMs = entry.headersAt - entry.createdAt;
-          target.reusedConnection = entry.reusedConnection;
-        }
-      });
-
-      return undiciRequestTimings;
-    }
-  };
-})();
-
-/**
- * Wraps a caller-supplied `fetch` implementation with DNS/TCP/TLS/TTFB phase
- * timings via Node's undici diagnostic channels. When a span tracer is
- * supplied, a `graphql.fetch` span is opened around the call with the
- * breakdown attached as attributes; the structured log is always emitted.
+ * Wraps a caller-supplied `fetch` implementation with coarse request timings.
+ * When a span tracer is supplied, a `graphql.fetch` span is opened around the
+ * call with the timings attached as attributes; the structured log is always
+ * emitted.
  *
  * **The package never calls Node's global `fetch` on its own.** You must
  * supply a `fetch` here — pass `globalThis.fetch` if you're happy with the
@@ -333,8 +208,6 @@ export const createInstrumentedFetch = ({
   logger?: GraphqlLogger;
   startSpan?: StartSpanFn;
 }): typeof fetch => {
-  const undiciTimingMap = subscribeOnce.ensure(logger);
-
   /**
    * Executes a single fetch call, recording timings into the per-request
    * `timings` object and (optionally) writing span attributes when called
@@ -357,26 +230,6 @@ export const createInstrumentedFetch = ({
 
     const timings: GraphqlFetchTimings = { host };
 
-    const createChannelName = 'undici:request:create';
-    /**
-     * One-shot listener that binds the next undici request object back to
-     * this fetch's `timings` target so concurrent calls don't collide.
-     */
-    const onCreate = (message: unknown) => {
-      const m = message as { request?: object };
-      if (!m.request) return;
-      const entry = undiciTimingMap.get(m.request);
-      if (entry && !entry.target) {
-        entry.target = timings;
-        diagnosticsChannel.unsubscribe(createChannelName, onCreate);
-      }
-    };
-    try {
-      diagnosticsChannel.subscribe(createChannelName, onCreate);
-    } catch {
-      // diagnostics_channel unavailable — coarse timings only.
-    }
-
     try {
       const response = await fetchImpl(input, init);
       const fetchSettledAt = performance.now();
@@ -398,32 +251,8 @@ export const createInstrumentedFetch = ({
           span.setAttribute('http.status_code', response.status);
           if (timings.fetchMs != null)
             span.setAttribute('timing.fetch_ms', timings.fetchMs);
-          if (timings.beforeConnectMs != null)
-            span.setAttribute(
-              'timing.before_connect_ms',
-              timings.beforeConnectMs
-            );
-          if (timings.connectMs != null)
-            span.setAttribute('timing.connect_ms', timings.connectMs);
-          if (timings.sendHeadersMs != null)
-            span.setAttribute('timing.send_headers_ms', timings.sendHeadersMs);
-          if (timings.serverProcessingMs != null)
-            span.setAttribute(
-              'timing.server_processing_ms',
-              timings.serverProcessingMs
-            );
-          if (timings.headersToTtfbMs != null)
-            span.setAttribute(
-              'timing.headers_to_ttfb_ms',
-              timings.headersToTtfbMs
-            );
           if (timings.bodyReadMs != null)
             span.setAttribute('timing.body_read_ms', timings.bodyReadMs);
-          if (timings.reusedConnection != null)
-            span.setAttribute(
-              'http.connection.reused',
-              timings.reusedConnection
-            );
         }
 
         logger?.info('graphql.fetch.timing', {
@@ -446,12 +275,6 @@ export const createInstrumentedFetch = ({
         message: error instanceof Error ? error.message : String(error)
       });
       throw error;
-    } finally {
-      try {
-        diagnosticsChannel.unsubscribe(createChannelName, onCreate);
-      } catch {
-        // already unsubscribed
-      }
     }
   };
 

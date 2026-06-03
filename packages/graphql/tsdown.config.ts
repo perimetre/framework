@@ -12,7 +12,6 @@ export default defineConfig({
     '@graphql-typed-document-node/core',
     '@tanstack/react-query',
     'graphql',
-    'graphql-request',
-    'node:diagnostics_channel'
+    'graphql-request'
   ]
 });
