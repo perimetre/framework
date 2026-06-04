@@ -57,34 +57,30 @@ const operationNameFromDocument = (document: unknown): string => {
  * WPGraphQL Smart Cache only caches **GET** requests at the network layer.
  * To stay under the URL length limit (most edge proxies cap around 8 KB),
  * we use the Apollo Automatic Persisted Queries (APQ) protocol: send only
- * the sha256 hash of the printed query, plus variables and operationName.
- * Smart Cache resolves the hash to the saved document and executes it.
+ * the sha256 hash of the query (the `queryId`), plus variables and
+ * operationName. Smart Cache resolves the hash to the saved document and
+ * executes it.
  *
- * First request for a given hash: POST with both `query` and `queryId` so
- * Smart Cache stores the alias and returns data in one round trip.
- * Subsequent requests: GET with `queryId` only — served from the network
- * cache when warm.
+ * ## Hashes now match — GET-first, POST-fallback
  *
- * Hash normalization caveat: `graphql-php`'s `Printer::doPrint` doesn't
- * always match `graphql-js`'s `print()` byte-for-byte (descriptions,
- * argument formatting, etc.), so the codegen-embedded hash may not be the
- * hash Smart Cache actually stores the document under. We work around this
- * by reading the `x-graphql-query-id` response header on the register POST
- * — that's the server-assigned hash — and using it for the subsequent
- * APQ GETs.
+ * The codegen hasher ({@link hashOperationForWpGraphqlSmartCache}) prints the
+ * document the same way `graphql-php` does, so the embedded `queryId` equals
+ * the id the server stores the persisted document under. That means the
+ * **first** request for a hash can go straight out as an APQ **GET** and hit
+ * the document — no POST-to-register round trip, no per-cold-start re-warm,
+ * no tracking of a separate "server hash".
+ *
+ * The only time a GET misses is when the document has *never* been registered
+ * on this server (e.g. a freshly-deployed query the CMS has not seen yet). In
+ * that case Smart Cache replies with `PersistedQueryNotFound`; we register the
+ * document with a single POST (which sends both `query` and `queryId`, so the
+ * server saves it under the id we already use) and then resume GETs. Because
+ * the hashes match, that POST happens at most once per *document lifetime per
+ * server*, not once per process.
+ *
+ * Mutations and subscriptions never use the GET path — they always POST.
  */
 const APQ_NOT_FOUND_ERROR = 'PersistedQueryNotFound';
-const APQ_QUERY_ID_HEADER = 'x-graphql-query-id';
-
-type ApqRegisterResult = {
-  response: ApqResponse;
-  /**
-   * The hash Smart Cache stored the document under, as reported in the
-   * `x-graphql-query-id` response header. Falls back to the codegen hash
-   * when the header is missing.
-   */
-  serverHash: string;
-};
 
 type ApqResponse = {
   data?: unknown;
@@ -146,14 +142,11 @@ export type ExecuteGraphqlRequest = <TResult, TVariables>(
  * present, and falls back to the supplied `client.request` for mutations,
  * unhashed documents, or any APQ transport failure.
  *
- * The first request for a given hash registers it via APQ POST and
- * records the **server-assigned** hash from the `x-graphql-query-id`
- * response header. Subsequent requests use APQ GET with the server hash
- * so Smart Cache's network cache can serve a HIT. The registration map
- * is kept in process memory — each lambda cold-start re-warms by sending
- * one POST per hash before serving GETs. If Smart Cache later returns
- * `PersistedQueryNotFound` (alias eviction, deployment churn), the
- * executor re-registers via POST and resumes GETs for the new hash.
+ * Because the codegen hash matches the server's normalized persisted-query
+ * id, the executor issues an APQ **GET** first. On the rare
+ * `PersistedQueryNotFound` (the document was never registered on this server),
+ * it registers the document with one POST and retries the GET, so subsequent
+ * callers stay on the cacheable GET fast path.
  */
 export const createApqExecutor = ({
   client,
@@ -163,16 +156,6 @@ export const createApqExecutor = ({
   persistedDocuments,
   startSpan
 }: ApqExecutorOptions): ExecuteGraphqlRequest => {
-  /**
-   * codegenHash → serverHash. The server hash is the one Smart Cache
-   * stored the document under (from the `x-graphql-query-id` response
-   * header on the register POST). Subsequent GETs use the server hash so
-   * Smart Cache can actually find the document — sending the codegen
-   * hash returns `PersistedQueryNotFound` whenever the two normalizers
-   * disagree.
-   */
-  const registeredServerHashes = new Map<string, string>();
-
   /**
    * Wraps `fn` in a span when `startSpan` is configured; runs it bare
    * otherwise. Lets the executor be tracer-agnostic.
@@ -188,18 +171,19 @@ export const createApqExecutor = ({
   };
 
   /**
-   * Registers a persisted query alias on the WPGraphQL Smart Cache server
-   * and returns the executed response data in a single round trip,
-   * alongside the server-assigned hash from the `x-graphql-query-id`
-   * response header. Returns `null` when we don't have a persisted
-   * documents entry for the codegen hash.
+   * Registers a persisted query on the WPGraphQL Smart Cache server and
+   * returns the executed response in the same round trip. Sends both `query`
+   * and `queryId` so the server saves the document under the *same* id the
+   * client already uses — no second identifier to track. Returns `null` when
+   * there's no persisted-documents entry for the hash (callers fall through
+   * to the regular client).
    */
   const registerViaApqPost = async (
-    codegenHash: string,
+    hash: string,
     operationName: string,
     variables: unknown
-  ): Promise<ApqRegisterResult | null> => {
-    const query = persistedDocuments[codegenHash];
+  ): Promise<ApqResponse | null> => {
+    const query = persistedDocuments[hash];
     if (!query) return null;
 
     const res = await fetchImpl(endpoint, {
@@ -211,7 +195,7 @@ export const createApqExecutor = ({
       body: JSON.stringify({
         operationName,
         query,
-        queryId: codegenHash,
+        queryId: hash,
         variables: variables ?? {}
       })
     });
@@ -220,140 +204,86 @@ export const createApqExecutor = ({
       throw new Error(`APQ POST returned HTTP ${String(res.status)}`);
     }
 
-    const response = (await res.json()) as ApqResponse;
-    const headerHash = res.headers.get(APQ_QUERY_ID_HEADER)?.trim();
-    const serverHash =
-      headerHash !== undefined && headerHash.length > 0
-        ? headerHash
-        : codegenHash;
-
-    return { response, serverHash };
+    return (await res.json()) as ApqResponse;
   };
 
   /**
-   * Registers (or re-registers) the document and returns the response
-   * payload from the POST. Updates `registeredServerHashes` on success.
-   * Returns `null` if there's no persisted-documents entry for the hash
-   * — callers should fall through to the regular client.
+   * Registers the document via POST and returns its response data, falling
+   * back to the regular client if registration has no entry or fails. Used
+   * when an APQ GET misses because the document was never registered on this
+   * server.
    */
   const registerAndExecute = async <TResult, TVariables>(
-    codegenHash: string,
+    hash: string,
     operationName: string,
     document: TypedDocumentNode<TResult, TVariables>,
     variables?: TVariables
-  ): Promise<{ data: TResult } | null> => {
+  ): Promise<TResult> => {
     return wrapSpan(
       `graphql.apq.register.${operationName}`,
       'graphql.query',
-      { operationName, hash: codegenHash, transport: 'apq-register-post' },
-      async (span) => {
+      { operationName, hash, transport: 'apq-register-post' },
+      async () => {
         try {
           const registered = await registerViaApqPost(
-            codegenHash,
+            hash,
             operationName,
             variables
           );
 
           if (
             registered &&
-            !registered.response.errors &&
-            registered.response.data !== undefined
+            !registered.errors &&
+            registered.data !== undefined
           ) {
-            const previousServerHash = registeredServerHashes.get(codegenHash);
-            registeredServerHashes.set(codegenHash, registered.serverHash);
-            if (
-              previousServerHash &&
-              previousServerHash !== registered.serverHash
-            ) {
-              logger?.info('graphql.apq.server_hash_rotated', {
-                operationName,
-                codegenHash,
-                previousServerHash,
-                serverHash: registered.serverHash
-              });
-            }
-            span?.setAttribute(
-              'graphql.apq.server_hash',
-              registered.serverHash
-            );
-            return { data: registered.response.data as TResult };
+            return registered.data as TResult;
           }
 
-          registeredServerHashes.delete(codegenHash);
           logger?.warn('graphql.apq.register_failed', {
             operationName,
-            hash: codegenHash,
-            hadErrors: !!registered?.response.errors
+            hash,
+            hadErrors: !!registered?.errors
           });
-          return {
-            data: await client.request(
-              document,
-              variables as object | undefined
-            )
-          };
         } catch (error) {
-          registeredServerHashes.delete(codegenHash);
           logger?.warn('graphql.apq.register_threw', {
             operationName,
-            hash: codegenHash,
+            hash,
             message: error instanceof Error ? error.message : String(error)
           });
-          return {
-            data: await client.request(
-              document,
-              variables as object | undefined
-            )
-          };
         }
+
+        return client.request(document, variables as object | undefined);
       }
     );
   };
 
   /**
-   * Executes a GraphQL operation. Queries with a codegen-embedded hash
-   * route through APQ (POST-to-register on the first hit, GET on
-   * subsequent hits using the server-assigned hash). Everything else
-   * falls back to the supplied client.
+   * Executes a GraphQL operation. Queries with a codegen-embedded hash route
+   * through APQ — GET first, and a one-off register POST then GET if the
+   * server reports `PersistedQueryNotFound`. Everything else (mutations,
+   * subscriptions, unhashed documents) falls back to the supplied client.
    */
   async function execute<TResult, TVariables>(
     document: TypedDocumentNode<TResult, TVariables>,
     variables?: TVariables
   ): Promise<TResult> {
-    const { hash: codegenHash, operationKind } = apqMetaFromDocument(document);
+    const { hash, operationKind } = apqMetaFromDocument(document);
     const operationName = operationNameFromDocument(document);
 
-    if (operationKind !== 'query' || !codegenHash) {
-      return client.request(document, variables as object | undefined);
-    }
-
-    const serverHash = registeredServerHashes.get(codegenHash);
-    if (!serverHash) {
-      const registered = await registerAndExecute(
-        codegenHash,
-        operationName,
-        document,
-        variables
-      );
-      if (registered) return registered.data;
-      // No persisted-documents entry — fall back to the normal client.
+    if (operationKind !== 'query' || !hash) {
       return client.request(document, variables as object | undefined);
     }
 
     const apqUrl = buildApqGetUrl(
       endpoint,
-      serverHash,
+      hash,
       operationName,
       variables ?? {}
     );
     return wrapSpan(
       `graphql.apq.${operationName}`,
       'graphql.query',
-      {
-        operationName,
-        hash: codegenHash,
-        serverHash,
-        transport: 'apq-get'
-      },
+      { operationName, hash, transport: 'apq-get' },
       async (span) => {
         try {
           const res = await fetchImpl(apqUrl, {
@@ -365,36 +295,25 @@ export const createApqExecutor = ({
             throw new Error(`APQ GET returned HTTP ${String(res.status)}`);
           }
 
-          const body = (await res.json()) as {
-            data?: unknown;
-            errors?: { message: string }[];
-          };
+          const body = (await res.json()) as ApqResponse;
 
           const apqMiss = body.errors?.some(
             (err) => err.message === APQ_NOT_FOUND_ERROR
           );
           if (apqMiss) {
             span?.setAttribute('graphql.apq.miss', true);
-            registeredServerHashes.delete(codegenHash);
-            logger?.info('graphql.apq.miss_reregister', {
+            logger?.info('graphql.apq.miss_register', {
               operationName,
-              codegenHash,
-              serverHash
+              hash
             });
-            // The alias was evicted (or never existed). Re-register via
-            // POST and execute in the same round trip rather than falling
-            // back to an uncached plain POST — that way the next caller
-            // for this hash gets to use the GET fast path again.
-            const registered = await registerAndExecute(
-              codegenHash,
+            // The document was never registered on this server. Register it
+            // with one POST (same id we already use) and execute in the same
+            // round trip; the next caller for this hash gets the GET fast path.
+            return await registerAndExecute(
+              hash,
               operationName,
               document,
               variables
-            );
-            if (registered) return registered.data;
-            return await client.request(
-              document,
-              variables as object | undefined
             );
           }
 
