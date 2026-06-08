@@ -257,6 +257,33 @@
           "$value": "{pui.primitive.color.overlay.1}"
         }
       },
+      "badge": {
+        "$description": "Product status badge variants (bg = pill fill, fg = label). Acorn ships neutral, undesigned defaults; each brand defines its own per-status palette (see Stelpro's override, from Figma Badges/Tags 554:5225).",
+        "new-bg": {
+          "$value": "{pui.primitive.color.overlay.3}"
+        },
+        "new-fg": {
+          "$value": "{pui.primitive.color.overlay.11}"
+        },
+        "soon-bg": {
+          "$value": "{pui.primitive.color.overlay.3}"
+        },
+        "soon-fg": {
+          "$value": "{pui.primitive.color.overlay.11}"
+        },
+        "discontinued-bg": {
+          "$value": "{pui.primitive.color.overlay.3}"
+        },
+        "discontinued-fg": {
+          "$value": "{pui.primitive.color.overlay.11}"
+        },
+        "unavailable-bg": {
+          "$value": "{pui.primitive.color.overlay.3}"
+        },
+        "unavailable-fg": {
+          "$value": "{pui.primitive.color.overlay.11}"
+        }
+      },
       "dropdown": {
         "$description": "Dropdown/overlay colors.",
         "bg": {

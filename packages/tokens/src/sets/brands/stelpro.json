@@ -99,14 +99,29 @@
           "$value": "{pui.primitive.color.overlay.1}",
           "$description": "Stelpro uses light text on primary red alertbar. Acorn: overlay-12."
         }
+      },
+      "badge": {
+        "$description": "Stelpro product status tags — Figma Badges/Tags (node 554:5225). soon and unavailable inherit the neutral base default.",
+        "new-bg": {
+          "$value": "{pui.primitive.color.overlay.1}",
+          "$description": "Figma color/structural/white."
+        },
+        "new-fg": {
+          "$value": "{pui.primitive.color.primary.9}",
+          "$description": "Figma color/text/eyebrow (#cc0000)."
+        },
+        "discontinued-bg": {
+          "$value": "#fee2e2",
+          "$description": "Figma color/functional/error/100 — discontinued tag fill. Off Stelpro's red scale (kept badge-scoped so it doesn't shift feedback-error)."
+        },
+        "discontinued-fg": {
+          "$value": "#7f1d1d",
+          "$description": "Figma color/functional/error/900 — discontinued tag label. Off Stelpro's red scale; badge-scoped."
+        }
       }
     },
     "radius": {
       "$type": "borderRadius",
-      "badge": {
-        "$value": "{pui.primitive.radius.none}",
-        "$description": "Stelpro uses no rounded corners for badges."
-      },
       "button": {
         "$value": "{pui.primitive.radius.none}",
         "$description": "Figma Button/Primary — radius/none, square corners."
