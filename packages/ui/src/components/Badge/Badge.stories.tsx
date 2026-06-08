@@ -21,6 +21,10 @@ export default {
       options: ['solid', 'soft', 'surface', 'outline'],
       control: { type: 'select' },
       defaultValue: 'soft'
+    },
+    status: {
+      options: ['new', 'soon', 'discontinued', 'unavailable'],
+      control: { type: 'select' }
     }
   }
 } satisfies StoryDefault<Props>;
@@ -158,6 +162,25 @@ export const StatusBadges: Story<Props> = () => (
         Complete
       </Badge>
     </div>
+  </div>
+);
+
+// Tokenized product status variant — colors come from brand badge tokens
+// (themeable per brand), not from className. e.g. Stelpro discontinued = #7F1D1D.
+export const ProductStatus: Story<Props> = () => (
+  <div className="pui:flex pui:flex-wrap pui:gap-4 pui:items-center">
+    <Badge size="2" status="new">
+      New
+    </Badge>
+    <Badge size="2" status="soon">
+      Coming soon
+    </Badge>
+    <Badge size="2" status="discontinued">
+      Discontinued
+    </Badge>
+    <Badge size="2" status="unavailable">
+      Unavailable
+    </Badge>
   </div>
 );
 

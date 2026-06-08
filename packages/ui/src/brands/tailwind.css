@@ -199,6 +199,18 @@
   --color-pui-alertbar-fourth-fg: var(--pui-color-alertbar-fourth-fg);
 
   /* ========================================
+   * BADGE STATUS TOKENS
+   * ======================================== */
+  --color-pui-badge-new-bg: var(--pui-color-badge-new-bg);
+  --color-pui-badge-new-fg: var(--pui-color-badge-new-fg);
+  --color-pui-badge-soon-bg: var(--pui-color-badge-soon-bg);
+  --color-pui-badge-soon-fg: var(--pui-color-badge-soon-fg);
+  --color-pui-badge-discontinued-bg: var(--pui-color-badge-discontinued-bg);
+  --color-pui-badge-discontinued-fg: var(--pui-color-badge-discontinued-fg);
+  --color-pui-badge-unavailable-bg: var(--pui-color-badge-unavailable-bg);
+  --color-pui-badge-unavailable-fg: var(--pui-color-badge-unavailable-fg);
+
+  /* ========================================
    * SEMANTIC SHAPE TOKENS
    * ======================================== */
   --radius-pui-button: var(--pui-radius-button);

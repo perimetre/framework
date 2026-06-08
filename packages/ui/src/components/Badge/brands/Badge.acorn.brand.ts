@@ -66,6 +66,20 @@ export const badgeAcornVariants = cva({
         // Outline variant - border only with accent text
         // Example usage: <Badge variant="outline" className="pui:border pui:border-blue-500 pui:text-blue-700">
       ]
+    },
+    // Product status colors via semantic badge tokens (brand-themeable).
+    // Optional — omit `status` for a color-agnostic badge driven by className.
+    status: {
+      new: ['pui:bg-pui-badge-new-bg', 'pui:text-pui-badge-new-fg'],
+      soon: ['pui:bg-pui-badge-soon-bg', 'pui:text-pui-badge-soon-fg'],
+      discontinued: [
+        'pui:bg-pui-badge-discontinued-bg',
+        'pui:text-pui-badge-discontinued-fg'
+      ],
+      unavailable: [
+        'pui:bg-pui-badge-unavailable-bg',
+        'pui:text-pui-badge-unavailable-fg'
+      ]
     }
   },
   defaultVariants: {

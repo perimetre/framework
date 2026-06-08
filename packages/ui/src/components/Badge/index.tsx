@@ -35,6 +35,7 @@ const Badge: React.FC<PropsWithChildren<BadgeProps>> = ({
   children,
   className,
   size,
+  status,
   variant,
   ...props
 }) => {
@@ -44,7 +45,10 @@ const Badge: React.FC<PropsWithChildren<BadgeProps>> = ({
   const badgeVariants = getBrandVariant(badgeBrandVariants);
 
   return (
-    <Comp className={badgeVariants({ size, variant, className })} {...props}>
+    <Comp
+      className={badgeVariants({ size, status, variant, className })}
+      {...props}
+    >
       {children}
     </Comp>
   );
