@@ -1,7 +1,7 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import type { GraphQLClient } from 'graphql-request';
-import type { ExecuteGraphqlRequest } from './apq.js';
+import type { ExecuteGraphqlRequest, GraphqlRequestOptions } from './apq.js';
 import type { GraphqlSpan, StartSpanFn } from './middlewares.js';
 import { getOperationName } from './utils.js';
 
@@ -70,10 +70,28 @@ export const createGraphqlTanstack = ({
    * Builds a TanStack `queryOptions` bag for a GraphQL document. Spread
    * the result into `useQuery` / `prefetchQuery` to add staleTime, enabled,
    * select, etc.
+   *
+   * Pass a third `options` argument to tune the transport for this query —
+   * most notably `edgeCache` (TTL in seconds), which adds an `edgeCache=<ttl>`
+   * query param so the WPGraphQL Smart Cache server emits a matching
+   * `Cache-Control` header and nginx caches the GET at the edge. Only effective
+   * on the cacheable GET transport (APQ / Trusted Documents); ignored otherwise.
+   *
+   * `options` always comes after `variables`. For a query that takes no
+   * variables, pass `undefined` in the variables slot.
+   * @example Edge-cache a query for 60–300s
+   * ```ts
+   * // with variables — options is the third argument
+   * useQuery(graphqlOptions(GetPostDocument, { slug }, { edgeCache: 300 }));
+   * // no variables — pass `undefined` first
+   * useQuery(graphqlOptions(GetHomepageDocument, undefined, { edgeCache: 60 }));
+   * ```
    */
   function graphqlOptions<TResult, TVariables>(
     document: TypedDocumentNode<TResult, TVariables>,
-    ...[variables]: TVariables extends Record<string, never> ? [] : [TVariables]
+    ...[variables, options]: TVariables extends Record<string, never>
+      ? [variables?: undefined, options?: GraphqlRequestOptions]
+      : [variables: TVariables, options?: GraphqlRequestOptions]
   ) {
     const operationName = getOperationName(document);
     return queryOptions({
@@ -86,9 +104,11 @@ export const createGraphqlTanstack = ({
             op: 'graphql.query',
             attributes: { operationName }
           },
-          async () => executor(document, variables as TVariables)
+          async () => executor(document, variables, options)
         ),
-      queryKey: [document, variables] as const
+      // Fold `edgeCache` into the key so the same operation+variables cached
+      // under different TTLs don't collide in TanStack's client-side cache.
+      queryKey: [document, variables, options?.edgeCache] as const
     });
   }
 

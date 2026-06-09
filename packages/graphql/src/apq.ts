@@ -82,22 +82,77 @@ const operationNameFromDocument = (document: unknown): string => {
  */
 const APQ_NOT_FOUND_ERROR = 'PersistedQueryNotFound';
 
+/**
+ * Per-request options that callers can attach to a single GraphQL operation
+ * (alongside its variables). These are transport hints, not GraphQL inputs —
+ * they tune *how* the request is sent, not *what* it asks for.
+ */
+export type GraphqlRequestOptions = {
+  /**
+   * Edge-cache TTL as a non-negative integer number of **seconds**. When set,
+   * the request is sent with an `?edgeCache=<seconds>` query var; the server
+   * responds with a matching `Cache-Control: max-age` and the request becomes
+   * cacheable at the edge for that long. Without the var, responses stay
+   * uncacheable (the global default is `max-age=0`), so opting in is per-call.
+   *
+   * Only takes effect on the cacheable GET transport (a hashed query under APQ
+   * / Trusted Documents) — it's ignored for mutations, subscriptions, unhashed
+   * documents, and the passthrough POST transport.
+   *
+   * **Invalidation is TTL-only** — the edge cannot purge by tag, so a cached
+   * response can serve stale up to its TTL after the content changes. Keep TTLs
+   * short (≈30–60s) for anything where staleness is user-visible. A
+   * non-integer / negative TTL is dropped (the var stays part of the edge cache
+   * key, so it must stay byte-stable).
+   */
+  edgeCache?: number;
+};
+
 type ApqResponse = {
   data?: unknown;
   errors?: { message: string }[];
 };
 
 /**
+ * Appends the shared edge-cache query param to a persisted-query URL when a
+ * TTL is supplied. Shared by the APQ and Trusted Documents transports so the
+ * param shape stays identical across both.
+ *
+ * The TTL is required to be a non-negative **integer** number of seconds and
+ * is emitted in its canonical decimal form. Varnish keys its cache on
+ * `hash_data(req.url)`, so the param's exact text is part of the cache key —
+ * normalizing to an integer keeps `{ edgeCache: 300 }` from fragmenting into
+ * separate entries for `300`, `300.0`, etc. (and a fractional `max-age` is
+ * meaningless anyway). A non-integer, non-finite, or negative TTL is dropped
+ * rather than written as a bad cache directive.
+ */
+export const applyEdgeCacheParam = (
+  url: URL,
+  edgeCache: number | undefined
+): void => {
+  if (
+    typeof edgeCache === 'number' &&
+    Number.isInteger(edgeCache) &&
+    edgeCache >= 0
+  ) {
+    url.searchParams.set('edgeCache', String(edgeCache));
+  }
+};
+
+/**
  * Builds the APQ GET URL with `queryId`, `operationName`, and serialized
  * `variables` query params. Splitting the params this way keeps every
  * variant of the same operation on a single URL key, which is what Smart
- * Cache's network cache uses for its lookup.
+ * Cache's network cache uses for its lookup. A caller-supplied `edgeCache`
+ * TTL is appended as the `edgeCache` param so the server can set
+ * `Cache-Control` and the edge cache can store the GET.
  */
 const buildApqGetUrl = (
   endpoint: string,
   hash: string,
   operationName: string,
-  variables: unknown
+  variables: unknown,
+  edgeCache?: number
 ): string => {
   const url = new URL(endpoint);
   url.searchParams.set('queryId', hash);
@@ -105,6 +160,7 @@ const buildApqGetUrl = (
   if (variables && Object.keys(variables as object).length > 0) {
     url.searchParams.set('variables', JSON.stringify(variables));
   }
+  applyEdgeCacheParam(url, edgeCache);
   return url.href;
 };
 
@@ -133,7 +189,8 @@ export type ApqExecutorOptions = {
 
 export type ExecuteGraphqlRequest = <TResult, TVariables>(
   document: TypedDocumentNode<TResult, TVariables>,
-  variables?: TVariables
+  variables?: TVariables,
+  options?: GraphqlRequestOptions
 ) => Promise<TResult>;
 
 /**
@@ -181,12 +238,19 @@ export const createApqExecutor = ({
   const registerViaApqPost = async (
     hash: string,
     operationName: string,
-    variables: unknown
+    variables: unknown,
+    edgeCache?: number
   ): Promise<ApqResponse | null> => {
     const query = persistedDocuments[hash];
     if (!query) return null;
 
-    const res = await fetchImpl(endpoint, {
+    // The register POST primes the server with the document; carry the same
+    // `edgeCache` TTL on its URL so the server can set `Cache-Control` on this
+    // response too (the next caller stays on the cacheable GET fast path).
+    const postUrl = new URL(endpoint);
+    applyEdgeCacheParam(postUrl, edgeCache);
+
+    const res = await fetchImpl(postUrl.href, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -217,7 +281,8 @@ export const createApqExecutor = ({
     hash: string,
     operationName: string,
     document: TypedDocumentNode<TResult, TVariables>,
-    variables?: TVariables
+    variables?: TVariables,
+    edgeCache?: number
   ): Promise<TResult> => {
     return wrapSpan(
       `graphql.apq.register.${operationName}`,
@@ -228,7 +293,8 @@ export const createApqExecutor = ({
           const registered = await registerViaApqPost(
             hash,
             operationName,
-            variables
+            variables,
+            edgeCache
           );
 
           if (
@@ -265,7 +331,8 @@ export const createApqExecutor = ({
    */
   async function execute<TResult, TVariables>(
     document: TypedDocumentNode<TResult, TVariables>,
-    variables?: TVariables
+    variables?: TVariables,
+    options?: GraphqlRequestOptions
   ): Promise<TResult> {
     const { hash, operationKind } = apqMetaFromDocument(document);
     const operationName = operationNameFromDocument(document);
@@ -274,11 +341,13 @@ export const createApqExecutor = ({
       return client.request(document, variables as object | undefined);
     }
 
+    const edgeCache = options?.edgeCache;
     const apqUrl = buildApqGetUrl(
       endpoint,
       hash,
       operationName,
-      variables ?? {}
+      variables ?? {},
+      edgeCache
     );
     return wrapSpan(
       `graphql.apq.${operationName}`,
@@ -313,7 +382,8 @@ export const createApqExecutor = ({
               hash,
               operationName,
               document,
-              variables
+              variables,
+              edgeCache
             );
           }
 
@@ -350,6 +420,10 @@ export const createApqExecutor = ({
  * Default executor that bypasses APQ and uses the standard POST transport.
  * Use this when you want a single uniform `executeGraphqlRequest` import
  * shape across projects, regardless of whether APQ is enabled.
+ *
+ * The third `options` argument (e.g. `edgeCache`) is accepted for signature
+ * compatibility but ignored — POSTs aren't edge-cached, so there's no URL to
+ * attach the param to.
  */
 export const createPassthroughExecutor = (
   client: GraphQLClient

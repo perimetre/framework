@@ -1,6 +1,10 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import type { GraphQLClient } from 'graphql-request';
-import type { ExecuteGraphqlRequest } from './apq.js';
+import {
+  applyEdgeCacheParam,
+  type ExecuteGraphqlRequest,
+  type GraphqlRequestOptions
+} from './apq.js';
 import type { GraphqlSpan, StartSpanFn } from './middlewares.js';
 import { OPERATION_DEFINITION_KIND, type GraphqlLogger } from './utils.js';
 
@@ -77,13 +81,16 @@ const metaFromDocument = (
 /**
  * Builds the persisted-query GET URL — `queryId` + `operationName` +
  * serialized `variables` — the same shape WPGraphQL Smart Cache's network
- * cache keys on.
+ * cache keys on. A caller-supplied `edgeCache` TTL is appended as the
+ * `edgeCache` param so the server can set `Cache-Control` and the edge cache
+ * can store the GET.
  */
 const buildGetUrl = (
   endpoint: string,
   id: string,
   operationName: string,
-  variables: unknown
+  variables: unknown,
+  edgeCache?: number
 ): string => {
   const url = new URL(endpoint);
   url.searchParams.set('queryId', id);
@@ -91,6 +98,7 @@ const buildGetUrl = (
   if (variables && Object.keys(variables as object).length > 0) {
     url.searchParams.set('variables', JSON.stringify(variables));
   }
+  applyEdgeCacheParam(url, edgeCache);
   return url.href;
 };
 
@@ -192,7 +200,8 @@ export const createTrustedDocumentExecutor = ({
    */
   async function execute<TResult, TVariables>(
     document: TypedDocumentNode<TResult, TVariables>,
-    variables?: TVariables
+    variables?: TVariables,
+    options?: GraphqlRequestOptions
   ): Promise<TResult> {
     const { hash, operationKind, operationName } = metaFromDocument(document);
 
@@ -200,7 +209,13 @@ export const createTrustedDocumentExecutor = ({
       return client.request(document, variables as object | undefined);
     }
 
-    const url = buildGetUrl(endpoint, hash, operationName, variables ?? {});
+    const url = buildGetUrl(
+      endpoint,
+      hash,
+      operationName,
+      variables ?? {},
+      options?.edgeCache
+    );
     return wrapSpan(
       `graphql.trusted.${operationName}`,
       { operationName, id: hash, transport: 'trusted-get' },

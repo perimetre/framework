@@ -24,10 +24,12 @@ import type { GraphqlLogger } from './utils.js';
 // when they want a narrower import surface, but everything is reachable from
 // here too.
 export {
+  applyEdgeCacheParam,
   createApqExecutor,
   createPassthroughExecutor,
   type ApqExecutorOptions,
-  type ExecuteGraphqlRequest
+  type ExecuteGraphqlRequest,
+  type GraphqlRequestOptions
 } from './apq.js';
 export {
   createGraphqlClient,
