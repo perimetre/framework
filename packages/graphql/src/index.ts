@@ -2,7 +2,8 @@ import type { GraphQLClient } from 'graphql-request';
 import {
   createApqExecutor,
   createPassthroughExecutor,
-  type ExecuteGraphqlRequest
+  type ExecuteGraphqlRequest,
+  type GraphqlRequestPlugin
 } from './apq.js';
 import {
   createGraphqlClient,
@@ -25,11 +26,16 @@ import type { GraphqlLogger } from './utils.js';
 // here too.
 export {
   applyEdgeCacheParam,
+  contextFromDocument,
   createApqExecutor,
   createPassthroughExecutor,
+  notifyResponse,
+  resolveRequestOptions,
   type ApqExecutorOptions,
   type ExecuteGraphqlRequest,
-  type GraphqlRequestOptions
+  type GraphqlRequestContext,
+  type GraphqlRequestOptions,
+  type GraphqlRequestPlugin
 } from './apq.js';
 export {
   createGraphqlClient,
@@ -113,6 +119,7 @@ export const createWpGraphql = ({
   options,
   persistedDocuments,
   plugins = [],
+  requestPlugins,
   startSpan,
   trustedDocuments = false
 }: {
@@ -152,6 +159,15 @@ export const createWpGraphql = ({
   persistedDocuments?: Record<string, string>;
   /** Extra plugins layered before the built-in logger/fetch instrumentation. */
   plugins?: GraphqlClientPlugin[];
+  /**
+   * Per-request transport plugins with `onRequest` / `onResponse` hooks (see
+   * {@link GraphqlRequestPlugin}). These run on **every request** and, unlike
+   * `plugins` (which configure the `graphql-request` POST client once), can
+   * shape the {@link GraphqlRequestOptions} that drive the cacheable GET URL —
+   * e.g. inject an `edgeCache` TTL for build-time requests only. Threaded into
+   * the active executor (APQ / Trusted Documents) and the TanStack helper.
+   */
+  requestPlugins?: GraphqlRequestPlugin[];
   /** Optional Sentry-style `startSpan` for tracing fetch + executor calls. */
   startSpan?: StartSpanFn;
   /**
@@ -206,6 +222,7 @@ export const createWpGraphql = ({
       client,
       fetch: fetchImpl,
       logger,
+      requestPlugins,
       startSpan
     });
   } else if (apq && persistedDocuments && fetchImpl) {
@@ -215,6 +232,7 @@ export const createWpGraphql = ({
       persistedDocuments,
       fetch: fetchImpl,
       logger,
+      requestPlugins,
       startSpan
     });
   } else {
@@ -224,6 +242,7 @@ export const createWpGraphql = ({
   const tanstack = createGraphqlTanstack({
     client,
     executor: executeGraphqlRequest,
+    requestPlugins,
     startSpan
   });
 

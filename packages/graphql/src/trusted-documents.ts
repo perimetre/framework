@@ -2,11 +2,15 @@ import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import type { GraphQLClient } from 'graphql-request';
 import {
   applyEdgeCacheParam,
+  contextFromDocument,
+  notifyResponse,
+  resolveRequestOptions,
   type ExecuteGraphqlRequest,
-  type GraphqlRequestOptions
+  type GraphqlRequestOptions,
+  type GraphqlRequestPlugin
 } from './apq.js';
 import type { GraphqlSpan, StartSpanFn } from './middlewares.js';
-import { OPERATION_DEFINITION_KIND, type GraphqlLogger } from './utils.js';
+import type { GraphqlLogger } from './utils.js';
 
 /**
  * # Trusted Documents (a.k.a. Saved Queries / safelisting)
@@ -35,48 +39,6 @@ import { OPERATION_DEFINITION_KIND, type GraphqlLogger } from './utils.js';
  */
 
 const APQ_NOT_FOUND_ERROR = 'PersistedQueryNotFound';
-
-/**
- * Reads the codegen-emitted persisted-query hash and the operation kind off a
- * `TypedDocumentNode`. Only queries can ride the GET transport — mutations and
- * subscriptions always POST.
- */
-type DocumentWithHash = {
-  __meta__?: { hash?: string };
-  definitions?: readonly {
-    kind: string;
-    name?: { value?: string };
-    operation?: string;
-  }[];
-};
-
-/**
- * Pulls the persisted-query hash, operation kind, and operation name off a
- * codegen-generated `TypedDocumentNode` (`__meta__.hash` + the operation
- * definition). Used to decide whether a request can ride the GET-by-id path.
- */
-const metaFromDocument = (
-  document: unknown
-): {
-  hash?: string;
-  operationKind: 'mutation' | 'query' | 'subscription';
-  operationName: string;
-} => {
-  const doc = document as DocumentWithHash;
-  const opDef = doc.definitions?.find(
-    (d) => d.kind === OPERATION_DEFINITION_KIND
-  );
-
-  let operationKind: 'mutation' | 'query' | 'subscription' = 'query';
-  if (opDef?.operation === 'mutation') operationKind = 'mutation';
-  else if (opDef?.operation === 'subscription') operationKind = 'subscription';
-
-  return {
-    hash: doc.__meta__?.hash,
-    operationKind,
-    operationName: opDef?.name?.value ?? 'AnonymousOperation'
-  };
-};
 
 /**
  * Builds the persisted-query GET URL — `queryId` + `operationName` +
@@ -122,6 +84,8 @@ export type TrustedDocumentExecutorOptions = {
   fetch: typeof fetch;
   /** Optional logger. Sentry's logger or `console` both work. */
   logger?: GraphqlLogger;
+  /** Per-request before/after hooks (see {@link GraphqlRequestPlugin}). */
+  requestPlugins?: GraphqlRequestPlugin[];
   /** Optional Sentry-style span wrapper. */
   startSpan?: StartSpanFn;
 };
@@ -175,6 +139,7 @@ export const createTrustedDocumentExecutor = ({
   endpoint,
   fetch: fetchImpl,
   logger,
+  requestPlugins,
   startSpan
 }: TrustedDocumentExecutorOptions): ExecuteGraphqlRequest => {
   /**
@@ -203,76 +168,100 @@ export const createTrustedDocumentExecutor = ({
     variables?: TVariables,
     options?: GraphqlRequestOptions
   ): Promise<TResult> {
-    const { hash, operationKind, operationName } = metaFromDocument(document);
+    const context = contextFromDocument(document);
+    const { hash, operationKind, operationName } = context;
 
-    if (operationKind !== 'query' || !hash) {
-      return client.request(document, variables as object | undefined);
-    }
+    // Resolve transport options through the plugin chain, then run the request,
+    // notifying `onResponse` once it settles either way.
+    const resolved = resolveRequestOptions(requestPlugins, context, options);
+    const startedAt = Date.now();
 
-    const url = buildGetUrl(
-      endpoint,
-      hash,
-      operationName,
-      variables ?? {},
-      options?.edgeCache
-    );
-    return wrapSpan(
-      `graphql.trusted.${operationName}`,
-      { operationName, id: hash, transport: 'trusted-get' },
-      async (span) => {
-        let body: { data?: unknown; errors?: { message: string }[] };
-        try {
-          const res = await fetchImpl(url, {
-            method: 'GET',
-            headers: { Accept: 'application/json' }
-          });
-          if (!res.ok) {
-            throw new Error(
-              `Trusted document GET returned HTTP ${String(res.status)}`
-            );
-          }
-          body = (await res.json()) as typeof body;
-        } catch (error) {
-          // A transport-level failure (network blip, edge 5xx) shouldn't take
-          // the request down when the document IS on the safelist — fall back
-          // to a normal POST. A missing-from-safelist id, by contrast, comes
-          // back as a 200 with a PersistedQueryNotFound error and is handled
-          // below as a hard error.
-          logger?.warn('graphql.trusted.transport_failed', {
-            operationName,
-            id: hash,
-            message: error instanceof Error ? error.message : String(error)
-          });
-          return client.request(document, variables as object | undefined);
-        }
-
-        const notRegistered = body.errors?.some(
-          (err) => err.message === APQ_NOT_FOUND_ERROR
-        );
-        if (notRegistered) {
-          span?.setAttribute('graphql.trusted.not_registered', true);
-          logger?.error('graphql.trusted.not_registered', {
-            operationName,
-            id: hash
-          });
-          throw new TrustedDocumentNotRegisteredError(operationName, hash);
-        }
-
-        if (body.errors && body.errors.length > 0) {
-          // Genuine GraphQL errors (validation, resolver) — return them to the
-          // caller's error handling via the client, which throws ClientError
-          // with the full payload.
-          logger?.warn('graphql.trusted.errors', {
-            operationName,
-            id: hash,
-            errorCount: body.errors.length
-          });
-          return client.request(document, variables as object | undefined);
-        }
-
-        return body.data as TResult;
+    /** The transport logic: persisted-query GET by id, or a POST fallback. */
+    const runRequest = async (): Promise<TResult> => {
+      if (operationKind !== 'query' || !hash) {
+        return client.request(document, variables as object | undefined);
       }
-    );
+
+      const url = buildGetUrl(
+        endpoint,
+        hash,
+        operationName,
+        variables ?? {},
+        resolved.edgeCache
+      );
+      return wrapSpan(
+        `graphql.trusted.${operationName}`,
+        { operationName, id: hash, transport: 'trusted-get' },
+        async (span) => {
+          let body: { data?: unknown; errors?: { message: string }[] };
+          try {
+            const res = await fetchImpl(url, {
+              method: 'GET',
+              headers: { Accept: 'application/json' }
+            });
+            if (!res.ok) {
+              throw new Error(
+                `Trusted document GET returned HTTP ${String(res.status)}`
+              );
+            }
+            body = (await res.json()) as typeof body;
+          } catch (error) {
+            // A transport-level failure (network blip, edge 5xx) shouldn't take
+            // the request down when the document IS on the safelist — fall back
+            // to a normal POST. A missing-from-safelist id, by contrast, comes
+            // back as a 200 with a PersistedQueryNotFound error and is handled
+            // below as a hard error.
+            logger?.warn('graphql.trusted.transport_failed', {
+              operationName,
+              id: hash,
+              message: error instanceof Error ? error.message : String(error)
+            });
+            return client.request(document, variables as object | undefined);
+          }
+
+          const notRegistered = body.errors?.some(
+            (err) => err.message === APQ_NOT_FOUND_ERROR
+          );
+          if (notRegistered) {
+            span?.setAttribute('graphql.trusted.not_registered', true);
+            logger?.error('graphql.trusted.not_registered', {
+              operationName,
+              id: hash
+            });
+            throw new TrustedDocumentNotRegisteredError(operationName, hash);
+          }
+
+          if (body.errors && body.errors.length > 0) {
+            // Genuine GraphQL errors (validation, resolver) — return them to the
+            // caller's error handling via the client, which throws ClientError
+            // with the full payload.
+            logger?.warn('graphql.trusted.errors', {
+              operationName,
+              id: hash,
+              errorCount: body.errors.length
+            });
+            return client.request(document, variables as object | undefined);
+          }
+
+          return body.data as TResult;
+        }
+      );
+    };
+
+    try {
+      const data = await runRequest();
+      notifyResponse(requestPlugins, context, {
+        data,
+        durationMs: Date.now() - startedAt
+      });
+      return data;
+    } catch (error) {
+      notifyResponse(requestPlugins, context, {
+        durationMs: Date.now() - startedAt,
+        error
+      });
+      throw error;
+    }
   }
 
   return execute;

@@ -1,7 +1,13 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import type { GraphQLClient } from 'graphql-request';
-import type { ExecuteGraphqlRequest, GraphqlRequestOptions } from './apq.js';
+import {
+  contextFromDocument,
+  resolveRequestOptions,
+  type ExecuteGraphqlRequest,
+  type GraphqlRequestOptions,
+  type GraphqlRequestPlugin
+} from './apq.js';
 import type { GraphqlSpan, StartSpanFn } from './middlewares.js';
 import { getOperationName } from './utils.js';
 
@@ -60,10 +66,19 @@ const wrapSpan = async <T>(
 export const createGraphqlTanstack = ({
   client,
   executor,
+  requestPlugins,
   startSpan
 }: {
   client: GraphQLClient;
   executor: ExecuteGraphqlRequest;
+  /**
+   * Per-request before-hooks (see {@link GraphqlRequestPlugin}). Resolved here
+   * only to fold the effective `edgeCache` into the query key so the same
+   * operation cached under different resolved TTLs (e.g. build vs runtime)
+   * doesn't collide. The executor re-resolves and runs the hooks for real, so
+   * the hooks must be pure.
+   */
+  requestPlugins?: GraphqlRequestPlugin[];
   startSpan?: StartSpanFn;
 }) => {
   /**
@@ -94,6 +109,16 @@ export const createGraphqlTanstack = ({
       : [variables: TVariables, options?: GraphqlRequestOptions]
   ) {
     const operationName = getOperationName(document);
+    // Resolve the effective transport options through the request plugins so the
+    // query key reflects what will actually be sent (e.g. a build-only
+    // `edgeCache` default). The executor re-resolves on its own request path —
+    // we only peek here, and pass the caller's original `options` through
+    // unchanged so the executor stays the single authority.
+    const resolved = resolveRequestOptions(
+      requestPlugins,
+      contextFromDocument(document),
+      options
+    );
     return queryOptions({
       /** Runs the GraphQL operation via the supplied executor. */
       queryFn: async () =>
@@ -106,9 +131,10 @@ export const createGraphqlTanstack = ({
           },
           async () => executor(document, variables, options)
         ),
-      // Fold `edgeCache` into the key so the same operation+variables cached
-      // under different TTLs don't collide in TanStack's client-side cache.
-      queryKey: [document, variables, options?.edgeCache] as const
+      // Fold the resolved `edgeCache` into the key so the same operation+variables
+      // cached under different effective TTLs (e.g. build vs runtime) don't
+      // collide in TanStack's client-side cache.
+      queryKey: [document, variables, resolved.edgeCache] as const
     });
   }
 

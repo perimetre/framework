@@ -83,6 +83,21 @@ const operationNameFromDocument = (document: unknown): string => {
 const APQ_NOT_FOUND_ERROR = 'PersistedQueryNotFound';
 
 /**
+ * Read-only metadata about the operation a {@link GraphqlRequestPlugin} is
+ * acting on. Derived from the document — never the GraphQL inputs themselves
+ * (those are the operation's concern, not the transport's). Both `onRequest`
+ * and `onResponse` receive it.
+ */
+export type GraphqlRequestContext = {
+  /** The codegen persisted-query hash, when the document carries one. */
+  hash?: string;
+  /** `query` rides the cacheable GET transport; the others always POST. */
+  operationKind: 'mutation' | 'query' | 'subscription';
+  /** The operation name (`'AnonymousOperation'` for unnamed documents). */
+  operationName: string;
+};
+
+/**
  * Per-request options that callers can attach to a single GraphQL operation
  * (alongside its variables). These are transport hints, not GraphQL inputs —
  * they tune *how* the request is sent, not *what* it asks for.
@@ -106,6 +121,109 @@ export type GraphqlRequestOptions = {
    * key, so it must stay byte-stable).
    */
   edgeCache?: number;
+};
+
+/**
+ * Builds the {@link GraphqlRequestContext} for a document — the single place
+ * that reads `__meta__.hash` and the operation definition. Shared by every
+ * executor and the TanStack helper so they all hand plugins the same context
+ * for a given document (the helper needs it to resolve options for the query
+ * key with the same inputs the executor will use).
+ */
+export const contextFromDocument = (
+  document: unknown
+): GraphqlRequestContext => ({
+  ...apqMetaFromDocument(document),
+  operationName: operationNameFromDocument(document)
+});
+
+/**
+ * A per-request transport plugin with before/after hooks. Registered on
+ * `createWpGraphql` via `requestPlugins`; the hooks run on **every request**.
+ *
+ * Unlike {@link GraphqlClientPlugin} (which configures the `graphql-request`
+ * POST client once, at construction), an `onRequest` hook shapes the transport
+ * hints ({@link GraphqlRequestOptions}) that control the cacheable GET URL —
+ * the one layer a client plugin can't reach. Use it for cross-cutting rules
+ * like "edge-cache everything during the static build" without touching call
+ * sites. `onResponse` is the symmetric after-hook for timing/observation.
+ *
+ * (Distinct from graphql-request's `RequestMiddleware`/`ResponseMiddleware`,
+ * which wrap the raw HTTP POST inside `client.request` — they never see the
+ * persisted-query GET path these hooks exist to influence.)
+ */
+export type GraphqlRequestPlugin = {
+  /**
+   * Runs **before** the request. Given the operation context and the options
+   * resolved so far, return the options to use (or `void` / the same object to
+   * leave them unchanged). Across `requestPlugins`, `onRequest` hooks run
+   * left-to-right, each receiving the previous one's output; the caller's own
+   * per-call `options` are the chain's initial input — so a plugin that only
+   * supplies a *default* should leave a field it finds already set untouched.
+   *
+   * **Must be pure.** It can be invoked more than once for a single logical
+   * request (the TanStack helper resolves options once to build the query key,
+   * then the executor resolves them again to send), so it must be a pure
+   * function of `(context, options)` with no side effects.
+   */
+  onRequest?: (
+    context: GraphqlRequestContext,
+    options: GraphqlRequestOptions
+  ) => GraphqlRequestOptions | undefined;
+  /**
+   * Runs **after** the request settles, with the operation context and the
+   * outcome: `data` on success, `error` on failure (mutually exclusive), plus
+   * `durationMs` measured from just before the request. Observation only — the
+   * return value is ignored and it must not throw (a throw is swallowed so it
+   * can't mask the real result). Only invoked on the executor's request path,
+   * not when the TanStack helper resolves options for the query key.
+   */
+  onResponse?: (
+    context: GraphqlRequestContext,
+    result: { data?: unknown; durationMs: number; error?: unknown }
+  ) => void;
+};
+
+/**
+ * Folds the per-call `options` through every plugin's `onRequest` hook
+ * left-to-right and returns the resolved transport options. Shared by the
+ * executors and the TanStack helper so resolution is identical everywhere. With
+ * no plugins the caller's options pass through unchanged. A hook returning
+ * `void` (or a falsy value) is treated as "no change".
+ */
+export const resolveRequestOptions = (
+  plugins: GraphqlRequestPlugin[] | undefined,
+  context: GraphqlRequestContext,
+  options: GraphqlRequestOptions | undefined
+): GraphqlRequestOptions => {
+  let resolved: GraphqlRequestOptions = options ?? {};
+  if (plugins) {
+    for (const plugin of plugins) {
+      if (!plugin.onRequest) continue;
+      resolved = plugin.onRequest(context, resolved) ?? resolved;
+    }
+  }
+  return resolved;
+};
+
+/**
+ * Notifies every plugin's `onResponse` hook that a request settled. Swallows
+ * hook errors so a misbehaving observer can't change the request's outcome.
+ */
+export const notifyResponse = (
+  plugins: GraphqlRequestPlugin[] | undefined,
+  context: GraphqlRequestContext,
+  result: { data?: unknown; durationMs: number; error?: unknown }
+): void => {
+  if (!plugins) return;
+  for (const plugin of plugins) {
+    if (!plugin.onResponse) continue;
+    try {
+      plugin.onResponse(context, result);
+    } catch {
+      // An observation hook must never take down the request it's observing.
+    }
+  }
 };
 
 type ApqResponse = {
@@ -183,6 +301,8 @@ export type ApqExecutorOptions = {
   logger?: GraphqlLogger;
   /** The hash → printed query string map from codegen. */
   persistedDocuments: Record<string, string>;
+  /** Per-request before/after hooks (see {@link GraphqlRequestPlugin}). */
+  requestPlugins?: GraphqlRequestPlugin[];
   /** Optional Sentry-style span wrapper. */
   startSpan?: StartSpanFn;
 };
@@ -211,6 +331,7 @@ export const createApqExecutor = ({
   fetch: fetchImpl,
   logger,
   persistedDocuments,
+  requestPlugins,
   startSpan
 }: ApqExecutorOptions): ExecuteGraphqlRequest => {
   /**
@@ -334,83 +455,107 @@ export const createApqExecutor = ({
     variables?: TVariables,
     options?: GraphqlRequestOptions
   ): Promise<TResult> {
-    const { hash, operationKind } = apqMetaFromDocument(document);
-    const operationName = operationNameFromDocument(document);
+    const context = contextFromDocument(document);
+    const { hash, operationKind, operationName } = context;
 
-    if (operationKind !== 'query' || !hash) {
-      return client.request(document, variables as object | undefined);
-    }
+    // Resolve transport options through the plugin chain, then run the request,
+    // notifying `onResponse` once it settles either way. `runRequest` holds the
+    // transport logic; the wrapper around it just times + reports the outcome.
+    const resolved = resolveRequestOptions(requestPlugins, context, options);
+    const edgeCache = resolved.edgeCache;
+    const startedAt = Date.now();
 
-    const edgeCache = options?.edgeCache;
-    const apqUrl = buildApqGetUrl(
-      endpoint,
-      hash,
-      operationName,
-      variables ?? {},
-      edgeCache
-    );
-    return wrapSpan(
-      `graphql.apq.${operationName}`,
-      'graphql.query',
-      { operationName, hash, transport: 'apq-get' },
-      async (span) => {
-        try {
-          const res = await fetchImpl(apqUrl, {
-            method: 'GET',
-            headers: { Accept: 'application/json' }
-          });
+    /** The transport logic: APQ GET (with register-on-miss) or a POST fallback. */
+    const runRequest = async (): Promise<TResult> => {
+      if (operationKind !== 'query' || !hash) {
+        return client.request(document, variables as object | undefined);
+      }
 
-          if (!res.ok) {
-            throw new Error(`APQ GET returned HTTP ${String(res.status)}`);
-          }
-
-          const body = (await res.json()) as ApqResponse;
-
-          const apqMiss = body.errors?.some(
-            (err) => err.message === APQ_NOT_FOUND_ERROR
-          );
-          if (apqMiss) {
-            span?.setAttribute('graphql.apq.miss', true);
-            logger?.info('graphql.apq.miss_register', {
-              operationName,
-              hash
+      const apqUrl = buildApqGetUrl(
+        endpoint,
+        hash,
+        operationName,
+        variables ?? {},
+        edgeCache
+      );
+      return wrapSpan(
+        `graphql.apq.${operationName}`,
+        'graphql.query',
+        { operationName, hash, transport: 'apq-get' },
+        async (span) => {
+          try {
+            const res = await fetchImpl(apqUrl, {
+              method: 'GET',
+              headers: { Accept: 'application/json' }
             });
-            // The document was never registered on this server. Register it
-            // with one POST (same id we already use) and execute in the same
-            // round trip; the next caller for this hash gets the GET fast path.
-            return await registerAndExecute(
-              hash,
-              operationName,
-              document,
-              variables,
-              edgeCache
-            );
-          }
 
-          if (body.errors && body.errors.length > 0) {
-            logger?.warn('graphql.apq.errors_fallback_post', {
+            if (!res.ok) {
+              throw new Error(`APQ GET returned HTTP ${String(res.status)}`);
+            }
+
+            const body = (await res.json()) as ApqResponse;
+
+            const apqMiss = body.errors?.some(
+              (err) => err.message === APQ_NOT_FOUND_ERROR
+            );
+            if (apqMiss) {
+              span?.setAttribute('graphql.apq.miss', true);
+              logger?.info('graphql.apq.miss_register', {
+                operationName,
+                hash
+              });
+              // The document was never registered on this server. Register it
+              // with one POST (same id we already use) and execute in the same
+              // round trip; the next caller for this hash gets the GET fast path.
+              return await registerAndExecute(
+                hash,
+                operationName,
+                document,
+                variables,
+                edgeCache
+              );
+            }
+
+            if (body.errors && body.errors.length > 0) {
+              logger?.warn('graphql.apq.errors_fallback_post', {
+                operationName,
+                errorCount: body.errors.length
+              });
+              return await client.request(
+                document,
+                variables as object | undefined
+              );
+            }
+
+            return body.data as TResult;
+          } catch (error) {
+            logger?.warn('graphql.apq.transport_failed', {
               operationName,
-              errorCount: body.errors.length
+              message: error instanceof Error ? error.message : String(error)
             });
             return await client.request(
               document,
               variables as object | undefined
             );
           }
-
-          return body.data as TResult;
-        } catch (error) {
-          logger?.warn('graphql.apq.transport_failed', {
-            operationName,
-            message: error instanceof Error ? error.message : String(error)
-          });
-          return await client.request(
-            document,
-            variables as object | undefined
-          );
         }
-      }
-    );
+      );
+    };
+
+    try {
+      const data = await runRequest();
+      notifyResponse(requestPlugins, context, {
+        data,
+        durationMs: Date.now() - startedAt
+      });
+      return data;
+    } catch (error) {
+      notifyResponse(requestPlugins, context, {
+        durationMs: Date.now() - startedAt,
+        error
+      });
+      throw error;
+    }
   }
 
   return execute;
