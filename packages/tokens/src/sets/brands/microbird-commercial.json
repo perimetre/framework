@@ -25,7 +25,7 @@
           "1": { "$value": "#FCFDFF", "$description": "Brand-tinted light background (Figma: Background)." },
           "2": { "$value": "#E2ECFF", "$description": "Subtle light blue (Figma: Light brand / Highlight light)." },
           "8": { "$value": "#007FE4", "$description": "Bright blue (Figma: Highlight medium)." },
-          "9": { "$value": "#004883", "$description": "Hero blue (Figma: Highlight dark / Dark brand)." },
+          "9": { "$value": "#00467E", "$description": "Hero blue (Figma: Highlight dark / Dark brand)." },
           "10": { "$value": "#001527", "$description": "Darkest navy for hover/active states." },
           "11": { "$value": "#004883", "$description": "Accessible text blue — same as hero (Figma: Text dark). High contrast on white." },
           "12": { "$value": "#001527", "$description": "Darkest blue. Same as step 10 for limited palette." }
