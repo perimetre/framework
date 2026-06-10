@@ -1,5 +1,11 @@
 # @perimetre/tokens
 
+## 0.7.1
+
+### Patch Changes
+
+- 7baf2e5: Update microbird-commercial `primary-9` hero blue from `#004883` to `#00467E`.
+
 ## 0.7.0
 
 ### Minor Changes
