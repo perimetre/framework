@@ -3,6 +3,7 @@ import { compose } from '@/lib/cva';
 import { imageCarouselImageWrapperAcornVariants } from './ImageCarouselImageWrapper.acorn.brand';
 import { imageCarouselLazyLoadContainerAcornVariants } from './ImageCarouselLazyLoadContainer.acorn.brand';
 import { imageCarouselLazyLoadContainerSprigVariants } from './ImageCarouselLazyLoadContainer.sprig.brand';
+import { imageCarouselLazyLoadContainerStelproVariants } from './ImageCarouselLazyLoadContainer.stelpro.brand';
 import { imageCarouselLazyLoadSpinnerAcornVariants } from './ImageCarouselLazyLoadSpinner.acorn.brand';
 
 export const imageCarouselLazyLoadContainerBrandVariants = {
@@ -10,11 +11,11 @@ export const imageCarouselLazyLoadContainerBrandVariants = {
   sprig: compose(
     imageCarouselLazyLoadContainerAcornVariants,
     imageCarouselLazyLoadContainerSprigVariants
+  ),
+  stelpro: compose(
+    imageCarouselLazyLoadContainerAcornVariants,
+    imageCarouselLazyLoadContainerStelproVariants
   )
-  // stelpro: compose(
-  //   imageCarouselLazyLoadContainerAcornVariants,
-  //   imageCarouselLazyLoadContainerStelproVariants
-  // )
 } as const satisfies BrandVariants<
   typeof imageCarouselLazyLoadContainerAcornVariants
 >;

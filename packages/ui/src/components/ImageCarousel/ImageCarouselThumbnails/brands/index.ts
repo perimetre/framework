@@ -4,17 +4,18 @@ import { imageCarouselThumbnailAcornVariants } from './ImageCarouselThumbnail.ac
 import { imageCarouselThumbnailSprigVariants } from './ImageCarouselThumbnail.sprig.brand';
 import { imageCarouselThumbnailStelproVariants } from './ImageCarouselThumbnail.stelpro.brand';
 import { imageCarouselThumbnailsContainerAcornVariants } from './ImageCarouselThumbnailsContainer.acorn.brand';
+import { imageCarouselThumbnailsContainerStelproVariants } from './ImageCarouselThumbnailsContainer.stelpro.brand';
 
 export const imageCarouselThumbnailsContainerBrandVariants = {
-  acorn: imageCarouselThumbnailsContainerAcornVariants
+  acorn: imageCarouselThumbnailsContainerAcornVariants,
   // sprig: compose(
   //   imageCarouselThumbnailsContainerAcornVariants,
   //   imageCarouselThumbnailsContainerSprigVariants
   // ),
-  // stelpro: compose(
-  //   imageCarouselThumbnailsContainerAcornVariants,
-  //   imageCarouselThumbnailsContainerStelproVariants
-  // )
+  stelpro: compose(
+    imageCarouselThumbnailsContainerAcornVariants,
+    imageCarouselThumbnailsContainerStelproVariants
+  )
 } as const satisfies BrandVariants<
   typeof imageCarouselThumbnailsContainerAcornVariants
 >;
