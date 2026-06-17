@@ -1,5 +1,80 @@
 # @perimetre/graphql
 
+## 0.4.0
+
+### Minor Changes
+
+- e86e97e: Add per-request transport plugins (`requestPlugins`) with `onRequest` / `onResponse` hooks.
+
+  `createWpGraphql` now accepts a `requestPlugins: GraphqlRequestPlugin[]` array. Unlike `plugins` (which configure the `graphql-request` POST client once, at construction), these run on **every request** and operate at the transport-hint layer — the one layer a `graphql-request` `requestMiddleware` can't reach, because the APQ / Trusted Documents executors issue their cacheable GET via a raw `fetch` that bypasses `client.request` entirely.
+  - **New `GraphqlRequestPlugin` type** (exported from `@perimetre/graphql` and `/apq`):
+
+    ```ts
+    type GraphqlRequestPlugin = {
+      // before the request — shape the transport options (e.g. inject edgeCache)
+      onRequest?: (
+        context: GraphqlRequestContext,
+        options: GraphqlRequestOptions
+      ) => GraphqlRequestOptions | undefined;
+      // after it settles — observe outcome + timing
+      onResponse?: (
+        context: GraphqlRequestContext,
+        result: { data?: unknown; durationMs: number; error?: unknown }
+      ) => void;
+    };
+    ```
+
+    `onRequest` hooks run left-to-right, each receiving the previous one's output; the caller's own per-call `options` are the chain's initial input, so a plugin supplying a _default_ leaves an already-set field untouched. `onResponse` is observation-only — its return value is ignored and a throw is swallowed so it can't mask the real result.
+
+    ```ts
+    createWpGraphql({
+      apq: true,
+      persistedDocuments,
+      fetch,
+      requestPlugins: [
+        {
+          // edge-cache every request during the static build, but never at runtime
+          onRequest: (ctx, opts) =>
+            isBuild && opts.edgeCache == null
+              ? { ...opts, edgeCache: 3600 }
+              : opts,
+          onResponse: (ctx, { durationMs }) =>
+            logger.info('graphql.timing', { op: ctx.operationName, durationMs })
+        }
+      ]
+    });
+    ```
+
+  - **New exports** alongside the type: `GraphqlRequestContext` (`{ hash?, operationKind, operationName }` — read-only operation metadata, never the GraphQL inputs), plus the helpers `contextFromDocument`, `resolveRequestOptions`, and `notifyResponse` for callers composing their own executors.
+  - **`onRequest` is folded into the TanStack `queryKey`.** `graphqlOptions` resolves the plugin chain to compute the effective `edgeCache` and keys on _that_, so the same operation cached under different resolved TTLs (e.g. build vs runtime) doesn't collide. The executor re-resolves and runs the hooks for real, so `onRequest` **must be pure** (it can run more than once per logical request).
+  - Threaded into the APQ executor, the Trusted Documents executor, and the TanStack helper. The passthrough POST executor ignores `requestPlugins` (POSTs aren't edge-cached and have no GET URL to shape).
+
+  **Migration.** None — `requestPlugins` is optional and omitting it leaves every existing call path byte-identical.
+
+## 0.3.0
+
+### Minor Changes
+
+- 3ef73ea: Add a per-request `edgeCache` option for the persisted-query GET transport.
+
+  The server now honours an `?edgeCache=<seconds>` query var: when present, it responds with a matching `Cache-Control: max-age` so the request becomes cacheable at the edge for that long. Without the var, responses stay uncacheable (the global default is `max-age=0`), so opting in is per-call. This release lets callers opt a single query into that edge cache. A query var (not a header) is used because it's guaranteed to reach PHP and is part of the edge cache key, so opted-in and plain requests never collide.
+  - **New `GraphqlRequestOptions` type** (`{ edgeCache?: number }`), exported from `@perimetre/graphql` and `/apq`. It's a transport hint, not a GraphQL input.
+  - **`graphqlOptions` accepts a third `options` argument** (after `variables`). Pass `{ edgeCache }` to add the `edgeCache` param to the request URL:
+
+    ```ts
+    // with variables — options is the third argument
+    useQuery(graphqlOptions(GetPostDocument, { slug }, { edgeCache: 300 }));
+    // no variables — pass `undefined` in the variables slot
+    useQuery(graphqlOptions(GetHomepageDocument, undefined, { edgeCache: 60 }));
+    ```
+
+    `edgeCache` is folded into the TanStack `queryKey`, so the same operation cached under different TTLs doesn't collide client-side. Callers that don't pass it hash to the same key as before.
+
+  - **APQ and Trusted Documents executors** append the `edgeCache` param to the persisted-query GET URL (and, for APQ, to the register-on-miss POST), so the server sets `Cache-Control` on the cacheable response. The TTL only takes effect on the GET transport — it's ignored for mutations, subscriptions, unhashed documents, and the passthrough POST transport, none of which are edge-cached.
+  - The TTL must be a non-negative **integer** number of seconds; anything else (fractional, negative, non-finite) is dropped. The var is part of the edge cache key, so it's normalized to keep `{ edgeCache: 300 }` from fragmenting into separate `300` / `300.0` entries (shared `applyEdgeCacheParam` helper, also exported).
+
+  **Migration.** None — `edgeCache` is opt-in and the existing `graphqlOptions(doc)` / `graphqlOptions(doc, variables)` call shapes are unchanged.
+
 ## 0.2.0
 
 ### Minor Changes

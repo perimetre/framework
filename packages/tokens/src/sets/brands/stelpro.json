@@ -54,6 +54,12 @@
           "$description": "Figma color/text/primary (#2E2E2E) — body copy uses the same primary text color."
         }
       },
+      "border": {
+        "default": {
+          "$value": "{pui.primitive.color.overlay.4}",
+          "$description": "Figma color/border/default (#E5E5E5) — the hairline around the PDP gallery image + thumbnails and other default rules. Acorn: overlay-5 (#d4d4d4)."
+        }
+      },
       "interactive": {
         "on-primary": {
           "$value": "{pui.primitive.color.overlay.1}",

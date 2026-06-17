@@ -36,6 +36,16 @@ export type ImageCarouselProps<T = unknown> = {
    */
   className?: string;
   /**
+   * Where the dot indicators sit. `'overlay'` (default) keeps the original
+   * behavior — dots are absolutely positioned over the image and are suppressed
+   * when thumbnails are shown. `'below'` renders the dots as a sibling beneath
+   * the viewport (a brand can flow them under the image) and lets dots coexist
+   * with thumbnails, so a consumer can show both and CSS-toggle per breakpoint.
+   * Only `'below'` opts into the coexist behavior; every existing caller keeps
+   * the default and is unaffected.
+   */
+  dotsPlacement?: 'below' | 'overlay';
+  /**
    * Embla carousel options to customize how the carousel works.
    */
   options?: EmblaOptionsType;
@@ -123,6 +133,7 @@ export type ImageCarouselProps<T = unknown> = {
  */
 const ImageCarousel = <T,>({
   className,
+  dotsPlacement = 'overlay',
   options,
   plugins,
   renderImage,
@@ -320,14 +331,15 @@ const ImageCarousel = <T,>({
           </ImageCarouselControls>
         )}
 
-        {/* Dot Indicators */}
-        {showDots && !showThumbnails && (
+        {/* Dot Indicators (overlay) — DEFAULT behavior, unchanged: absolutely
+            positioned over the image, suppressed when thumbnails are shown. */}
+        {showDots && dotsPlacement === 'overlay' && !showThumbnails && (
           <ImageCarouselDotsContainer data-pui-component="DotsContainer">
             {slides.map((_, index) => (
               <ImageCarouselDot
                 key={index}
                 data-pui-component="CarouselDot"
-                data-pui-isSelected={index === selectedIndex}
+                data-pui-isselected={index === selectedIndex}
                 index={index}
                 isSelected={index === selectedIndex}
                 onClick={() => {
@@ -338,6 +350,27 @@ const ImageCarousel = <T,>({
           </ImageCarouselDotsContainer>
         )}
       </div>
+
+      {/* Dot Indicators (below) — OPT-IN via `dotsPlacement="below"`: rendered as
+          a sibling beneath the viewport so a brand can flow them under the image,
+          and allowed to coexist with thumbnails (consumer CSS-toggles per
+          breakpoint). Does not affect callers using the default `'overlay'`. */}
+      {showDots && dotsPlacement === 'below' && (
+        <ImageCarouselDotsContainer data-pui-component="DotsContainer">
+          {slides.map((_, index) => (
+            <ImageCarouselDot
+              key={index}
+              data-pui-component="CarouselDot"
+              data-pui-isselected={index === selectedIndex}
+              index={index}
+              isSelected={index === selectedIndex}
+              onClick={() => {
+                scrollTo(index);
+              }}
+            />
+          ))}
+        </ImageCarouselDotsContainer>
+      )}
 
       {/* Thumbnails on bottom - render after viewport */}
       {showThumbnails && thumbnailPosition === 'bottom' && thumbnailsComponent}

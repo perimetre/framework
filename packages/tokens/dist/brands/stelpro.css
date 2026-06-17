@@ -33,6 +33,7 @@
   [data-pui-brand='stelpro'] {
     --pui-color-fg-default: var(--pui-primitive-color-overlay-11);
     --pui-color-fg-body: var(--pui-primitive-color-overlay-11);
+    --pui-color-border-default: var(--pui-primitive-color-overlay-4);
     --pui-color-interactive-on-primary: var(--pui-primitive-color-overlay-1);
     --pui-color-button-primary-fill: #353c43;
     --pui-color-button-secondary-hover: #e2e5e9;
