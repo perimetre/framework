@@ -66,6 +66,18 @@ export const badgeAcornVariants = cva({
         // Outline variant - border only with accent text
         // Example usage: <Badge variant="outline" className="pui:border pui:border-blue-500 pui:text-blue-700">
       ]
+    },
+    // Semantic tone — brand-themeable color via badge tokens.
+    // Generic, project-agnostic scale; projects alias these tones to their own
+    // labels (e.g. info="New", danger="Discontinued"). Acorn ships neutral
+    // defaults for every tone; brands recolor them via the badge tokens.
+    // Optional — omit `tone` for a color-agnostic badge driven by className.
+    tone: {
+      neutral: ['pui:bg-pui-badge-neutral-bg', 'pui:text-pui-badge-neutral-fg'],
+      info: ['pui:bg-pui-badge-info-bg', 'pui:text-pui-badge-info-fg'],
+      success: ['pui:bg-pui-badge-success-bg', 'pui:text-pui-badge-success-fg'],
+      warning: ['pui:bg-pui-badge-warning-bg', 'pui:text-pui-badge-warning-fg'],
+      danger: ['pui:bg-pui-badge-danger-bg', 'pui:text-pui-badge-danger-fg']
     }
   },
   defaultVariants: {

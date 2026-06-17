@@ -156,6 +156,16 @@
     --pui-color-alertbar-third-fg: var(--pui-primitive-color-overlay-12);
     --pui-color-alertbar-fourth-bg: var(--pui-primitive-color-overlay-12);
     --pui-color-alertbar-fourth-fg: var(--pui-primitive-color-overlay-1);
+    --pui-color-badge-neutral-bg: var(--pui-primitive-color-overlay-3);
+    --pui-color-badge-neutral-fg: var(--pui-primitive-color-overlay-11);
+    --pui-color-badge-info-bg: var(--pui-primitive-color-overlay-3);
+    --pui-color-badge-info-fg: var(--pui-primitive-color-overlay-11);
+    --pui-color-badge-success-bg: var(--pui-primitive-color-overlay-3);
+    --pui-color-badge-success-fg: var(--pui-primitive-color-overlay-11);
+    --pui-color-badge-warning-bg: var(--pui-primitive-color-overlay-3);
+    --pui-color-badge-warning-fg: var(--pui-primitive-color-overlay-11);
+    --pui-color-badge-danger-bg: var(--pui-primitive-color-overlay-3);
+    --pui-color-badge-danger-fg: var(--pui-primitive-color-overlay-11);
     --pui-color-dropdown-bg: var(--pui-color-bg-default);
     --pui-color-dropdown-border: var(--pui-color-border-default);
     --pui-color-dropdown-text: var(--pui-color-fg-default);

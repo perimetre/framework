@@ -21,6 +21,10 @@ export default {
       options: ['solid', 'soft', 'surface', 'outline'],
       control: { type: 'select' },
       defaultValue: 'soft'
+    },
+    tone: {
+      options: ['neutral', 'info', 'success', 'warning', 'danger'],
+      control: { type: 'select' }
     }
   }
 } satisfies StoryDefault<Props>;
@@ -158,6 +162,50 @@ export const StatusBadges: Story<Props> = () => (
         Complete
       </Badge>
     </div>
+  </div>
+);
+
+// Tokenized semantic tone scale — colors come from brand badge tokens
+// (themeable per brand), not from className. The tones are generic and
+// project-agnostic; a consumer project aliases them to its own labels.
+// e.g. Stelpro recolors info (its "New" tag) and danger (#7F1D1D, its
+// "Discontinued" tag); neutral/success/warning fall back to the Acorn default.
+export const Tones: Story<Props> = () => (
+  <div className="pui:flex pui:flex-wrap pui:gap-4 pui:items-center">
+    <Badge size="2" tone="neutral">
+      Neutral
+    </Badge>
+    <Badge size="2" tone="info">
+      Info
+    </Badge>
+    <Badge size="2" tone="success">
+      Success
+    </Badge>
+    <Badge size="2" tone="warning">
+      Warning
+    </Badge>
+    <Badge size="2" tone="danger">
+      Danger
+    </Badge>
+  </div>
+);
+
+// How a consumer project aliases the generic tones to its own vocabulary.
+// The design system stays product-agnostic; the labels live in the app.
+export const ProjectAliasExample: Story<Props> = () => (
+  <div className="pui:flex pui:flex-wrap pui:gap-4 pui:items-center">
+    <Badge size="2" tone="info">
+      New
+    </Badge>
+    <Badge size="2" tone="warning">
+      Coming soon
+    </Badge>
+    <Badge size="2" tone="danger">
+      Discontinued
+    </Badge>
+    <Badge size="2" tone="neutral">
+      Unavailable
+    </Badge>
   </div>
 );
 
