@@ -44,10 +44,10 @@
     --pui-color-button-inactive: #9ca6af;
     --pui-color-button-inactive-label: #6c767f;
     --pui-color-alertbar-first-fg: var(--pui-primitive-color-overlay-1);
-    --pui-color-badge-new-bg: var(--pui-primitive-color-overlay-1);
-    --pui-color-badge-new-fg: var(--pui-primitive-color-primary-9);
-    --pui-color-badge-discontinued-bg: #fee2e2;
-    --pui-color-badge-discontinued-fg: #7f1d1d;
+    --pui-color-badge-info-bg: var(--pui-primitive-color-overlay-1);
+    --pui-color-badge-info-fg: var(--pui-primitive-color-primary-9);
+    --pui-color-badge-danger-bg: #fee2e2;
+    --pui-color-badge-danger-fg: #7f1d1d;
     --pui-radius-button: var(--pui-primitive-radius-none);
     --pui-typo-display-xl-size: 4rem;
     --pui-typo-display-xl-leading: var(--pui-primitive-leading-relaxed);

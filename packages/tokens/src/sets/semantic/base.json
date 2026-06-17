@@ -258,29 +258,35 @@
         }
       },
       "badge": {
-        "$description": "Product status badge variants (bg = pill fill, fg = label). Acorn ships neutral, undesigned defaults; each brand defines its own per-status palette (see Stelpro's override, from Figma Badges/Tags 554:5225).",
-        "new-bg": {
+        "$description": "Semantic tone scale for Badge/Tag color (bg = pill fill, fg = label). Generic and project-agnostic — Acorn ships neutral, undesigned defaults for every tone, and each brand defines its own per-tone palette (see Stelpro's override, from Figma Badges/Tags 554:5225). Consumer projects alias these tones to their own labels (e.g. products: info=New, warning=Coming soon, danger=Discontinued, neutral=Unavailable).",
+        "neutral-bg": {
           "$value": "{pui.primitive.color.overlay.3}"
         },
-        "new-fg": {
+        "neutral-fg": {
           "$value": "{pui.primitive.color.overlay.11}"
         },
-        "soon-bg": {
+        "info-bg": {
           "$value": "{pui.primitive.color.overlay.3}"
         },
-        "soon-fg": {
+        "info-fg": {
           "$value": "{pui.primitive.color.overlay.11}"
         },
-        "discontinued-bg": {
+        "success-bg": {
           "$value": "{pui.primitive.color.overlay.3}"
         },
-        "discontinued-fg": {
+        "success-fg": {
           "$value": "{pui.primitive.color.overlay.11}"
         },
-        "unavailable-bg": {
+        "warning-bg": {
           "$value": "{pui.primitive.color.overlay.3}"
         },
-        "unavailable-fg": {
+        "warning-fg": {
+          "$value": "{pui.primitive.color.overlay.11}"
+        },
+        "danger-bg": {
+          "$value": "{pui.primitive.color.overlay.3}"
+        },
+        "danger-fg": {
           "$value": "{pui.primitive.color.overlay.11}"
         }
       },

@@ -29,13 +29,16 @@ export type BadgeProps = {
  * <Badge variant="outline" className="pui:border-orange-500 pui:text-orange-700">
  *   In Progress
  * </Badge>
+ * @example
+ * // Semantic tone — brand-themeable color, aliased per project (e.g. danger="Discontinued")
+ * <Badge tone="danger">Sold out</Badge>
  */
 const Badge: React.FC<PropsWithChildren<BadgeProps>> = ({
   asChild,
   children,
   className,
   size,
-  status,
+  tone,
   variant,
   ...props
 }) => {
@@ -46,7 +49,7 @@ const Badge: React.FC<PropsWithChildren<BadgeProps>> = ({
 
   return (
     <Comp
-      className={badgeVariants({ size, status, variant, className })}
+      className={badgeVariants({ size, tone, variant, className })}
       {...props}
     >
       {children}
