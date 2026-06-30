@@ -6,8 +6,11 @@ on:
 
 jobs:
   check-changeset:
-    # Skip bot PRs (e.g. dependabot, changeset bot, renovate)
-    if: ${{ github.actor_type != 'Bot' }}
+    # Skip bot PRs (e.g. dependabot, changeset bot, renovate) and the
+    # Changesets release PR, whose branch consumes (deletes) the changeset
+    # files — the check counts only added/modified files, so it would always
+    # fail on that PR even though it is the release itself.
+    if: ${{ github.event.pull_request.user.type != 'Bot' && github.head_ref != 'changeset-release/main' }}
     uses: perimetre/actions/.github/workflows/check-directory-files-changed.yml@master
     with:
       directoryPath: '.changeset'
