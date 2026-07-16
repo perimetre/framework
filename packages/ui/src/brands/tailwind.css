@@ -292,6 +292,7 @@
 @custom-variant pui-stelpro (&:where([data-pui-brand=stelpro], [data-pui-brand=stelpro] *));
 @custom-variant pui-microbird-commercial (&:where([data-pui-brand=microbird-commercial], [data-pui-brand=microbird-commercial] *));
 @custom-variant pui-microbird-school (&:where([data-pui-brand=microbird-school], [data-pui-brand=microbird-school] *));
+@custom-variant pui-oiq-place-pour-toi (&:where([data-pui-brand=oiq-place-pour-toi], [data-pui-brand=oiq-place-pour-toi] *));
 
 /* ========================================
  * CUSTOM VARIANTS FOR FORM ELEMENT STATES (using native group-has)

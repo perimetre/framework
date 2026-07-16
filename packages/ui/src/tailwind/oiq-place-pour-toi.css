@@ -1,0 +1,10 @@
+/**
+ * OIQ - Place pour toi brand tokens for Tailwind integration
+ * Includes Acorn base + OIQ overrides
+ *
+ * Usage:
+ *   @import '@perimetre/ui/tailwind';
+ *   @import '@perimetre/ui/tailwind/oiq-place-pour-toi.css';
+ */
+@import '@perimetre/tokens/brands/acorn.css';
+@import '@perimetre/tokens/brands/oiq-place-pour-toi.css';
