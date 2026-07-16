@@ -1,0 +1,324 @@
+{
+  "pui": {
+    "primitive": {
+      "font": {
+        "sans": {
+          "$value": "'Roboto', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+          "$type": "fontFamilies",
+          "$description": "OIQ body font — Figma font/family/sans 2 (Roboto). Used for H6 and all body/caption styles."
+        },
+        "display": {
+          "$value": "'Antique Olive Nord D', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+          "$type": "fontFamilies",
+          "$description": "OIQ display/heading font — Figma font/family/sans 1 (Antique Olive Nord D). Used for headings H1–H5."
+        }
+      },
+      "color": {
+        "$type": "color",
+        "primary": {
+          "$description": "OIQ Purple — 12-step primary scale. Anchored on Figma brand/purple (#921acc = step 9, the primary button fill), buttons/primary hover (#7a179e = step 10) and active (#62127f = step 11). Disabled button fill #c47fdd = step 6, disabled label #f3e8fa = step 2. Steps 1, 3-5, 7-8, 12 are interpolated to complete the ramp.",
+          "1": { "$value": "#faf3fd" },
+          "2": { "$value": "#f3e8fa" },
+          "3": { "$value": "#ecd6f7" },
+          "4": { "$value": "#e0bef1" },
+          "5": { "$value": "#d3a5eb" },
+          "6": { "$value": "#c47fdd" },
+          "7": { "$value": "#ac54d4" },
+          "8": { "$value": "#9e35cf" },
+          "9": { "$value": "#921acc" },
+          "10": { "$value": "#7a179e" },
+          "11": { "$value": "#62127f" },
+          "12": { "$value": "#3a0b4c" }
+        },
+        "overlay": {
+          "$description": "OIQ neutral scale. Anchored on Figma text/body (#272727 = step 12), text/caption (#404040 = step 10), buttons/secondary border (#99a1af = step 7) and disabled label (#6d777a = step 8). Replaces acorn's sand-tinted neutrals with OIQ's pure grays.",
+          "1": { "$value": "#ffffff" },
+          "2": { "$value": "#fafafa" },
+          "3": { "$value": "#f5f5f5" },
+          "4": { "$value": "#e5e5e5" },
+          "5": { "$value": "#d4d4d4" },
+          "6": { "$value": "#b8bdc5" },
+          "7": { "$value": "#99a1af" },
+          "8": { "$value": "#6d777a" },
+          "9": { "$value": "#525252" },
+          "10": { "$value": "#404040" },
+          "11": { "$value": "#333333" },
+          "12": { "$value": "#272727" }
+        },
+        "brand-blue": {
+          "$value": "#002487",
+          "$description": "OIQ brand blue — Figma colors/brand/blue. Used for headings and default borders."
+        },
+        "brand-purple": {
+          "$value": "{pui.primitive.color.primary.9}",
+          "$description": "OIQ brand purple — Figma colors/brand/purple (#921acc). Alias of the primary scale's hero step (primary-9); kept as a named brand color for palette completeness without duplicating the value."
+        },
+        "brand-red": {
+          "$value": "#ff4d2b",
+          "$description": "OIQ brand red — Figma colors/brand/red. Used for eyebrow/kicker text."
+        },
+        "brand-yellow": {
+          "$value": "#f2b238",
+          "$description": "OIQ brand yellow — Figma colors/brand/yellow. Brand accent; no semantic consumer yet."
+        },
+        "brand-green": {
+          "$value": "#adf533",
+          "$description": "OIQ brand green — Figma colors/brand/green. Used for the dark/accent border."
+        }
+      }
+    },
+    "color": {
+      "$type": "color",
+      "surface": {
+        "primary": {
+          "$value": "#fafff8",
+          "$description": "Figma colors/background/page (#FAFFF8) — OIQ's faint-green page background. Acorn: overlay-1 (white)."
+        },
+        "dark": {
+          "$value": "#1d3c34",
+          "$description": "Figma colors/background/dark (#1D3C34) — OIQ's dark green section background. Acorn: overlay-12."
+        },
+        "accent": {
+          "$value": "#c4d9e4",
+          "$description": "Figma colors/background/accent-light (#C4D9E4) — OIQ's light blue accent background. Acorn: primary-2."
+        }
+      },
+      "fg": {
+        "heading": {
+          "$value": "{pui.primitive.color.brand-blue}",
+          "$description": "Figma colors/text/heading (#002487) — OIQ brand blue headings. Acorn: fg-default."
+        },
+        "eyebrow": {
+          "$value": "{pui.primitive.color.brand-red}",
+          "$description": "Figma colors/text/eyebrow (#ff4d2b) — OIQ brand red eyebrow/kicker text. Acorn: interactive-primary."
+        },
+        "muted": {
+          "$value": "{pui.primitive.color.overlay.10}",
+          "$description": "Figma colors/text/caption (#404040) — OIQ secondary/caption text. Acorn: overlay-11."
+        }
+      },
+      "interactive": {
+        "on-primary": {
+          "$value": "{pui.primitive.color.overlay.1}",
+          "$description": "Figma colors/buttons/primary/label/default (#ffffff) — white label on OIQ's purple button fill. Acorn: overlay-12 (dark)."
+        }
+      },
+      "border": {
+        "default": {
+          "$value": "{pui.primitive.color.brand-blue}",
+          "$description": "Figma colors/border/default (#002487) — OIQ brand blue. Acorn: overlay-5."
+        },
+        "dark": {
+          "$value": "{pui.primitive.color.brand-green}",
+          "$description": "Figma colors/border/dark (#adf533) — OIQ brand green accent border. Acorn: border-default."
+        }
+      },
+      "tag": {
+        "bg": {
+          "$value": "#edffc7",
+          "$description": "Figma colors/buttons/tiertiary/background/default (#edffc7) — OIQ pale lime tag fill. Acorn: overlay-3."
+        },
+        "bg-selected": {
+          "$value": "{pui.primitive.color.brand-green}",
+          "$description": "Figma colors/buttons/tiertiary/background/active (#adf533) — OIQ brand green selected tag. Acorn: primary-4."
+        },
+        "fg-disabled": {
+          "$value": "#a3a3a3",
+          "$description": "Figma tag disabled label (#a3a3a3). Acorn: fg-subtle. (bg-disabled inherits overlay-3 = #f5f5f5; fg inherits fg-default = #272727.)"
+        }
+      },
+      "button": {
+        "active": {
+          "$value": "{pui.primitive.color.primary.11}",
+          "$description": "Figma colors/buttons/primary/background/active (#62127f). Acorn maps active to primary-10 (same as hover); OIQ uses a darker distinct active."
+        },
+        "inactive": {
+          "$value": "{pui.primitive.color.primary.6}",
+          "$description": "Figma colors/buttons/primary/background/disabled (#c47fdd) — a dimmed purple, not gray. Acorn: overlay-8."
+        },
+        "inactive-label": {
+          "$value": "{pui.primitive.color.primary.2}",
+          "$description": "Figma colors/buttons/primary/label/disabled (#f3e8fa) — pale purple label on the disabled purple fill."
+        },
+        "secondary-fill": {
+          "$value": "#f8fbea",
+          "$description": "Figma colors/buttons/secondary/background/default (#f8fbea) — OIQ pale cream-green. Brand accent literal. Acorn: bg-default (white)."
+        },
+        "secondary-hover": {
+          "$value": "#eef6d1",
+          "$description": "Figma colors/buttons/secondary/background/hover (#eef6d1). Acorn: interactive-primary."
+        },
+        "secondary-active": {
+          "$value": "#9bc632",
+          "$description": "Figma colors/buttons/secondary/background/active (#9bc632) — OIQ green. Acorn defaults active to the hover color."
+        },
+        "secondary-outline": {
+          "$value": "{pui.primitive.color.overlay.7}",
+          "$description": "Figma colors/buttons/secondary/border/default (#99a1af). Acorn: overlay-8."
+        },
+        "secondary-label": {
+          "$value": "#1d3c34",
+          "$description": "Figma colors/buttons/secondary/label/default (#1d3c34) — OIQ dark green on the pale secondary fill. Acorn: on-primary."
+        },
+        "focus-border": {
+          "$value": "{pui.primitive.color.brand-yellow}",
+          "$description": "Figma colors/buttons/primary/border/focus (#f2b238) — OIQ brand yellow focus ring on the primary button. (Primary focus background inherits button.active = #62127f.)"
+        },
+        "secondary-focus-border": {
+          "$value": "{pui.primitive.color.overlay.1}",
+          "$description": "Figma colors/buttons/secondary/border/focus (#ffffff) — white focus ring on the secondary button. (Secondary focus background inherits secondary-active = #9bc632.)"
+        },
+        "secondary-inactive": {
+          "$value": "{pui.color.button.secondary-active}",
+          "$description": "Figma colors/buttons/secondary/background/disabled (#9bc632) — same green as secondary active. Acorn: primary disabled fill."
+        },
+        "secondary-inactive-label": {
+          "$value": "{pui.primitive.color.overlay.8}",
+          "$description": "Figma colors/buttons/secondary/label/disabled (#6d777a) — OIQ overlay-8. Acorn: primary disabled label."
+        }
+      }
+    },
+    "radius": {
+      "$type": "borderRadius",
+      "button": {
+        "$value": "{pui.primitive.radius.none}",
+        "$description": "Figma Button/Primary (node 191:608) — square corners. Acorn: full (pill)."
+      },
+      "input": {
+        "$value": "0.5rem",
+        "$description": "Figma corner-radius/md (8px)."
+      },
+      "badge": {
+        "$value": "{pui.primitive.radius.none}",
+        "$description": "OIQ tags/badges use square corners, matching the button language (Figma Tag node 644:452). Acorn: full."
+      }
+    },
+    "typo": {
+      "$description": "OIQ headings H1–H5 use the display font (Antique Olive Nord D); H6 and all body styles inherit the sans font (Roboto).",
+      "heading-1": {
+        "$description": "Figma H1 (node 149:403): Antique Olive Nord D Regular, 60px / 72px (1.2) / 0 tracking.",
+        "family": {
+          "$value": "{pui.primitive.font.display}",
+          "$type": "fontFamilies"
+        },
+        "size": { "$value": "3.75rem", "$type": "fontSizes" },
+        "leading": {
+          "$value": "{pui.primitive.leading.snug}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" }
+      },
+      "heading-2": {
+        "$description": "Figma H2: Antique Olive Nord D Regular, 48px / 64px (1.333) / 0 tracking.",
+        "family": {
+          "$value": "{pui.primitive.font.display}",
+          "$type": "fontFamilies"
+        },
+        "size": {
+          "$value": "{pui.primitive.font.size.5xl}",
+          "$type": "fontSizes"
+        },
+        "leading": { "$value": "1.3333", "$type": "lineHeights" },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" }
+      },
+      "heading-3": {
+        "$description": "Figma H3: Antique Olive Nord D Regular, 36px / 48px (1.333) / 0 tracking.",
+        "family": {
+          "$value": "{pui.primitive.font.display}",
+          "$type": "fontFamilies"
+        },
+        "size": {
+          "$value": "{pui.primitive.font.size.4xl}",
+          "$type": "fontSizes"
+        },
+        "leading": { "$value": "1.3333", "$type": "lineHeights" },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" }
+      },
+      "heading-4": {
+        "$description": "Figma H4: Antique Olive Nord D Regular, 24px / 32px (1.333) / 0 tracking.",
+        "family": {
+          "$value": "{pui.primitive.font.display}",
+          "$type": "fontFamilies"
+        },
+        "size": {
+          "$value": "{pui.primitive.font.size.2xl}",
+          "$type": "fontSizes"
+        },
+        "leading": { "$value": "1.3333", "$type": "lineHeights" },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" }
+      },
+      "heading-5": {
+        "$description": "Figma H5: Antique Olive Nord D, 20px / 24px (1.2) / 0 tracking / weight 900 (heavier than H1–H4).",
+        "family": {
+          "$value": "{pui.primitive.font.display}",
+          "$type": "fontFamilies"
+        },
+        "size": {
+          "$value": "{pui.primitive.font.size.xl}",
+          "$type": "fontSizes"
+        },
+        "leading": { "$value": "1.2", "$type": "lineHeights" },
+        "weight": { "$value": "900", "$type": "fontWeights" },
+        "tracking": { "$value": "0", "$type": "letterSpacing" }
+      },
+      "large": {
+        "$description": "Figma Body L (Roboto): 20px / 32px (1.6) / 0.4px tracking. Body text uses the sans font (Roboto) via inheritance.",
+        "size": {
+          "$value": "{pui.primitive.font.size.xl}",
+          "$type": "fontSizes"
+        },
+        "leading": { "$value": "1.6", "$type": "lineHeights" },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0.025rem", "$type": "letterSpacing" }
+      },
+      "base": {
+        "$description": "Figma Body M (Roboto): 16px / 24px (1.5) / 0 tracking.",
+        "size": {
+          "$value": "{pui.primitive.font.size.base}",
+          "$type": "fontSizes"
+        },
+        "leading": {
+          "$value": "{pui.primitive.leading.loose}",
+          "$type": "lineHeights"
+        },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" }
+      },
+      "tiny": {
+        "$description": "Figma Caption (Roboto): 12px / 16px (1.333) / 0 tracking.",
+        "size": {
+          "$value": "{pui.primitive.font.size.xs}",
+          "$type": "fontSizes"
+        },
+        "leading": { "$value": "1.3333", "$type": "lineHeights" },
+        "weight": {
+          "$value": "{pui.primitive.font.weight.normal}",
+          "$type": "fontWeights"
+        },
+        "tracking": { "$value": "0", "$type": "letterSpacing" }
+      }
+    }
+  }
+}

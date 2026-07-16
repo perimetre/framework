@@ -81,5 +81,19 @@
       "semantic/base": "enabled",
       "brands/microbird-school": "enabled"
     }
+  },
+  {
+    "id": "oiq-place-pour-toi",
+    "name": "OIQ - Place pour toi",
+    "group": "brand",
+    "selectedTokenSets": {
+      "primitives/colors": "source",
+      "primitives/typography": "source",
+      "primitives/shape": "source",
+      "primitives/shadow": "source",
+      "primitives/motion": "source",
+      "semantic/base": "enabled",
+      "brands/oiq-place-pour-toi": "enabled"
+    }
   }
 ]

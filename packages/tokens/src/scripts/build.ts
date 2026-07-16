@@ -24,7 +24,8 @@ const BRANDS = [
   'stelpro',
   'cima',
   'microbird-commercial',
-  'microbird-school'
+  'microbird-school',
+  'oiq-place-pour-toi'
 ] as const;
 
 // Register Tokens Studio transforms into Style Dictionary
