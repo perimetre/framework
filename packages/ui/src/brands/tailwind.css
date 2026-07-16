@@ -102,11 +102,16 @@
   /* Surface colors */
   --color-pui-surface-primary: var(--pui-color-surface-primary);
   --color-pui-surface-secondary: var(--pui-color-surface-secondary);
+  --color-pui-surface-dark: var(--pui-color-surface-dark);
+  --color-pui-surface-accent: var(--pui-color-surface-accent);
 
   /* Foreground colors (text, icons) */
   --color-pui-fg-default: var(--pui-color-fg-default);
   --color-pui-fg-muted: var(--pui-color-fg-muted);
   --color-pui-fg-subtle: var(--pui-color-fg-subtle);
+  --color-pui-fg-heading: var(--pui-color-fg-heading);
+  --color-pui-fg-eyebrow: var(--pui-color-fg-eyebrow);
+  --color-pui-fg-inverse: var(--pui-color-fg-inverse);
   --color-pui-fg-body: var(--pui-color-fg-body);
   --color-pui-fg-link-primary: var(--pui-color-fg-link-primary);
   --color-pui-fg-link-secondary: var(--pui-color-fg-link-secondary);
@@ -116,6 +121,7 @@
 
   /* Border colors */
   --color-pui-border-default: var(--pui-color-border-default);
+  --color-pui-border-dark: var(--pui-color-border-dark);
   --color-pui-border-baseline: var(--pui-color-border-baseline);
   --color-pui-border-focus: var(--pui-color-border-focus);
   --color-pui-border-rule-primary: var(--pui-color-border-rule-primary);
@@ -144,6 +150,18 @@
   --color-pui-button-active: var(--pui-color-button-active);
   --color-pui-button-inactive: var(--pui-color-button-inactive);
   --color-pui-button-inactive-label: var(--pui-color-button-inactive-label);
+  --color-pui-button-focus: var(--pui-color-button-focus);
+  --color-pui-button-focus-border: var(--pui-color-button-focus-border);
+  --color-pui-button-secondary-focus: var(--pui-color-button-secondary-focus);
+  --color-pui-button-secondary-focus-border: var(
+    --pui-color-button-secondary-focus-border
+  );
+  --color-pui-button-secondary-inactive: var(
+    --pui-color-button-secondary-inactive
+  );
+  --color-pui-button-secondary-inactive-label: var(
+    --pui-color-button-secondary-inactive-label
+  );
 
   /* Input field colors */
   --color-pui-input-bg: var(--pui-color-input-bg);
@@ -211,6 +229,15 @@
   --color-pui-badge-warning-fg: var(--pui-color-badge-warning-fg);
   --color-pui-badge-danger-bg: var(--pui-color-badge-danger-bg);
   --color-pui-badge-danger-fg: var(--pui-color-badge-danger-fg);
+
+  /* ========================================
+   * TAG / CHIP TOKENS
+   * ======================================== */
+  --color-pui-tag-bg: var(--pui-color-tag-bg);
+  --color-pui-tag-bg-selected: var(--pui-color-tag-bg-selected);
+  --color-pui-tag-bg-disabled: var(--pui-color-tag-bg-disabled);
+  --color-pui-tag-fg: var(--pui-color-tag-fg);
+  --color-pui-tag-fg-disabled: var(--pui-color-tag-fg-disabled);
 
   /* ========================================
    * SEMANTIC SHAPE TOKENS
