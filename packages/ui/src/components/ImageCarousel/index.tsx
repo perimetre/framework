@@ -32,6 +32,18 @@ import ImageCarouselViewport from './ImageCarouselViewport';
 
 export type ImageCarouselProps<T = unknown> = {
   /**
+   * Extra content appended inside the thumbnails container, after the mapped
+   * slide thumbnails. Rendered as additional grid/flex cells alongside the
+   * thumbnails, so a consumer can add a custom tile — e.g. a "view in 3D"
+   * trigger — that lives inline in the strip without being a swipeable slide.
+   *
+   * Only rendered when `showThumbnails` is true (it shares the thumbnails
+   * container). Unlike a slide thumbnail, it carries no `scrollTo` behavior —
+   * the consumer wires its own `onClick`. Ignored by every caller that doesn't
+   * pass it, so existing usage is unaffected.
+   */
+  appendThumbnails?: React.ReactNode;
+  /**
    * Additional className for the root element.
    */
   className?: string;
@@ -132,6 +144,7 @@ export type ImageCarouselProps<T = unknown> = {
  * - Brand-aware styling
  */
 const ImageCarousel = <T,>({
+  appendThumbnails,
   className,
   dotsPlacement = 'overlay',
   options,
@@ -259,6 +272,9 @@ const ImageCarousel = <T,>({
           }}
         />
       ))}
+      {/* Custom trailing cells (e.g. a "view in 3D" tile). Rendered inline in
+          the strip after the slide thumbnails; carries no slide/scroll behavior. */}
+      {appendThumbnails}
     </ImageCarouselThumbnailsContainer>
   );
 
