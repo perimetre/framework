@@ -22,6 +22,14 @@
         },
         "secondary": {
           "$value": "{pui.primitive.color.overlay.3}"
+        },
+        "dark": {
+          "$value": "{pui.primitive.color.overlay.12}",
+          "$description": "Dark section/hero background (light text sits on top). Acorn defaults to the darkest neutral; brands override with their dark brand color."
+        },
+        "accent": {
+          "$value": "{pui.primitive.color.primary.2}",
+          "$description": "Light accent/highlight section background. Acorn defaults to a light primary tint; brands override with their accent-light color."
         }
       },
       "fg": {
@@ -34,6 +42,18 @@
         },
         "subtle": {
           "$value": "{pui.primitive.color.overlay.8}"
+        },
+        "heading": {
+          "$value": "{pui.color.fg.default}",
+          "$description": "Heading text color. Acorn defaults to fg-default; brands override when headings use a distinct color (e.g. OIQ brand blue)."
+        },
+        "eyebrow": {
+          "$value": "{pui.color.interactive.primary}",
+          "$description": "Eyebrow/kicker accent text color. Acorn defaults to the primary accent; brands override (e.g. OIQ brand red)."
+        },
+        "inverse": {
+          "$value": "{pui.primitive.color.overlay.1}",
+          "$description": "Inverse/on-dark text color for text sitting on dark surfaces. Defaults to the lightest neutral (white)."
         },
         "body": {
           "$value": "{pui.primitive.color.overlay.12}"
@@ -58,6 +78,10 @@
         "$description": "Borders, strokes, dividers.",
         "default": {
           "$value": "{pui.primitive.color.overlay.5}"
+        },
+        "dark": {
+          "$value": "{pui.color.border.default}",
+          "$description": "Dark/accent border. Acorn defaults to border-default; brands override with an accent border color (e.g. OIQ brand green)."
         },
         "baseline": {
           "$value": "{pui.primitive.color.overlay.8}",
@@ -135,6 +159,30 @@
         "inactive-label": {
           "$value": "{pui.color.interactive.on-primary}",
           "$description": "Label color for disabled buttons. Defaults to the regular on-primary label; brands can dim it (e.g. Stelpro)."
+        },
+        "focus": {
+          "$value": "{pui.color.button.active}",
+          "$description": "Primary button background while focused. Defaults to the active color."
+        },
+        "focus-border": {
+          "$value": "{pui.color.focus-outline}",
+          "$description": "Primary button focus ring/border color. Defaults to the global focus outline; brands override (e.g. OIQ brand yellow)."
+        },
+        "secondary-focus": {
+          "$value": "{pui.color.button.secondary-active}",
+          "$description": "Secondary button background while focused. Defaults to the secondary active color."
+        },
+        "secondary-focus-border": {
+          "$value": "{pui.color.button.secondary-outline}",
+          "$description": "Secondary button focus ring/border color. Defaults to the secondary outline; brands override (e.g. OIQ white)."
+        },
+        "secondary-inactive": {
+          "$value": "{pui.color.button.inactive}",
+          "$description": "Secondary button background while disabled. Defaults to the primary disabled fill; brands override."
+        },
+        "secondary-inactive-label": {
+          "$value": "{pui.color.button.inactive-label}",
+          "$description": "Secondary button label while disabled. Defaults to the primary disabled label; brands override."
         }
       },
       "input": {
@@ -288,6 +336,29 @@
         },
         "danger-fg": {
           "$value": "{pui.primitive.color.overlay.11}"
+        }
+      },
+      "tag": {
+        "$description": "Tag/Chip component colors — a compact, selectable/dismissible chip (distinct from the static Badge tone scale). Acorn ships neutral defaults; brands recolor via these tokens.",
+        "bg": {
+          "$value": "{pui.primitive.color.overlay.3}",
+          "$description": "Default (unselected) tag background."
+        },
+        "bg-selected": {
+          "$value": "{pui.primitive.color.primary.4}",
+          "$description": "Selected/active tag background."
+        },
+        "bg-disabled": {
+          "$value": "{pui.primitive.color.overlay.3}",
+          "$description": "Disabled tag background."
+        },
+        "fg": {
+          "$value": "{pui.color.fg.default}",
+          "$description": "Tag label color (default and selected)."
+        },
+        "fg-disabled": {
+          "$value": "{pui.color.fg.subtle}",
+          "$description": "Disabled tag label color."
         }
       },
       "dropdown": {

@@ -90,9 +90,14 @@
     --pui-color-bg-muted: var(--pui-primitive-color-overlay-5);
     --pui-color-surface-primary: var(--pui-primitive-color-overlay-1);
     --pui-color-surface-secondary: var(--pui-primitive-color-overlay-3);
+    --pui-color-surface-dark: var(--pui-primitive-color-overlay-12);
+    --pui-color-surface-accent: var(--pui-primitive-color-primary-2);
     --pui-color-fg-default: var(--pui-primitive-color-overlay-12);
     --pui-color-fg-muted: var(--pui-primitive-color-overlay-11);
     --pui-color-fg-subtle: var(--pui-primitive-color-overlay-8);
+    --pui-color-fg-heading: var(--pui-color-fg-default);
+    --pui-color-fg-eyebrow: var(--pui-color-interactive-primary);
+    --pui-color-fg-inverse: var(--pui-primitive-color-overlay-1);
     --pui-color-fg-body: var(--pui-primitive-color-overlay-12);
     --pui-color-fg-link-primary: var(--pui-primitive-color-overlay-12);
     --pui-color-fg-link-secondary: var(--pui-primitive-color-overlay-8);
@@ -100,6 +105,7 @@
     --pui-color-fg-icon: var(--pui-primitive-color-overlay-9);
     --pui-color-fg-icon-chevron: var(--pui-primitive-color-overlay-9);
     --pui-color-border-default: var(--pui-primitive-color-overlay-5);
+    --pui-color-border-dark: var(--pui-color-border-default);
     --pui-color-border-baseline: var(--pui-primitive-color-overlay-8);
     --pui-color-border-focus: var(--pui-primitive-color-primary-9);
     --pui-color-border-rule-primary: var(--pui-primitive-color-overlay-9);
@@ -121,6 +127,12 @@
     --pui-color-button-active: var(--pui-primitive-color-primary-10);
     --pui-color-button-inactive: var(--pui-primitive-color-overlay-8);
     --pui-color-button-inactive-label: var(--pui-color-interactive-on-primary);
+    --pui-color-button-focus: var(--pui-color-button-active);
+    --pui-color-button-focus-border: var(--pui-color-focus-outline);
+    --pui-color-button-secondary-focus: var(--pui-color-button-secondary-active);
+    --pui-color-button-secondary-focus-border: var(--pui-color-button-secondary-outline);
+    --pui-color-button-secondary-inactive: var(--pui-color-button-inactive);
+    --pui-color-button-secondary-inactive-label: var(--pui-color-button-inactive-label);
     --pui-color-input-bg: var(--pui-color-bg-default);
     --pui-color-input-border: var(--pui-color-border-default);
     --pui-color-input-border-focus: var(--pui-color-border-focus);
@@ -166,6 +178,11 @@
     --pui-color-badge-warning-fg: var(--pui-primitive-color-overlay-11);
     --pui-color-badge-danger-bg: var(--pui-primitive-color-overlay-3);
     --pui-color-badge-danger-fg: var(--pui-primitive-color-overlay-11);
+    --pui-color-tag-bg: var(--pui-primitive-color-overlay-3);
+    --pui-color-tag-bg-selected: var(--pui-primitive-color-primary-4);
+    --pui-color-tag-bg-disabled: var(--pui-primitive-color-overlay-3);
+    --pui-color-tag-fg: var(--pui-color-fg-default);
+    --pui-color-tag-fg-disabled: var(--pui-color-fg-subtle);
     --pui-color-dropdown-bg: var(--pui-color-bg-default);
     --pui-color-dropdown-border: var(--pui-color-border-default);
     --pui-color-dropdown-text: var(--pui-color-fg-default);
