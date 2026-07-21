@@ -16,6 +16,41 @@ const twMerge = extendTailwindMerge({
       ? className.replace(PUI_PREFIX, '')
       : className;
     return parseClassName(classNameWithoutPrefix);
+  },
+  /**
+   * Teach twMerge about our custom design-token utilities so it can dedupe them
+   * against Tailwind's built-ins (e.g. `rounded-pui-input` vs `rounded-none`,
+   * `shadow-pui-input-focus` vs `shadow-none`). Without this, both survive a
+   * merge and the winner is decided by stylesheet order — so brand overrides
+   * couldn't reliably beat the acorn base.
+   */
+  extend: {
+    classGroups: {
+      rounded: [
+        {
+          rounded: [
+            'pui-button',
+            'pui-input',
+            'pui-badge',
+            'pui-control',
+            'pui-dropdown'
+          ]
+        }
+      ],
+      shadow: [
+        {
+          shadow: [
+            'pui-button',
+            'pui-button-hover',
+            'pui-input',
+            'pui-input-focus',
+            'pui-card',
+            'pui-dropdown',
+            'pui-dropdown-panel'
+          ]
+        }
+      ]
+    }
   }
 });
 

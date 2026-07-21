@@ -403,6 +403,18 @@
         },
         "separator": {
           "$value": "{pui.primitive.color.overlay.4}"
+        },
+        "field-border": {
+          "$value": "{pui.color.input.border}",
+          "$description": "Rest-state trigger border for the FieldDropdown control. Acorn matches the input border; brands override (e.g. OIQ neutral gray)."
+        },
+        "field-item-hover-bg": {
+          "$value": "{pui.color.dropdown.item-hover-bg}",
+          "$description": "Hover/focus background for a FieldDropdown option. Acorn matches the shared dropdown hover; brands override (e.g. OIQ light purple)."
+        },
+        "field-item-selected-bg": {
+          "$value": "{pui.color.dropdown.item-bg}",
+          "$description": "Selected background for a FieldDropdown option. Acorn = item background (no fill; selection shown by weight only); brands override (e.g. OIQ purple tint)."
         }
       }
     },
@@ -452,6 +464,10 @@
       },
       "dropdown": {
         "$value": "{pui.primitive.shadow.md}"
+      },
+      "dropdown-panel": {
+        "$value": "{pui.shadow.dropdown}",
+        "$description": "Elevation for the FieldDropdown options panel. Acorn matches the shared dropdown shadow; brands override (e.g. OIQ hard offset shadow)."
       }
     },
     "font-weight-label": {

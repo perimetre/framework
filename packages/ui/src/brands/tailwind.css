@@ -257,6 +257,7 @@
   --shadow-pui-input: var(--pui-shadow-input);
   --shadow-pui-input-focus: var(--pui-shadow-input-focus);
   --shadow-pui-dropdown: var(--pui-shadow-dropdown);
+  --shadow-pui-dropdown-panel: var(--pui-shadow-dropdown-panel);
   --shadow-pui-card: var(--pui-shadow-card);
 
   /* Focus outline */
@@ -280,6 +281,13 @@
   --color-pui-dropdown-item-bg: var(--pui-color-dropdown-item-bg);
   --color-pui-dropdown-item-hover-bg: var(--pui-color-dropdown-item-hover-bg);
   --color-pui-dropdown-separator: var(--pui-color-dropdown-separator);
+  --color-pui-dropdown-field-border: var(--pui-color-dropdown-field-border);
+  --color-pui-dropdown-field-item-hover-bg: var(
+    --pui-color-dropdown-field-item-hover-bg
+  );
+  --color-pui-dropdown-field-item-selected-bg: var(
+    --pui-color-dropdown-field-item-selected-bg
+  );
   --radius-pui-dropdown: var(--pui-radius-dropdown);
 }
 

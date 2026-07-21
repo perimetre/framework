@@ -132,6 +132,20 @@
           "$description": "Figma colors/border/dark (#adf533) — OIQ brand green accent border. Acorn: border-default."
         }
       },
+      "dropdown": {
+        "field-border": {
+          "$value": "{pui.primitive.color.overlay.4}",
+          "$description": "Figma dropdown rest border colors/border/gray (#e6e6e6 = overlay-4). Acorn: input border (OIQ brand blue)."
+        },
+        "field-item-hover-bg": {
+          "$value": "#f6e7ff",
+          "$description": "Figma dropdown item hover colors/purple/100 (#f6e7ff). Acorn: shared dropdown hover (gray)."
+        },
+        "field-item-selected-bg": {
+          "$value": "#efd3ff",
+          "$description": "Figma dropdown item selected colors/purple/200 (#efd3ff). Acorn: item background (no fill; weight-only selection)."
+        }
+      },
       "tag": {
         "bg": {
           "$value": "#edffc7",
@@ -183,6 +197,13 @@
           "$value": "{pui.primitive.color.primary.11}",
           "$description": "Figma colors/buttons/secondary/border/focus (#69188b = primary-11) — dark purple focus ring on the secondary button. Acorn: secondary outline."
         }
+      }
+    },
+    "shadow": {
+      "$type": "boxShadow",
+      "dropdown-panel": {
+        "$value": "-8px 10px 0 0 #000000",
+        "$description": "Figma Drop Shadow vF — hard black offset (x -8, y 10, blur 0, spread 0) on the open dropdown panel. Acorn: soft md shadow."
       }
     },
     "radius": {

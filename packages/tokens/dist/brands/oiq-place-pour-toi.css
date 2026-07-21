@@ -68,9 +68,13 @@
     --pui-color-tag-bg: #edffc7;
     --pui-color-tag-bg-selected: var(--pui-primitive-color-brand-green);
     --pui-color-tag-fg-disabled: var(--pui-primitive-color-overlay-7);
+    --pui-color-dropdown-field-border: var(--pui-primitive-color-overlay-4);
+    --pui-color-dropdown-field-item-hover-bg: #f6e7ff;
+    --pui-color-dropdown-field-item-selected-bg: #efd3ff;
     --pui-radius-button: var(--pui-primitive-radius-none);
     --pui-radius-input: 0.5rem;
     --pui-radius-badge: var(--pui-primitive-radius-none);
+    --pui-shadow-dropdown-panel: -8px 10px 0 0 #000000;
     --pui-typo-heading-1-size: clamp(1.75rem, calc(0.52rem + 5.05vw), 3.75rem);
     --pui-typo-heading-1-leading: clamp(2.25rem, calc(0.87rem + 5.68vw), 4.5rem);
     --pui-typo-heading-1-weight: var(--pui-primitive-font-weight-normal);
