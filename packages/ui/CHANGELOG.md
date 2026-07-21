@@ -1,5 +1,11 @@
 # @perimetre/ui
 
+## 16.12.1
+
+### Patch Changes
+
+- fafab13: FieldBaseDropdown: show `cursor-pointer` when hovering the trigger (all brands). Disabled state still reverts to `cursor-not-allowed`.
+
 ## 16.12.0
 
 ### Minor Changes
