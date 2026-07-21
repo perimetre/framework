@@ -13,7 +13,7 @@ import { cva } from '@/lib/cva';
 export const fieldBaseDropdownInputAcornVariants = cva({
   base: [
     // Structural styles
-    'pui:col-start-1 pui:row-start-1 pui:block pui:w-full pui:px-3 pui:py-1.5 pui:text-base pui:border pui:border-solid pui:sm:text-sm/6',
+    'pui:col-start-1 pui:row-start-1 pui:block pui:w-full pui:cursor-pointer pui:px-3 pui:py-1.5 pui:text-base pui:border pui:border-solid pui:sm:text-sm/6',
     // Semantic: input field colors (rest border is dropdown-scoped)
     'pui:bg-pui-input-bg pui:text-pui-input-text pui:border-pui-dropdown-field-border',
     // Semantic: input radius
