@@ -35,7 +35,9 @@ export const Default: Story<Props> = ({ items, name, ...props }) => {
       items={items}
       name={name}
       value={value}
-      onChange={(next) => { setValue(next as DropdownItem | null); }}
+      onChange={(next) => {
+        setValue(next as DropdownItem | null);
+      }}
       {...props}
     />
   );
@@ -91,7 +93,9 @@ export const Multiple: Story<Props> = ({ items, name, ...props }) => {
       items={items}
       name={name}
       value={value}
-      onChange={(next) => { setValue(next as DropdownItem[]); }}
+      onChange={(next) => {
+        setValue(next as DropdownItem[]);
+      }}
       {...props}
     />
   );
