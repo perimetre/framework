@@ -115,9 +115,11 @@
   --color-pui-fg-body: var(--pui-color-fg-body);
   --color-pui-fg-link-primary: var(--pui-color-fg-link-primary);
   --color-pui-fg-link-secondary: var(--pui-color-fg-link-secondary);
+  --color-pui-fg-link-hover: var(--pui-color-fg-link-hover);
   --color-pui-fg-link-active: var(--pui-color-fg-link-active);
   --color-pui-fg-icon: var(--pui-color-fg-icon);
   --color-pui-fg-icon-chevron: var(--pui-color-fg-icon-chevron);
+  --color-pui-fg-icon-active: var(--pui-color-fg-icon-active);
 
   /* Border colors */
   --color-pui-border-default: var(--pui-color-border-default);

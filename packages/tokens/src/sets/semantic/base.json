@@ -64,6 +64,10 @@
         "link-secondary": {
           "$value": "{pui.primitive.color.overlay.8}"
         },
+        "link-hover": {
+          "$value": "{pui.primitive.color.primary.10}",
+          "$description": "Text-link color on hover. Sits between link-primary (default) and link-active, mirroring the button hover/active ramp (primary-10 → primary-11)."
+        },
         "link-active": {
           "$value": "{pui.primitive.color.primary.11}"
         },
@@ -72,6 +76,10 @@
         },
         "icon-chevron": {
           "$value": "{pui.primitive.color.overlay.9}"
+        },
+        "icon-active": {
+          "$value": "{pui.color.interactive.primary}",
+          "$description": "Icon color in an active/selected state — highlights to the brand primary."
         }
       },
       "border": {
