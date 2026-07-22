@@ -1,5 +1,21 @@
 # @perimetre/ui
 
+## 16.13.0
+
+### Minor Changes
+
+- 83138e8: Button: add a `flat` (text-only) variant and a slotted shadow colour for OIQ.
+  - New `flat` variant — a text-only button (no fill/border/shadow), implementing
+    the OIQ Figma Button/Text spec (node 720:333). Acorn gets a neutral default.
+  - The OIQ button's hard offset shadow colour is now a slot
+    (`--pui-button-shadow-color`, default black). Recolour it — e.g. the "on
+    black" purple-shadow variant — with the new `pui:button-shadow-*` functional
+    utility (reads the `--color-*` theme; arbitrary `pui:button-shadow-[#…]` also
+    works), or from a consumer app via a `[--pui-button-shadow-color:…]`
+    arbitrary property.
+
+- 83138e8: FieldDropdown/FieldBaseDropdown: options can now carry per-item leading and trailing slots via the `itemLeading`/`itemTrailing` render props (keyed on the option's `{ selected, focus, disabled }` state), mirroring the field's `leading`/`trailing` addons. Options lay out as a `justify-between` row (leading + label, then trailing). FieldDropdown defaults `itemTrailing` to a check on the selected option (matches the design system); pass your own to override for selected or unselected items.
+
 ## 16.12.1
 
 ### Patch Changes
