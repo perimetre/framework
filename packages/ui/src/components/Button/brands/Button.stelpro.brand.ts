@@ -45,7 +45,8 @@ export const buttonStelproVariants = cva({
         'pui:disabled:text-pui-button-inactive-label'
       ],
       outline: '',
-      primaryLight: ''
+      primaryLight: '',
+      flat: ''
     },
     size: {
       small: '',

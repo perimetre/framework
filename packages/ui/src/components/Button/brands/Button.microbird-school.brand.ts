@@ -31,7 +31,8 @@ export const buttonMicroBirdSchoolVariants = cva({
         'pui:text-pui-overlay-12',
         'pui:bg-pui-primary-9',
         'pui:hover:bg-pui-primary-10'
-      ]
+      ],
+      flat: ''
     },
     size: {
       small: '',
