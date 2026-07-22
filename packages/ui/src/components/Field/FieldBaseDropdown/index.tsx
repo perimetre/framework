@@ -20,6 +20,17 @@ export type DropdownItem = {
   label: string;
 };
 
+/**
+ * Render state HeadlessUI exposes for each option, forwarded to the per-item
+ * `itemLeading`/`itemTrailing` render props so a callee can vary the addon by
+ * selection (e.g. a check only on the selected item).
+ */
+export type DropdownOptionState = {
+  disabled: boolean;
+  focus: boolean;
+  selected: boolean;
+};
+
 export type FieldBaseDropdownProps<T extends DropdownItem> = {
   /** Additional class name for the trigger button. */
   className?: string;
@@ -29,8 +40,18 @@ export type FieldBaseDropdownProps<T extends DropdownItem> = {
   disabled?: boolean;
   /** Custom render for the trigger's selected text. */
   displayValue?: (value: null | T | T[]) => React.ReactNode;
+  /**
+   * Custom render for an option's leading slot, keyed on selection state.
+   * Mirrors the field's `leading` addon but per-item — return `null` to omit.
+   */
+  itemLeading?: (item: T, state: DropdownOptionState) => React.ReactNode;
   /** The items to display. */
   items: T[];
+  /**
+   * Custom render for an option's trailing slot, keyed on selection state.
+   * Mirrors the field's `trailing` addon but per-item — return `null` to omit.
+   */
+  itemTrailing?: (item: T, state: DropdownOptionState) => React.ReactNode;
   /**
    * Enable multi-select (value becomes an array). Named to mirror the native
    * `<select multiple>` / HeadlessUI Listbox API.
@@ -68,6 +89,8 @@ function FieldBaseDropdown<T extends DropdownItem>({
   disabled,
   displayValue,
   error,
+  itemLeading,
+  itemTrailing,
   items,
   leading,
   multiple,
@@ -128,7 +151,27 @@ function FieldBaseDropdown<T extends DropdownItem>({
     >
       {items.map((item) => (
         <ListboxOption key={item.id} className={optionVariants()} value={item}>
-          <>{renderItem ? renderItem(item) : item.label}</>
+          {(state) => {
+            const itemLeadingContent = itemLeading?.(item, state);
+            const itemTrailingContent = itemTrailing?.(item, state);
+            return (
+              <span className="pui:flex pui:w-full pui:items-center pui:gap-2">
+                {itemLeadingContent != null && (
+                  <span className="pui:flex pui:shrink-0 pui:items-center">
+                    {itemLeadingContent}
+                  </span>
+                )}
+                <span className="pui:min-w-0 pui:flex-1 pui:truncate">
+                  {renderItem ? renderItem(item) : item.label}
+                </span>
+                {itemTrailingContent != null && (
+                  <span className="pui:flex pui:shrink-0 pui:items-center">
+                    {itemTrailingContent}
+                  </span>
+                )}
+              </span>
+            );
+          }}
         </ListboxOption>
       ))}
     </ListboxOptions>

@@ -17,7 +17,7 @@ export const buttonAcornVariants = cva({
     // Semantic motion tokens - themeable
     'pui:transition-shadow pui:duration-pui-normal',
     // Structural styles
-    'pui:inline-flex pui:items-center pui:justify-center pui:gap-2',
+    'pui:inline-flex pui:items-center pui:justify-center pui:gap-2 pui:cursor-pointer',
     // Typography
     'pui:leading-[1.335rem] pui:font-bold pui:uppercase'
   ],
@@ -48,6 +48,14 @@ export const buttonAcornVariants = cva({
         'pui:bg-pui-primary-2',
         'pui:hover:bg-pui-primary-10',
         'pui:hover:text-pui-primary-2'
+      ],
+      // Text-only button: no fill, border, or shadow — just an interactive
+      // label. Brands recolour via the interactive tokens.
+      flat: [
+        'pui:bg-transparent',
+        'pui:text-pui-interactive-primary',
+        'pui:shadow-none',
+        'pui:hover:text-pui-button-hover'
       ]
     },
     size: {

@@ -379,6 +379,29 @@
 }
 
 /* ========================================
+ * SLOTTED SHADOW COLOR
+ *
+ * OIQ's hard offset button shadow reads its color from a slot variable
+ * (`--pui-button-shadow-color`), defaulted to black in the brand base. A
+ * consumer recolors the shadow — the purple "on black" / on-color variants
+ * in the Figma spec — by writing the slot class:
+ *
+ *   pui:button-shadow-primary-11   (theme color)
+ *   pui:button-shadow-[#490368]    (arbitrary color)
+ *
+ * From a consumer app that does NOT use the pui: prefix, set the slot with a
+ * raw arbitrary property instead: [--pui-button-shadow-color:var(--color-…)].
+ *
+ * This is the Tailwind v4 successor to optrust's JS `matchUtilities` slot
+ * plugin: a single functional utility that reads the whole --color-* theme,
+ * no runtime plugin, and full variant support (hover:, etc.).
+ * ======================================== */
+
+@utility button-shadow-* {
+  --pui-button-shadow-color: --value(--color-*, [color]);
+}
+
+/* ========================================
  * TYPOGRAPHY UTILITY CLASSES
  *
  * Apply complete typography styles via a single class.

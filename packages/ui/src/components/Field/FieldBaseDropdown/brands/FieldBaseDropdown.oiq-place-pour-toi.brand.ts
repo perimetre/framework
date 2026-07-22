@@ -19,8 +19,9 @@ export const fieldBaseDropdownInputOiqPlacePourToiVariants = cva({
 export const fieldBaseDropdownOptionsOiqPlacePourToiVariants = cva({
   base: [
     // Square corners, flush with the trigger, bold brand-purple border, no
-    // default focus ring on the panel (selection is shown by the item highlight)
-    'pui:rounded-none pui:mt-0 pui:border-[3px] pui:border-pui-interactive-primary pui:focus:outline-none',
+    // default focus ring on the panel (selection is shown by the item highlight).
+    // py-0 drops acorn's vertical panel padding so items sit flush to the border.
+    'pui:rounded-none pui:mt-0 pui:py-0 pui:border-[3px] pui:border-pui-interactive-primary pui:focus:outline-none',
     // Open/close transition. Driven by HeadlessUI's `transition` prop (data-closed).
     // We animate the `translate` property (NOT `transform`) so the slide-down
     // survives floating-ui's `anchor`, which owns the inline `transform` for
@@ -36,5 +37,12 @@ export const fieldBaseDropdownOptionsOiqPlacePourToiVariants = cva({
 });
 
 export const fieldBaseDropdownOptionOiqPlacePourToiVariants = cva({
-  base: []
+  base: [
+    // Selection is shown by the purple fill + check only, not weight, so drop
+    // acorn's `data-selected:font-semibold`.
+    'pui:data-selected:font-normal',
+    // No focus outline; the active/focused item is shown by its purple fill
+    // only (kills the browser's default blue outline too).
+    'pui:outline-none pui:focus-visible:outline-none pui:data-focus:outline-none'
+  ]
 });

@@ -1,5 +1,5 @@
 import type { Story, StoryDefault } from '@ladle/react';
-import { Package } from 'lucide-react';
+import { Check, Package } from 'lucide-react';
 import { useState } from 'react';
 import FieldDropdown, { type DropdownItem, type FieldDropdownProps } from '.';
 
@@ -82,6 +82,18 @@ Leading.args = {
       className="pui:flex pui:size-5 pui:items-center pui:justify-center pui:sm:size-4"
     />
   )
+};
+
+export const ItemAddons: Story<Props> = (props) => <Default {...props} />;
+ItemAddons.args = {
+  ...Default.args,
+  label: 'Product size',
+  // Leading icon on every option; custom trailing check only on the selected one.
+  itemLeading: () => (
+    <Package aria-hidden className="pui:size-4 pui:text-pui-fg-subtle" />
+  ),
+  itemTrailing: (_item, { selected }) =>
+    selected ? <Check aria-hidden className="pui:size-4" /> : null
 };
 
 export const Multiple: Story<Props> = ({ items, name, ...props }) => {

@@ -1,10 +1,11 @@
 'use client';
 
 import { type ForceRequiredProps } from '@perimetre/helpers/types';
-import { ChevronDown } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import FieldAddon from '../FieldAddon';
 import FieldBaseDropdown, {
   type DropdownItem,
+  type DropdownOptionState,
   type FieldBaseDropdownProps
 } from '../FieldBaseDropdown';
 import FieldContainer from '../FieldContainer';
@@ -43,6 +44,7 @@ function FieldDropdown<T extends DropdownItem>({
   description,
   error,
   hint,
+  itemTrailing,
   label,
   leading,
   name,
@@ -58,6 +60,18 @@ function FieldDropdown<T extends DropdownItem>({
     />
   );
 
+  // Default selected-item marker is a check (matches the design system). A
+  // callee can override per state via `itemTrailing`, or add `itemLeading`.
+  const itemTrailingContent =
+    itemTrailing ??
+    ((_item: T, { selected }: DropdownOptionState) =>
+      selected ? (
+        <Check
+          aria-hidden
+          className="pui:flex pui:size-5 pui:items-center pui:justify-center pui:sm:size-4"
+        />
+      ) : null);
+
   return (
     <FieldContainer className={containerClassName} name={name}>
       <FieldUpper
@@ -72,6 +86,7 @@ function FieldDropdown<T extends DropdownItem>({
         <FieldBaseDropdown<T>
           trailing
           error={!!error}
+          itemTrailing={itemTrailingContent}
           leading={!!leading}
           name={name}
           {...dropdownProps}
@@ -101,4 +116,4 @@ function FieldDropdown<T extends DropdownItem>({
 }
 
 export default FieldDropdown;
-export type { DropdownItem } from '../FieldBaseDropdown';
+export type { DropdownItem, DropdownOptionState } from '../FieldBaseDropdown';

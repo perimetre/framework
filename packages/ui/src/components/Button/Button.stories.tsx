@@ -18,7 +18,7 @@ export default {
       defaultValue: 'default'
     },
     variant: {
-      options: ['primary', 'secondary', 'outline', 'primaryLight'],
+      options: ['primary', 'secondary', 'outline', 'primaryLight', 'flat'],
       control: { type: 'select' },
       defaultValue: 'primary'
     }
@@ -55,11 +55,55 @@ PrimaryLight.args = {
   variant: 'primaryLight'
 };
 
+export const Flat = DefaultComp.bind({});
+Flat.args = {
+  label: 'Learn More',
+  variant: 'flat'
+};
+
 export const Small = Default.bind({});
 Small.args = {
   label: 'Shop',
   size: 'small'
 };
+
+/**
+ * Slotted shadow colour: the OIQ button's hard offset shadow defaults to
+ * black, but a consumer recolours it with the `pui:button-shadow-*` utility
+ * (or a `[--pui-button-shadow-color:…]` arbitrary property from an app).
+ */
+export const SlottedShadow: Story<Props> = ({
+  label = 'Shop Now',
+  ...props
+}) => (
+  <div
+    style={{
+      display: 'flex',
+      gap: '3rem',
+      alignItems: 'flex-start',
+      background: '#f5f5f5',
+      padding: '2.5rem'
+    }}
+  >
+    <Button {...props} variant="primary">
+      {label} (default)
+    </Button>
+    <Button
+      {...props}
+      className="pui:button-shadow-primary-9"
+      variant="primary"
+    >
+      {label} (slot)
+    </Button>
+    <Button
+      {...props}
+      className="pui:button-shadow-[#490368]"
+      variant="primary"
+    >
+      {label} (arbitrary)
+    </Button>
+  </div>
+);
 
 export const AllVariants: Story<Props> = ({ label = 'Shop Now', ...props }) => (
   <div
@@ -80,6 +124,9 @@ export const AllVariants: Story<Props> = ({ label = 'Shop Now', ...props }) => (
       {label}
     </Button>
     <Button {...props} variant="primaryLight">
+      {label}
+    </Button>
+    <Button {...props} variant="flat">
       {label}
     </Button>
   </div>
