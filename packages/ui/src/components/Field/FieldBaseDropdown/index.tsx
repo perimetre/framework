@@ -146,7 +146,15 @@ function FieldBaseDropdown<T extends DropdownItem>({
       transition
       anchor={{ to: 'bottom start', gap: 0, padding: 8 }}
       className={optionsVariants({
-        className: 'pui:w-(--button-width) pui:!max-h-60'
+        // z-50: the panel is portalled to the end of `<body>` with no stacking
+        // context of its own, so a `z-index: auto` panel loses to ANY page
+        // section that sets an explicit z-index — it paints under it and the
+        // options stop being hit-testable (taps land on the section instead).
+        // Only shows up on short viewports, where floating-ui has no room below
+        // the trigger and flips the panel up into the content above it, which is
+        // why it reads as a touch/mobile-only bug. Structural and set here (not
+        // in a brand variant) so no brand override can drop it.
+        className: 'pui:z-50 pui:w-(--button-width) pui:!max-h-60'
       })}
     >
       {items.map((item) => (
