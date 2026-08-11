@@ -31,10 +31,21 @@ jobs:
       published: ${{ steps.changesets.outputs.published }}
       publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
     steps:
+      # Mint a token for the Perimetre Actions GitHub App so the release PR is
+      # authored by the app instead of github-actions[bot]. PRs authored by
+      # github-actions[bot] have their workflow runs held for manual approval.
+      - name: Generate app token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -68,7 +79,13 @@ jobs:
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
+        env:
+          # Overrides the job-level GITHUB_TOKEN so every API call this action
+          # makes is attributed to the app. NODE_AUTH_TOKEN stays on
+          # secrets.GITHUB_TOKEN — package publishing still uses it.
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         with:
+          token: ${{ steps.app-token.outputs.token }}
           publish: pnpm run release
           version: pnpm run version
           commit: 'chore(release): version packages'
