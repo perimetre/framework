@@ -1,4 +1,5 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { print } from 'graphql';
 import type { GraphQLClient } from 'graphql-request';
 import type { GraphqlSpan, StartSpanFn } from './middlewares.js';
 import { OPERATION_DEFINITION_KIND, type GraphqlLogger } from './utils.js';
@@ -83,6 +84,14 @@ const operationNameFromDocument = (document: unknown): string => {
 const APQ_NOT_FOUND_ERROR = 'PersistedQueryNotFound';
 
 /**
+ * What `executeGraphqlRequest.withMeta()` resolves to: the operation's data
+ * plus the response metadata.
+ */
+export type GraphqlExecuteResult<TResult> = {
+  data: TResult;
+} & GraphqlResponseMeta;
+
+/**
  * Read-only metadata about the operation a {@link GraphqlRequestPlugin} is
  * acting on. Derived from the document — never the GraphQL inputs themselves
  * (those are the operation's concern, not the transport's). Both `onRequest`
@@ -122,6 +131,50 @@ export type GraphqlRequestOptions = {
    */
   edgeCache?: number;
 };
+
+/**
+ * Metadata about the HTTP response that produced a result: the **final**
+ * response's headers (after any APQ register / POST fallback), which
+ * transport delivered it, and how long the whole request took.
+ */
+export type GraphqlResponseMeta = {
+  /** Wall-clock time from just before the request to its settlement. */
+  durationMs: number;
+  /**
+   * The raw fetch `Response.headers` of the response that produced `data`.
+   * For WPGraphQL this is where `X-GraphQL-Keys` lives — see
+   * `parseGraphqlKeys` in `@perimetre/graphql/keys`.
+   */
+  headers: Headers;
+  /** Which wire path produced the response. */
+  transport: GraphqlTransport;
+};
+
+/**
+ * The outcome handed to a plugin's `onResponse` hook. `data` and `error` are
+ * mutually exclusive. `headers` / `transport` are present whenever a response
+ * was received — including on a GraphQL error thrown as a `ClientError` —
+ * and absent only when the request failed before any response arrived.
+ */
+export type GraphqlResponseOutcome = {
+  data?: unknown;
+  durationMs: number;
+  error?: unknown;
+  headers?: Headers;
+  transport?: GraphqlTransport;
+};
+
+/**
+ * Which wire path a response came back on. Useful to assert (in tests and
+ * logs) that the headers you're reading belong to the response that actually
+ * produced the data — e.g. after an APQ miss, `'apq-register-post'` or
+ * `'post'` rather than the GET that missed.
+ */
+export type GraphqlTransport =
+  | 'apq-get'
+  | 'apq-register-post'
+  | 'post'
+  | 'trusted-get';
 
 /**
  * Builds the {@link GraphqlRequestContext} for a document — the single place
@@ -173,14 +226,16 @@ export type GraphqlRequestPlugin = {
   /**
    * Runs **after** the request settles, with the operation context and the
    * outcome: `data` on success, `error` on failure (mutually exclusive), plus
-   * `durationMs` measured from just before the request. Observation only — the
-   * return value is ignored and it must not throw (a throw is swallowed so it
-   * can't mask the real result). Only invoked on the executor's request path,
-   * not when the TanStack helper resolves options for the query key.
+   * `durationMs` measured from just before the request, and — whenever a
+   * response was received — the final response's `headers` and `transport`.
+   * Observation only — the return value is ignored and it must not throw (a
+   * throw is swallowed so it can't mask the real result). Only invoked on the
+   * executor's request path, not when the TanStack helper resolves options for
+   * the query key.
    */
   onResponse?: (
     context: GraphqlRequestContext,
-    result: { data?: unknown; durationMs: number; error?: unknown }
+    result: GraphqlResponseOutcome
   ) => void;
 };
 
@@ -213,7 +268,7 @@ export const resolveRequestOptions = (
 export const notifyResponse = (
   plugins: GraphqlRequestPlugin[] | undefined,
   context: GraphqlRequestContext,
-  result: { data?: unknown; durationMs: number; error?: unknown }
+  result: GraphqlResponseOutcome
 ): void => {
   if (!plugins) return;
   for (const plugin of plugins) {
@@ -307,6 +362,10 @@ export type ApqExecutorOptions = {
   startSpan?: StartSpanFn;
 };
 
+/**
+ * The data-only execute signature. Resolves to the operation's `data`, the
+ * same shape `client.request` returns — what `graphqlOptions` feeds TanStack.
+ */
 export type ExecuteGraphqlRequest = <TResult, TVariables>(
   document: TypedDocumentNode<TResult, TVariables>,
   variables?: TVariables,
@@ -314,16 +373,170 @@ export type ExecuteGraphqlRequest = <TResult, TVariables>(
 ) => Promise<TResult>;
 
 /**
+ * The metadata-returning execute signature: same inputs as
+ * {@link ExecuteGraphqlRequest}, resolves to `{ data, headers, transport,
+ * durationMs }` for the **final** response (after any APQ register or POST
+ * fallback). This is the per-call way to read response headers — e.g.
+ * WPGraphQL's `X-GraphQL-Keys` — without a global hook.
+ */
+export type ExecuteGraphqlRequestWithMeta = <TResult, TVariables>(
+  document: TypedDocumentNode<TResult, TVariables>,
+  variables?: TVariables,
+  options?: GraphqlRequestOptions
+) => Promise<GraphqlExecuteResult<TResult>>;
+
+/**
+ * What every executor factory returns: callable as a plain
+ * {@link ExecuteGraphqlRequest} (data only, unchanged), with a `.withMeta`
+ * variant that also returns the response headers. Anything typed as
+ * `ExecuteGraphqlRequest` accepts a `GraphqlExecutor`, so existing call sites
+ * and custom executors keep compiling.
+ */
+export type GraphqlExecutor = {
+  withMeta: ExecuteGraphqlRequestWithMeta;
+} & ExecuteGraphqlRequest;
+
+/** Inputs to a transport runner, resolved by the executor shell. */
+export type GraphqlTransportArgs<TResult, TVariables> = {
+  /** The operation context derived from the document. */
+  context: GraphqlRequestContext;
+  document: TypedDocumentNode<TResult, TVariables>;
+  /** Transport options after the `onRequest` plugin chain has run. */
+  options: GraphqlRequestOptions;
+  variables: TVariables | undefined;
+};
+
+/**
+ * What a transport hands back to the executor shell before timing is
+ * attached: the data, the headers of the response it came from, and which
+ * wire path delivered it.
+ */
+export type GraphqlTransportResult<TResult> = {
+  data: TResult;
+  headers: Headers;
+  transport: GraphqlTransport;
+};
+
+/** The transport logic an executor plugs into {@link createExecutor}. */
+type TransportRunner = <TResult, TVariables>(
+  args: GraphqlTransportArgs<TResult, TVariables>
+) => Promise<GraphqlTransportResult<TResult>>;
+
+/**
+ * Pulls the response headers off a thrown error when it carries them.
+ * graphql-request's `ClientError` exposes `error.response.headers` for a
+ * GraphQL-error or non-2xx response, so `onResponse` observers can still read
+ * e.g. `X-GraphQL-Keys` on a failed request. Duck-typed on purpose so it works
+ * across duplicated `graphql-request` copies.
+ */
+const headersFromError = (error: unknown): Headers | undefined => {
+  if (typeof error !== 'object' || error === null || !('response' in error)) {
+    return undefined;
+  }
+  const response = (error as { response?: unknown }).response;
+  if (
+    typeof response !== 'object' ||
+    response === null ||
+    !('headers' in response)
+  ) {
+    return undefined;
+  }
+  const headers = (response as { headers?: unknown }).headers;
+  return headers instanceof Headers ? headers : undefined;
+};
+
+/**
+ * Sends an operation over the standard POST transport via the supplied
+ * `graphql-request` client and returns its data **with** the response headers.
+ * Uses `client.rawRequest` (which runs the same request/response middlewares
+ * and `errorPolicy` as `client.request`, but keeps `headers`/`status`) so the
+ * POST path can surface headers like the GET paths do. Shared by every
+ * executor's POST fallback.
+ */
+export const postViaClient = async <TResult, TVariables>(
+  client: GraphQLClient,
+  document: TypedDocumentNode<TResult, TVariables>,
+  variables: TVariables | undefined
+): Promise<GraphqlTransportResult<TResult>> => {
+  const response = await client.rawRequest<TResult>(
+    print(document),
+    variables as object | undefined
+  );
+  return { data: response.data, headers: response.headers, transport: 'post' };
+};
+
+/**
+ * Builds a {@link GraphqlExecutor} around a transport runner. Owns everything
+ * the transports share: deriving the operation context, folding per-call
+ * options through the `onRequest` plugin chain, timing the request, notifying
+ * `onResponse` once it settles either way (with the final response's headers
+ * when there are any), and exposing both the data-only call and `.withMeta`.
+ */
+export const createExecutor = ({
+  requestPlugins,
+  run
+}: {
+  requestPlugins?: GraphqlRequestPlugin[];
+  run: TransportRunner;
+}): GraphqlExecutor => {
+  /** Runs the transport and returns data plus the final response's metadata. */
+  const withMeta: ExecuteGraphqlRequestWithMeta = async (
+    document,
+    variables,
+    options
+  ) => {
+    const context = contextFromDocument(document);
+    const resolved = resolveRequestOptions(requestPlugins, context, options);
+    const startedAt = Date.now();
+
+    try {
+      const result = await run({
+        context,
+        document,
+        options: resolved,
+        variables
+      });
+      const durationMs = Date.now() - startedAt;
+      notifyResponse(requestPlugins, context, {
+        data: result.data,
+        durationMs,
+        headers: result.headers,
+        transport: result.transport
+      });
+      return { ...result, durationMs };
+    } catch (error) {
+      notifyResponse(requestPlugins, context, {
+        durationMs: Date.now() - startedAt,
+        error,
+        headers: headersFromError(error)
+      });
+      throw error;
+    }
+  };
+
+  /** The data-only call — `withMeta` minus the metadata. */
+  const execute: ExecuteGraphqlRequest = async (document, variables, options) =>
+    (await withMeta(document, variables, options)).data;
+
+  return Object.assign(execute, { withMeta });
+};
+
+/**
  * Creates an `executeGraphqlRequest` helper that routes queries through
  * WPGraphQL Smart Cache's APQ flow when the codegen-embedded hash is
- * present, and falls back to the supplied `client.request` for mutations,
- * unhashed documents, or any APQ transport failure.
+ * present, and falls back to the supplied client's POST transport for
+ * mutations, unhashed documents, or any APQ transport failure.
  *
  * Because the codegen hash matches the server's normalized persisted-query
  * id, the executor issues an APQ **GET** first. On the rare
  * `PersistedQueryNotFound` (the document was never registered on this server),
  * it registers the document with one POST and retries the GET, so subsequent
  * callers stay on the cacheable GET fast path.
+ *
+ * The returned executor also exposes `.withMeta(document, variables, options)`
+ * which resolves to `{ data, headers, transport, durationMs }` — the headers
+ * are always those of the response that produced `data`, so after a miss you
+ * get the register POST's (or the fallback POST's) headers, not the GET's.
  */
 export const createApqExecutor = ({
   client,
@@ -333,7 +546,7 @@ export const createApqExecutor = ({
   persistedDocuments,
   requestPlugins,
   startSpan
-}: ApqExecutorOptions): ExecuteGraphqlRequest => {
+}: ApqExecutorOptions): GraphqlExecutor => {
   /**
    * Wraps `fn` in a span when `startSpan` is configured; runs it bare
    * otherwise. Lets the executor be tracer-agnostic.
@@ -350,18 +563,18 @@ export const createApqExecutor = ({
 
   /**
    * Registers a persisted query on the WPGraphQL Smart Cache server and
-   * returns the executed response in the same round trip. Sends both `query`
-   * and `queryId` so the server saves the document under the *same* id the
-   * client already uses — no second identifier to track. Returns `null` when
-   * there's no persisted-documents entry for the hash (callers fall through
-   * to the regular client).
+   * returns the executed response (body + headers) in the same round trip.
+   * Sends both `query` and `queryId` so the server saves the document under
+   * the *same* id the client already uses — no second identifier to track.
+   * Returns `null` when there's no persisted-documents entry for the hash
+   * (callers fall through to the regular client).
    */
   const registerViaApqPost = async (
     hash: string,
     operationName: string,
     variables: unknown,
     edgeCache?: number
-  ): Promise<ApqResponse | null> => {
+  ): Promise<{ body: ApqResponse; headers: Headers } | null> => {
     const query = persistedDocuments[hash];
     if (!query) return null;
 
@@ -389,14 +602,13 @@ export const createApqExecutor = ({
       throw new Error(`APQ POST returned HTTP ${String(res.status)}`);
     }
 
-    return (await res.json()) as ApqResponse;
+    return { body: (await res.json()) as ApqResponse, headers: res.headers };
   };
 
   /**
-   * Registers the document via POST and returns its response data, falling
-   * back to the regular client if registration has no entry or fails. Used
-   * when an APQ GET misses because the document was never registered on this
-   * server.
+   * Registers the document via POST and returns its response, falling back to
+   * the regular client if registration has no entry or fails. Used when an APQ
+   * GET misses because the document was never registered on this server.
    */
   const registerAndExecute = async <TResult, TVariables>(
     hash: string,
@@ -404,7 +616,7 @@ export const createApqExecutor = ({
     document: TypedDocumentNode<TResult, TVariables>,
     variables?: TVariables,
     edgeCache?: number
-  ): Promise<TResult> => {
+  ): Promise<GraphqlTransportResult<TResult>> => {
     return wrapSpan(
       `graphql.apq.register.${operationName}`,
       'graphql.query',
@@ -420,16 +632,20 @@ export const createApqExecutor = ({
 
           if (
             registered &&
-            !registered.errors &&
-            registered.data !== undefined
+            !registered.body.errors &&
+            registered.body.data !== undefined
           ) {
-            return registered.data as TResult;
+            return {
+              data: registered.body.data as TResult,
+              headers: registered.headers,
+              transport: 'apq-register-post'
+            };
           }
 
           logger?.warn('graphql.apq.register_failed', {
             operationName,
             hash,
-            hadErrors: !!registered?.errors
+            hadErrors: !!registered?.body.errors
           });
         } catch (error) {
           logger?.warn('graphql.apq.register_threw', {
@@ -439,126 +655,102 @@ export const createApqExecutor = ({
           });
         }
 
-        return client.request(document, variables as object | undefined);
+        return postViaClient(client, document, variables);
       }
     );
   };
 
   /**
-   * Executes a GraphQL operation. Queries with a codegen-embedded hash route
-   * through APQ — GET first, and a one-off register POST then GET if the
-   * server reports `PersistedQueryNotFound`. Everything else (mutations,
-   * subscriptions, unhashed documents) falls back to the supplied client.
+   * The APQ transport: queries with a codegen-embedded hash go out as an APQ
+   * GET — with a one-off register POST then GET if the server reports
+   * `PersistedQueryNotFound`. Everything else (mutations, subscriptions,
+   * unhashed documents) falls back to the supplied client's POST.
    */
-  async function execute<TResult, TVariables>(
-    document: TypedDocumentNode<TResult, TVariables>,
-    variables?: TVariables,
-    options?: GraphqlRequestOptions
-  ): Promise<TResult> {
-    const context = contextFromDocument(document);
+  const run: TransportRunner = async <TResult, TVariables>({
+    context,
+    document,
+    options,
+    variables
+  }: GraphqlTransportArgs<TResult, TVariables>): Promise<
+    GraphqlTransportResult<TResult>
+  > => {
     const { hash, operationKind, operationName } = context;
+    const edgeCache = options.edgeCache;
 
-    // Resolve transport options through the plugin chain, then run the request,
-    // notifying `onResponse` once it settles either way. `runRequest` holds the
-    // transport logic; the wrapper around it just times + reports the outcome.
-    const resolved = resolveRequestOptions(requestPlugins, context, options);
-    const edgeCache = resolved.edgeCache;
-    const startedAt = Date.now();
+    if (operationKind !== 'query' || !hash) {
+      return postViaClient(client, document, variables);
+    }
 
-    /** The transport logic: APQ GET (with register-on-miss) or a POST fallback. */
-    const runRequest = async (): Promise<TResult> => {
-      if (operationKind !== 'query' || !hash) {
-        return client.request(document, variables as object | undefined);
-      }
+    const apqUrl = buildApqGetUrl(
+      endpoint,
+      hash,
+      operationName,
+      variables ?? {},
+      edgeCache
+    );
+    return wrapSpan(
+      `graphql.apq.${operationName}`,
+      'graphql.query',
+      { operationName, hash, transport: 'apq-get' },
+      async (span) => {
+        try {
+          const res = await fetchImpl(apqUrl, {
+            method: 'GET',
+            headers: { Accept: 'application/json' }
+          });
 
-      const apqUrl = buildApqGetUrl(
-        endpoint,
-        hash,
-        operationName,
-        variables ?? {},
-        edgeCache
-      );
-      return wrapSpan(
-        `graphql.apq.${operationName}`,
-        'graphql.query',
-        { operationName, hash, transport: 'apq-get' },
-        async (span) => {
-          try {
-            const res = await fetchImpl(apqUrl, {
-              method: 'GET',
-              headers: { Accept: 'application/json' }
-            });
+          if (!res.ok) {
+            throw new Error(`APQ GET returned HTTP ${String(res.status)}`);
+          }
 
-            if (!res.ok) {
-              throw new Error(`APQ GET returned HTTP ${String(res.status)}`);
-            }
+          const body = (await res.json()) as ApqResponse;
 
-            const body = (await res.json()) as ApqResponse;
-
-            const apqMiss = body.errors?.some(
-              (err) => err.message === APQ_NOT_FOUND_ERROR
-            );
-            if (apqMiss) {
-              span?.setAttribute('graphql.apq.miss', true);
-              logger?.info('graphql.apq.miss_register', {
-                operationName,
-                hash
-              });
-              // The document was never registered on this server. Register it
-              // with one POST (same id we already use) and execute in the same
-              // round trip; the next caller for this hash gets the GET fast path.
-              return await registerAndExecute(
-                hash,
-                operationName,
-                document,
-                variables,
-                edgeCache
-              );
-            }
-
-            if (body.errors && body.errors.length > 0) {
-              logger?.warn('graphql.apq.errors_fallback_post', {
-                operationName,
-                errorCount: body.errors.length
-              });
-              return await client.request(
-                document,
-                variables as object | undefined
-              );
-            }
-
-            return body.data as TResult;
-          } catch (error) {
-            logger?.warn('graphql.apq.transport_failed', {
+          const apqMiss = body.errors?.some(
+            (err) => err.message === APQ_NOT_FOUND_ERROR
+          );
+          if (apqMiss) {
+            span?.setAttribute('graphql.apq.miss', true);
+            logger?.info('graphql.apq.miss_register', {
               operationName,
-              message: error instanceof Error ? error.message : String(error)
+              hash
             });
-            return await client.request(
+            // The document was never registered on this server. Register it
+            // with one POST (same id we already use) and execute in the same
+            // round trip; the next caller for this hash gets the GET fast path.
+            return await registerAndExecute(
+              hash,
+              operationName,
               document,
-              variables as object | undefined
+              variables,
+              edgeCache
             );
           }
+
+          if (body.errors && body.errors.length > 0) {
+            logger?.warn('graphql.apq.errors_fallback_post', {
+              operationName,
+              errorCount: body.errors.length
+            });
+            return await postViaClient(client, document, variables);
+          }
+
+          return {
+            data: body.data as TResult,
+            headers: res.headers,
+            transport: 'apq-get'
+          };
+        } catch (error) {
+          logger?.warn('graphql.apq.transport_failed', {
+            operationName,
+            message: error instanceof Error ? error.message : String(error)
+          });
+          return await postViaClient(client, document, variables);
         }
-      );
-    };
+      }
+    );
+  };
 
-    try {
-      const data = await runRequest();
-      notifyResponse(requestPlugins, context, {
-        data,
-        durationMs: Date.now() - startedAt
-      });
-      return data;
-    } catch (error) {
-      notifyResponse(requestPlugins, context, {
-        durationMs: Date.now() - startedAt,
-        error
-      });
-      throw error;
-    }
-  }
-
-  return execute;
+  return createExecutor({ requestPlugins, run });
 };
 
 /**
@@ -568,11 +760,17 @@ export const createApqExecutor = ({
  *
  * The third `options` argument (e.g. `edgeCache`) is accepted for signature
  * compatibility but ignored — POSTs aren't edge-cached, so there's no URL to
- * attach the param to.
+ * attach the param to. `.withMeta` works here too, so a project can read
+ * response headers before it opts into a persisted-query transport.
  */
 export const createPassthroughExecutor = (
   client: GraphQLClient
-): ExecuteGraphqlRequest => {
-  return (document, variables) =>
-    client.request(document, variables as object | undefined);
-};
+): GraphqlExecutor =>
+  createExecutor({
+    /** Always POST via the client; headers come from `rawRequest`. */
+    run: async <TResult, TVariables>({
+      document,
+      variables
+    }: GraphqlTransportArgs<TResult, TVariables>) =>
+      postViaClient(client, document, variables)
+  });

@@ -282,7 +282,12 @@ export const createInstrumentedFetch = ({
    * Public `fetch` replacement. Opens a tracer span around the call when
    * `startSpan` is configured, otherwise runs `run` directly.
    */
-  const instrumentedFetch: typeof fetch = async (input, init) => {
+  // Cast: bun-types' `typeof fetch` also carries `preconnect`, which a plain
+  // wrapper never implements. Behaviour is unchanged.
+  const instrumentedFetch = (async (
+    input: Parameters<typeof fetch>[0],
+    init?: Parameters<typeof fetch>[1]
+  ) => {
     if (!startSpan) {
       return run(input, init);
     }
@@ -306,7 +311,7 @@ export const createInstrumentedFetch = ({
       },
       (span) => run(input, init, span)
     );
-  };
+  }) as typeof fetch;
 
   return instrumentedFetch;
 };
@@ -421,7 +426,12 @@ export const createRetryFetch = ({
   maxThrottleWaitMs?: number;
   maxUpstreamWaitMs?: number;
 }): typeof fetch => {
-  return async (input, init) => {
+  // Cast: see `createInstrumentedFetch` — bun-types' `typeof fetch` requires
+  // `preconnect`.
+  return (async (
+    input: Parameters<typeof fetch>[0],
+    init?: Parameters<typeof fetch>[1]
+  ) => {
     const isQuery = isQueryOperation(init?.body);
     const signal = init?.signal;
     let attempt = 0;
@@ -486,7 +496,7 @@ export const createRetryFetch = ({
 
       return response;
     }
-  };
+  }) as typeof fetch;
 };
 
 /**

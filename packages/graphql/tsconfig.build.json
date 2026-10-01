@@ -2,6 +2,6 @@
   "compilerOptions": {
     "rootDir": "./src"
   },
-  "exclude": ["node_modules", "dist", "tsdown.config.ts"],
+  "exclude": ["node_modules", "dist", "src/__tests__", "tsdown.config.ts"],
   "extends": "./tsconfig.json"
 }

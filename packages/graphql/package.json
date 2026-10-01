@@ -8,6 +8,7 @@
   "devDependencies": {
     "@perimetre/eslint-config-base": "workspace:*",
     "@tanstack/react-query": "^5.0.0",
+    "@types/bun": "^1.3.9",
     "@types/node": "^22.19.11",
     "eslint": "^9.39.2",
     "tsdown": "0.20.3",
@@ -61,8 +62,9 @@
     "url": "https://github.com/perimetre/framework.git"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "bun test && tsdown",
     "lint": "eslint .",
+    "test": "bun test",
     "typecheck": "tsc --project tsconfig.build.json --noEmit"
   },
   "type": "module",

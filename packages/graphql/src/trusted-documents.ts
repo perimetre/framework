@@ -1,13 +1,12 @@
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import type { GraphQLClient } from 'graphql-request';
 import {
   applyEdgeCacheParam,
-  contextFromDocument,
-  notifyResponse,
-  resolveRequestOptions,
-  type ExecuteGraphqlRequest,
-  type GraphqlRequestOptions,
-  type GraphqlRequestPlugin
+  createExecutor,
+  postViaClient,
+  type GraphqlExecutor,
+  type GraphqlRequestPlugin,
+  type GraphqlTransportArgs,
+  type GraphqlTransportResult
 } from './apq.js';
 import type { GraphqlSpan, StartSpanFn } from './middlewares.js';
 import type { GraphqlLogger } from './utils.js';
@@ -133,6 +132,10 @@ export class TrustedDocumentNotRegisteredError extends Error {
  *
  * This is intentionally distinct from {@link createApqExecutor}; pick one
  * transport per client.
+ *
+ * Like the APQ executor, the result exposes `.withMeta(...)` which resolves to
+ * `{ data, headers, transport, durationMs }` for the response that produced
+ * the data (the GET's, or the fallback POST's).
  */
 export const createTrustedDocumentExecutor = ({
   client,
@@ -141,7 +144,7 @@ export const createTrustedDocumentExecutor = ({
   logger,
   requestPlugins,
   startSpan
-}: TrustedDocumentExecutorOptions): ExecuteGraphqlRequest => {
+}: TrustedDocumentExecutorOptions): GraphqlExecutor => {
   /**
    * Wraps `fn` in a tracer span when `startSpan` is configured; runs it bare
    * otherwise. Keeps the executor observability-aware without a hard Sentry
@@ -158,28 +161,25 @@ export const createTrustedDocumentExecutor = ({
     );
   };
 
-  /**
-   * Executes one operation under the trusted-documents contract: hashed
-   * queries go out as a GET by id (throwing on an unknown id); everything
-   * else falls back to the supplied client's POST transport.
-   */
-  async function execute<TResult, TVariables>(
-    document: TypedDocumentNode<TResult, TVariables>,
-    variables?: TVariables,
-    options?: GraphqlRequestOptions
-  ): Promise<TResult> {
-    const context = contextFromDocument(document);
-    const { hash, operationKind, operationName } = context;
+  return createExecutor({
+    requestPlugins,
+    /**
+     * The trusted-documents transport: hashed queries go out as a GET by id
+     * (throwing on an unknown id); everything else falls back to the supplied
+     * client's POST transport.
+     */
+    run: async <TResult, TVariables>({
+      context,
+      document,
+      options,
+      variables
+    }: GraphqlTransportArgs<TResult, TVariables>): Promise<
+      GraphqlTransportResult<TResult>
+    > => {
+      const { hash, operationKind, operationName } = context;
 
-    // Resolve transport options through the plugin chain, then run the request,
-    // notifying `onResponse` once it settles either way.
-    const resolved = resolveRequestOptions(requestPlugins, context, options);
-    const startedAt = Date.now();
-
-    /** The transport logic: persisted-query GET by id, or a POST fallback. */
-    const runRequest = async (): Promise<TResult> => {
       if (operationKind !== 'query' || !hash) {
-        return client.request(document, variables as object | undefined);
+        return postViaClient(client, document, variables);
       }
 
       const url = buildGetUrl(
@@ -187,13 +187,14 @@ export const createTrustedDocumentExecutor = ({
         hash,
         operationName,
         variables ?? {},
-        resolved.edgeCache
+        options.edgeCache
       );
       return wrapSpan(
         `graphql.trusted.${operationName}`,
         { operationName, id: hash, transport: 'trusted-get' },
         async (span) => {
           let body: { data?: unknown; errors?: { message: string }[] };
+          let headers: Headers;
           try {
             const res = await fetchImpl(url, {
               method: 'GET',
@@ -205,6 +206,7 @@ export const createTrustedDocumentExecutor = ({
               );
             }
             body = (await res.json()) as typeof body;
+            headers = res.headers;
           } catch (error) {
             // A transport-level failure (network blip, edge 5xx) shouldn't take
             // the request down when the document IS on the safelist — fall back
@@ -216,7 +218,7 @@ export const createTrustedDocumentExecutor = ({
               id: hash,
               message: error instanceof Error ? error.message : String(error)
             });
-            return client.request(document, variables as object | undefined);
+            return postViaClient(client, document, variables);
           }
 
           const notRegistered = body.errors?.some(
@@ -240,31 +242,18 @@ export const createTrustedDocumentExecutor = ({
               id: hash,
               errorCount: body.errors.length
             });
-            return client.request(document, variables as object | undefined);
+            return postViaClient(client, document, variables);
           }
 
-          return body.data as TResult;
+          return {
+            data: body.data as TResult,
+            headers,
+            transport: 'trusted-get'
+          };
         }
       );
-    };
-
-    try {
-      const data = await runRequest();
-      notifyResponse(requestPlugins, context, {
-        data,
-        durationMs: Date.now() - startedAt
-      });
-      return data;
-    } catch (error) {
-      notifyResponse(requestPlugins, context, {
-        durationMs: Date.now() - startedAt,
-        error
-      });
-      throw error;
     }
-  }
-
-  return execute;
+  });
 };
 
 // ---------------------------------------------------------------------------
