@@ -16,6 +16,7 @@ The package is opinionated about **what** goes in your `src/server/graphql/index
 | `withRetryFetch`                           | You want bounded retries on transient network/upstream failures. |
 | `createApqExecutor`                        | APQ (learn-at-runtime) on `wp-graphql-smart-cache`.              |
 | `createTrustedDocumentExecutor`            | Trusted Documents (safelist) — GET-by-id only, no runtime learn. |
+| `parseGraphqlKeys`                         | You want to tag cached reads with WPGraphQL's `X-GraphQL-Keys`.  |
 | `registerTrustedDocuments`                 | Pre-register the safelist on the CMS at deploy time.             |
 | `trustedDocumentsCodegenHook`              | Register documents straight from your `codegen.ts` hooks.        |
 | `createGraphqlTanstack`                    | You want `graphqlOptions` / `graphqlMutationOptions` helpers.    |
@@ -310,6 +311,44 @@ export const {
 
 Mutations and subscriptions still POST through the underlying client, exactly as with APQ. The persisted-documents map isn't needed at runtime for this transport (the executor reads `__meta__.hash` off each generated document) — it's only used by the deploy-time registrar.
 
+## Reading response headers / `X-GraphQL-Keys`
+
+Every executor (`createApqExecutor`, `createTrustedDocumentExecutor`, `createPassthroughExecutor`, and the `executeGraphqlRequest` that `createWpGraphql` returns) is callable as before — data only — **and** exposes `.withMeta(document, variables?, options?)`, which resolves to:
+
+```ts
+type GraphqlExecuteResult<TResult> = {
+  data: TResult;
+  headers: Headers; // raw fetch Response.headers of the response that produced `data`
+  transport: 'apq-get' | 'apq-register-post' | 'post' | 'trusted-get';
+  durationMs: number;
+};
+```
+
+`headers` always belong to the **final** response: after an APQ `PersistedQueryNotFound` miss you get the register-POST's headers (or the fallback POST's), never the GET's that missed. Mutations and unhashed documents go through `graphql-request`'s `rawRequest`, so the POST path carries headers too. The `onResponse` hook of a `GraphqlRequestPlugin` receives the same `headers` / `transport` alongside `data` / `error` / `durationMs` (headers are also attached on a thrown `ClientError`; they're `undefined` only when the request failed before any response arrived).
+
+The main use is tagging a Next.js `'use cache: remote'` read with what WPGraphQL says the response resolved. The Query Analyzer emits an `X-GraphQL-Keys` header — `<queryId> graphql:Query <OperationName> list:<type>… <relayId>… skipped:<type>…` — and WPGraphQL Smart Cache purges by exactly those keys. `parseGraphqlKeys` (from `@perimetre/graphql/keys`, also re-exported from the root) splits it into buckets; `lists` and `skipped` are kept in wire form (`list:post`, `skipped:post`) because those are the purge keys you tag with:
+
+```ts
+// src/server/cms/cache.ts
+import { cacheLife, cacheTag } from 'next/cache';
+import { parseGraphqlKeys } from '@perimetre/graphql/keys';
+import { executeGraphqlRequest } from '@/server/graphql';
+
+export async function getPage(uri: string) {
+  'use cache: remote';
+  cacheLife('max');
+  const { data, headers } = await executeGraphqlRequest.withMeta(
+    GetPageDocument,
+    { uri }
+  );
+  const { nodeIds, lists, skipped } = parseGraphqlKeys(headers);
+  cacheTag('cms', ...nodeIds, ...lists, ...skipped); // a second cacheTag call after the fetch is fine
+  return data;
+}
+```
+
+`skipped:<type>` appears when the header overflowed WPGraphQL's 4000-char limit (`graphql_query_analyzer_header_length_limit`): ids of that type were dropped, so tag the type-level key as a fallback. The header is only sent when the Query Analyzer is enabled on the CMS — check with `curl -I` against a persisted GET. The parser is pure, dependency-free, and never throws (a missing header yields empty buckets).
+
 ## Bring-your-own-fetch
 
 **The package never calls Node's global `fetch` on its own.** That's deliberate: every project ends up wanting some combination of retries, observability wrapping, custom headers, abort-signal plumbing, or buyer-injection on the transport layer, and the cleanest way to support all of those is to make the consumer pass the `fetch` they want used.
@@ -472,9 +511,10 @@ You normally don't call it directly — `wpGraphqlSmartCachePresetConfig()` wire
 | `@perimetre/graphql/apq`               | `createApqExecutor`, `createPassthroughExecutor`                                                                                                                                                    |
 | `@perimetre/graphql/trusted-documents` | `createTrustedDocumentExecutor`, `registerTrustedDocuments`, `TrustedDocumentNotRegisteredError`                                                                                                    |
 | `@perimetre/graphql/codegen`           | `hashOperationForWpGraphqlSmartCache`, `wpGraphqlSmartCachePresetConfig`, `printForWpGraphqlSmartCache`, `trustedDocumentsCodegenHook`                                                              |
+| `@perimetre/graphql/keys`              | `parseGraphqlKeys`, `GRAPHQL_KEYS_HEADER`                                                                                                                                                           |
 | `@perimetre/graphql/print`             | `printForWpGraphqlSmartCache`                                                                                                                                                                       |
 
-The `tanstack` subpath is the only one that pulls in `@tanstack/react-query`. Server-only modules can import everything else without dragging the React tree in. The `apq`, `trusted-documents`, and `print` subpaths are pure (no `node:` builtins) and run anywhere; the `codegen` subpath imports `node:crypto` + `node:fs/promises` (Node-only — it's for your `codegen.ts` / deploy scripts).
+The `tanstack` subpath is the only one that pulls in `@tanstack/react-query`. Server-only modules can import everything else without dragging the React tree in. The `apq`, `trusted-documents`, `keys`, and `print` subpaths are pure (no `node:` builtins) and run anywhere; the `codegen` subpath imports `node:crypto` + `node:fs/promises` (Node-only — it's for your `codegen.ts` / deploy scripts).
 
 ## Logger interface
 

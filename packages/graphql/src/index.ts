@@ -2,7 +2,7 @@ import type { GraphQLClient } from 'graphql-request';
 import {
   createApqExecutor,
   createPassthroughExecutor,
-  type ExecuteGraphqlRequest,
+  type GraphqlExecutor,
   type GraphqlRequestPlugin
 } from './apq.js';
 import {
@@ -28,14 +28,24 @@ export {
   applyEdgeCacheParam,
   contextFromDocument,
   createApqExecutor,
+  createExecutor,
   createPassthroughExecutor,
   notifyResponse,
+  postViaClient,
   resolveRequestOptions,
   type ApqExecutorOptions,
   type ExecuteGraphqlRequest,
+  type ExecuteGraphqlRequestWithMeta,
+  type GraphqlExecuteResult,
+  type GraphqlExecutor,
   type GraphqlRequestContext,
   type GraphqlRequestOptions,
-  type GraphqlRequestPlugin
+  type GraphqlRequestPlugin,
+  type GraphqlResponseMeta,
+  type GraphqlResponseOutcome,
+  type GraphqlTransport,
+  type GraphqlTransportArgs,
+  type GraphqlTransportResult
 } from './apq.js';
 export {
   createGraphqlClient,
@@ -43,6 +53,11 @@ export {
   type GraphqlClientOptions,
   type GraphqlClientPlugin
 } from './client.js';
+export {
+  GRAPHQL_KEYS_HEADER,
+  parseGraphqlKeys,
+  type GraphqlKeys
+} from './keys.js';
 export {
   createTrustedDocumentExecutor,
   registerTrustedDocuments,
@@ -64,11 +79,18 @@ export {
  * Result of `createWpGraphql` — a one-shot, batteries-included setup that
  * returns everything a Perimetre WordPress project needs: the underlying
  * client, the request executor (APQ-routed if persisted docs are provided,
- * passthrough otherwise), and the TanStack helpers.
+ * passthrough otherwise; `.withMeta` for response headers), and the TanStack
+ * helpers.
  */
 export type WpGraphqlBundle = {
   client: GraphQLClient;
-  executeGraphqlRequest: ExecuteGraphqlRequest;
+  /**
+   * Data-only executor, callable as before. Also exposes
+   * `.withMeta(document, variables, options)` which resolves to
+   * `{ data, headers, transport, durationMs }` for the final response — the
+   * per-call way to read e.g. WPGraphQL's `X-GraphQL-Keys` header.
+   */
+  executeGraphqlRequest: GraphqlExecutor;
 } & GraphqlTanstack;
 
 /**
@@ -215,7 +237,7 @@ export const createWpGraphql = ({
     );
   }
 
-  let executeGraphqlRequest: ExecuteGraphqlRequest;
+  let executeGraphqlRequest: GraphqlExecutor;
   if (trustedDocuments && fetchImpl) {
     executeGraphqlRequest = createTrustedDocumentExecutor({
       endpoint,

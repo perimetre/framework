@@ -27,17 +27,9 @@ Shared packages, configurations, and architectural patterns for Perimetre projec
 
 ## Documentation
 
-### LLMs Directory
+### Pattern Guides
 
-AI-focused documentation for patterns and best practices:
-
-- `LLMs/error-handling-exception.md` - Error-as-values pattern with TypeScript
-- `LLMs/services.md` - Service layer architecture guide
-- `LLMs/trpc.md` - tRPC implementation patterns for Next.js
-- `LLMs/react-hook-form.md` - Form handling patterns
-- `LLMs/graphql.md` - GraphQL + TanStack Query usage
-- `LLMs/tanstack-query.md` - TanStack Query patterns
-- `LLMs/icons.md` - Icon implementation guide
+The pattern guides that used to live in `LLMs/` now live in the [ai-toolkit](https://github.com/perimetre/ai-toolkit) repo, plugin `perimetre-apps`: see the `app-code-review` skill's `references/*.md` (services, error handling, tRPC, TanStack Query, GraphQL, forms, icons), plus the `app-caching` and `seo` skills.
 
 ### Examples Directory
 

@@ -70,7 +70,7 @@ if (result.ok) {
 }
 ```
 
-**Related Docs**: `LLMs/services.md`, `LLMs/error-handling-exception.md`, `examples/trpc/`
+**Related Docs**: ai-toolkit `perimetre-apps` → `app-code-review/references/services.md`, `error-handling.md`; `examples/trpc/`
 
 ---
 
@@ -115,7 +115,7 @@ import { HomeIcon } from 'lucide-react'
 </div>
 ```
 
-**Related Docs**: `LLMs/icons.md`
+**Related Docs**: ai-toolkit `perimetre-apps` → `app-code-review/references/icons.md`
 
 ---
 
@@ -220,7 +220,7 @@ if (!result.ok) {
 const user = result.data; // Type-safe success
 ```
 
-**Documentation**: `LLMs/error-handling-exception.md`
+**Documentation**: ai-toolkit `perimetre-apps` → `app-code-review/references/error-handling.md`
 
 ### Service Layer Architecture
 
@@ -239,7 +239,7 @@ const services = s.router({
 });
 ```
 
-**Documentation**: `LLMs/services.md`, `examples/trpc/`
+**Documentation**: ai-toolkit `perimetre-apps` → `app-code-review/references/services.md`; `examples/trpc/`
 
 ### Accessibility-First Icons
 
@@ -251,7 +251,7 @@ TypeScript enforces accessibility at compile time:
 <Icon icon={X} /> // ERROR: Must provide aria-hidden or label
 ```
 
-**Documentation**: `LLMs/icons.md`
+**Documentation**: ai-toolkit `perimetre-apps` → `app-code-review/references/icons.md`
 
 ## Package Relationships
 
@@ -323,21 +323,12 @@ npm config set @perimetre:registry https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${NPM_TOKEN}
 ```
 
-## LLM Documentation
+## Pattern Guides
 
-AI-focused documentation for common patterns and architectures:
-
-- **error-handling-exception.md** - Error-as-values pattern (Go/Rust-like) with TypeScript discriminated unions
-- **services.md** - Service layer architecture with `@perimetre/service-builder` and dependency injection
-- **trpc.md** - tRPC implementation patterns for Next.js App Router
-- **react-hook-form.md** - Form handling with uncontrolled inputs and Zod validation
-- **graphql.md** - GraphQL + TanStack Query integration patterns
-- **tanstack-query.md** - TanStack Query factory patterns and cache management
-- **icons.md** - Accessible icon implementation with `currentColor` and TypeScript enforcement
+The pattern guides that used to live in `LLMs/` now live in the [ai-toolkit](https://github.com/perimetre/ai-toolkit) repo, plugin `perimetre-apps`: see the `app-code-review` skill's `references/*.md` (services, error handling, tRPC, TanStack Query, GraphQL, forms, icons), plus the `app-caching` and `seo` skills.
 
 **Access pattern**: Always use absolute GitHub URLs when referencing docs:
 
-- Raw markdown: `https://raw.githubusercontent.com/perimetre/framework/refs/heads/main/LLMs/services.md`
 - GitHub viewer: `https://github.com/perimetre/framework/tree/main/examples/trpc`
 
 ## Examples

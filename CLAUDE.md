@@ -12,7 +12,7 @@
 
 - Contributing: `@CONTRIBUTING.md` - Development workflow and changeset usage
 - README: `@README.md` - Setup instructions for developers
-- LLMs/: AI-focused documentation on patterns and best practices
+- Pattern guides: ai-toolkit repo, plugin `perimetre-apps` (`app-code-review/references/*.md`, `app-caching`, `seo`)
 - examples/: Working example projects demonstrating integrations
 
 ## Technical Architecture
@@ -31,14 +31,6 @@
 framework/
 ├── .changeset/                           # Changesets config
 ├── .github/workflows/                    # CI/CD pipelines
-├── LLMs/                                 # AI documentation (patterns & guides)
-│   ├── error-handling-exception.md      # Error-as-values pattern
-│   ├── services.md                      # Service layer architecture
-│   ├── trpc.md                          # tRPC implementation guide
-│   ├── react-hook-form.md               # Form handling patterns
-│   ├── graphql.md                       # GraphQL + TanStack Query usage
-│   ├── tanstack-query.md                # TanStack Query patterns
-│   └── icons.md                         # Icon component patterns
 ├── examples/                            # Working example projects
 │   ├── trpc/                            # Full tRPC + service layer example
 │   └── tanstack-query-and-graphql/      # GraphQL + TanStack Query example
@@ -162,21 +154,12 @@ npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
 pnpm add @perimetre/eslint-config-nextjs
 ```
 
-## LLMs Documentation
+## Pattern Guides
 
-AI-focused documentation for common patterns and architectures:
-
-- **error-handling-exception.md** - Error-as-values pattern (Go/Rust-like) with TypeScript discriminated unions
-- **services.md** - Service layer architecture with `@perimetre/service-builder` and dependency injection
-- **trpc.md** - tRPC implementation patterns for Next.js App Router
-- **react-hook-form.md** - Form handling with uncontrolled inputs and Zod validation
-- **graphql.md** - GraphQL + TanStack Query integration patterns
-- **tanstack-query.md** - TanStack Query factory patterns and cache management
-- **icons.md** - Accessible icon implementation with `currentColor` and TypeScript enforcement
+The pattern guides that used to live in `LLMs/` now live in the [ai-toolkit](https://github.com/perimetre/ai-toolkit) repo, plugin `perimetre-apps`: see the `app-code-review` skill's `references/*.md` (services, error handling, tRPC, TanStack Query, GraphQL, forms, icons), plus the `app-caching` and `seo` skills.
 
 **Access pattern**: Always use absolute GitHub URLs when referencing docs:
 
-- Raw markdown: `https://raw.githubusercontent.com/perimetre/framework/refs/heads/main/LLMs/services.md`
 - GitHub viewer: `https://github.com/perimetre/framework/tree/main/examples/trpc`
 
 ## Examples
@@ -249,7 +232,7 @@ pnpm release              # Build + publish (usually in CI)
 
 - 13 published packages (7 configs + 4 utilities + 1 component library)
 - CI/CD pipelines with automated releases
-- Comprehensive LLMs documentation for AI assistants
+- Pattern guides maintained in the ai-toolkit repo (`perimetre-apps` plugin)
 - Working examples for tRPC and GraphQL patterns
 - Authentication via GitHub CLI for developers
 
