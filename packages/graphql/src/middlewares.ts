@@ -410,6 +410,15 @@ const sleep = (ms: number): Promise<void> =>
  * Mutations are never retried on body-level errors because the server may
  * have already executed them. Query-only retries assume idempotency.
  *
+ * **Outage amplification.** 429 and 502/503/504 are retried for every
+ * request, mutations and persisted-query GETs included, up to `maxRetries`
+ * (4) times — against a failing CMS one read becomes five requests, and a 504
+ * can come back after a mutation ran. Timeouts and aborts are never retried,
+ * and socket errors only for POST bodies that start with `query` (an APQ GET
+ * has no body). On a server's CMS transport prefer `maxRetries: 1` and a short
+ * `maxUpstreamWaitMs`; see `apqPostFallback` in the README for the same
+ * reasoning applied to the APQ executor.
+ *
  * **The package never calls Node's global `fetch` on its own.** Pass a
  * `fetch` here — usually `globalThis.fetch`.
  */

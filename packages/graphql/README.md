@@ -183,6 +183,32 @@ WPGraphQL Smart Cache stores each persisted document under `sha256(graphql-php p
 
 The only time a GET misses is when a document has **never** been registered on that server (e.g. a freshly-deployed query the CMS hasn't seen). In that case Smart Cache replies `PersistedQueryNotFound`; the executor registers it with a single POST (sending both `query` and `queryId`, so it's saved under the id you already use) and then resumes GETs — so that POST happens at most once per document per server, not once per process.
 
+### A failed GET is not re-sent as a POST (`apqPostFallback`)
+
+Up to 0.5, any failed APQ GET — a timeout, a network error, any non-2xx, GraphQL `errors` in the body — was re-sent as a POST. Since 0.6 the executor only does that when the failure is about the GET itself:
+
+| GET outcome                                            | `'get-specific'` (default)                                                                             | `'any'`  |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | -------- |
+| `PersistedQueryNotFound`                               | register POST (client POST if that fails) — unchanged                                                  | same     |
+| HTTP 414 (URL too long), 405 (GET not allowed)         | POST via the client, logs `graphql.apq.get_rejected_fallback_post`                                     | same     |
+| `fetch` throws (timeout, `AbortError`, `fetch failed`) | rethrows the same error object                                                                         | POST     |
+| HTTP 401 / 403 / 429 / 5xx                             | rethrows a `ClientError` (status, headers, body)                                                       | POST     |
+| GraphQL `errors` in the body                           | what the POST would do: `ClientError` under `errorPolicy: 'none'`, the data under `'all'` / `'ignore'` | POST     |
+| the caller's `signal` aborted                          | rethrows                                                                                               | rethrows |
+
+**Why `'any'` amplifies an outage.** On stelpro (2026-10-28) the CMS hung and every read waited out its 15 s timeout. The executor then re-sent each timed-out GET as a POST, which waited another 15 s against the same hung server — twice the load on a CMS that was already down, twice the latency for every visitor. The POST also bypasses Smart Cache's network cache, so it can never be the cheap request. When the host's bot protection (Imunify360) started answering 403, the executor POSTed into the block too. A 5xx, a 403, a 429 or a timeout says the _server_ is in trouble; only a 414 or a 405 says the _GET_ is, and only those are fixed by switching transport. Keep `'any'` for a server whose GETs fail while its POSTs work (a proxy that mangles query strings).
+
+```ts
+createWpGraphql({ apq: true, apqPostFallback: 'get-specific' /* default */, … });
+createApqExecutor({ …, postFallback: 'get-specific' });
+```
+
+Errors thrown for a received response are the same `ClientError` the client's POST throws, so `onResponse` observers and catch sites see `response.status` / `response.headers` either way. `errorResponseMeta(error)` returns `{ headers, transport }` for a thrown error (`transport: 'apq-get'` when the GET produced it); both are `undefined` when no response arrived.
+
+Pass `{ signal }` in the per-call options to abort a request: it reaches every `fetch` the request makes, and an aborted request is never re-sent.
+
+> **`withRetryFetch` has the same failure mode.** Its defaults retry HTTP 429 and 502/503/504 up to 4 times for every request (POSTs and mutations included), so one read against a CMS answering 503 becomes 5 requests. Transient socket errors are retried only for POST bodies starting with `query` — never the APQ GET, which has no body — and timeouts/aborts are never retried. If you wrap the CMS `fetch` with it, lower `maxRetries` (1) and `maxUpstreamWaitMs`, or leave it off the server transport and rely on the stale-if-error copy instead.
+
 ## Tier 5 — Trusted Documents (Saved Queries / safelisting)
 
 Trusted Documents is the **safelisting** model — the same idea as [trusted documents](https://benjie.dev/graphql/trusted-documents) (Benjie Gillam / The Guild) and Apollo's `rover persisted-queries publish`. It's a **separate transport from APQ**, with a different contract:
@@ -324,7 +350,7 @@ type GraphqlExecuteResult<TResult> = {
 };
 ```
 
-`headers` always belong to the **final** response: after an APQ `PersistedQueryNotFound` miss you get the register-POST's headers (or the fallback POST's), never the GET's that missed. Mutations and unhashed documents go through `graphql-request`'s `rawRequest`, so the POST path carries headers too. The `onResponse` hook of a `GraphqlRequestPlugin` receives the same `headers` / `transport` alongside `data` / `error` / `durationMs` (headers are also attached on a thrown `ClientError`; they're `undefined` only when the request failed before any response arrived).
+`headers` always belong to the **final** response: after an APQ `PersistedQueryNotFound` miss (or a 414 / 405) you get the register-POST's headers (or the fallback POST's), never the GET's that missed. Mutations and unhashed documents go through `graphql-request`'s `rawRequest`, so the POST path carries headers too. The `onResponse` hook of a `GraphqlRequestPlugin` receives the same `headers` / `transport` alongside `data` / `error` / `durationMs` (headers and transport are also reported for a thrown `ClientError` — read them with `errorResponseMeta(error)`; they're `undefined` only when the request failed before any response arrived).
 
 The main use is tagging a Next.js `'use cache: remote'` read with what WPGraphQL says the response resolved. The Query Analyzer emits an `X-GraphQL-Keys` header — `<queryId> graphql:Query <OperationName> list:<type>… <relayId>… skipped:<type>…` — and WPGraphQL Smart Cache purges by exactly those keys. `parseGraphqlKeys` (from `@perimetre/graphql/keys`, also re-exported from the root) splits it into buckets; `lists` and `skipped` are kept in wire form (`list:post`, `skipped:post`) because those are the purge keys you tag with:
 
@@ -413,6 +439,8 @@ Available plugin slots:
 ## Retry on transient failures
 
 `withRetryFetch` adds bounded retries for transient network errors (idempotent queries only), HTTP 429 throttling, and HTTP 502/503/504 from edge proxies. Useful when the upstream is flaky (Shopify storefront API, WordPress behind a busy CDN).
+
+**Mind the outage case.** 429 and 502/503/504 are retried for _every_ request — mutations included (a 504 may come back after the server executed it) — up to `maxRetries` (4) times: against a CMS that is failing, one read becomes five requests. It never retries a timeout or an abort. For a WordPress server transport, prefer `maxRetries: 1` with a short `maxUpstreamWaitMs`, plus the stale-if-error copy; see [`apqPostFallback`](#a-failed-get-is-not-re-sent-as-a-post-apqpostfallback).
 
 ```ts
 import { createGraphqlClient } from '@perimetre/graphql';
@@ -508,7 +536,7 @@ You normally don't call it directly — `wpGraphqlSmartCachePresetConfig()` wire
 | `@perimetre/graphql`                   | `createGraphqlClient`, `createWpGraphql`, `createPassthroughExecutor`, `createApqExecutor`, `createTrustedDocumentExecutor`, `registerTrustedDocuments`, `TrustedDocumentNotRegisteredError`, types |
 | `@perimetre/graphql/middlewares`       | `withRequestLogger`, `withResponseLogger`, `withInstrumentedFetch`, `withRetryFetch`, `createInstrumentedFetch`, `createRetryFetch`                                                                 |
 | `@perimetre/graphql/tanstack`          | `createGraphqlTanstack`                                                                                                                                                                             |
-| `@perimetre/graphql/apq`               | `createApqExecutor`, `createPassthroughExecutor`                                                                                                                                                    |
+| `@perimetre/graphql/apq`               | `createApqExecutor`, `createPassthroughExecutor`, `errorResponseMeta`                                                                                                                               |
 | `@perimetre/graphql/trusted-documents` | `createTrustedDocumentExecutor`, `registerTrustedDocuments`, `TrustedDocumentNotRegisteredError`                                                                                                    |
 | `@perimetre/graphql/codegen`           | `hashOperationForWpGraphqlSmartCache`, `wpGraphqlSmartCachePresetConfig`, `printForWpGraphqlSmartCache`, `trustedDocumentsCodegenHook`                                                              |
 | `@perimetre/graphql/keys`              | `parseGraphqlKeys`, `GRAPHQL_KEYS_HEADER`                                                                                                                                                           |

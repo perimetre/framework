@@ -2,6 +2,7 @@ import type { GraphQLClient } from 'graphql-request';
 import {
   createApqExecutor,
   createPassthroughExecutor,
+  type ApqPostFallback,
   type GraphqlExecutor,
   type GraphqlRequestPlugin
 } from './apq.js';
@@ -30,10 +31,12 @@ export {
   createApqExecutor,
   createExecutor,
   createPassthroughExecutor,
+  errorResponseMeta,
   notifyResponse,
   postViaClient,
   resolveRequestOptions,
   type ApqExecutorOptions,
+  type ApqPostFallback,
   type ExecuteGraphqlRequest,
   type ExecuteGraphqlRequestWithMeta,
   type GraphqlExecuteResult,
@@ -133,6 +136,7 @@ export type WpGraphqlBundle = {
  */
 export const createWpGraphql = ({
   apq = false,
+  apqPostFallback,
   captureException,
   debug = false,
   endpoint,
@@ -153,6 +157,14 @@ export const createWpGraphql = ({
    * exclusive with `trustedDocuments`.
    */
   apq?: boolean;
+  /**
+   * When a failed APQ GET is re-sent as a POST. `'get-specific'` (default):
+   * only for a 414 / 405, the failures a POST actually fixes; a timeout, a
+   * network error, 401/403/429/5xx and GraphQL errors are rethrown. `'any'`
+   * restores the pre-0.6 "POST on any failure", which doubles the load on a
+   * CMS that is already failing — see {@link ApqPostFallback}.
+   */
+  apqPostFallback?: ApqPostFallback;
   /** Optional `Sentry.captureException` for hard errors. */
   captureException?: (
     error: unknown,
@@ -254,6 +266,7 @@ export const createWpGraphql = ({
       persistedDocuments,
       fetch: fetchImpl,
       logger,
+      postFallback: apqPostFallback,
       requestPlugins,
       startSpan
     });
