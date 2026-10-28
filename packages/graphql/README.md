@@ -375,6 +375,33 @@ export async function getPage(uri: string) {
 
 `skipped:<type>` appears when the header overflowed WPGraphQL's 4000-char limit (`graphql_query_analyzer_header_length_limit`): ids of that type were dropped, so tag the type-level key as a fallback. The header is only sent when the Query Analyzer is enabled on the CMS — check with `curl -I` against a persisted GET. The parser is pure, dependency-free, and never throws (a missing header yields empty buckets).
 
+### Tagging an entry with its CMS keys: `entryGraphqlKeys` / `collapseGraphqlKeys`
+
+Tagging a read with every raw bucket (above) has two problems in practice. `list:<type>` is emitted for every connection a document reads — a product page reading related products carries `list:product`, so the first new product expires every product page. And a route can carry at most 128 tags on Vercel (per Runtime Cache item AND per cached route response), while a rich page resolves dozens of nodes. The helpers keep what is worth tagging:
+
+```ts
+import { entryGraphqlKeys } from '@perimetre/graphql/keys';
+
+/** Vercel allows 128 tags per route; the rest goes to hand tags, menus, settings, Next. */
+const MAX_CMS_KEYS = 96;
+
+export async function getPage(id: string) {
+  'use cache: remote';
+  cacheLife('max');
+  cacheTag(...READ_TAGS.page(id)); // hand tags: cms, entry-<id>
+  const { data, headers } = await cmsQuery.withMeta(PageByIdDocument, { id });
+  cacheTag(...entryGraphqlKeys([headers], MAX_CMS_KEYS));
+  return data;
+}
+```
+
+- `collapseGraphqlKeys(headers[], max, { ignoreTypes?, onCollapse? })` — the node ids and `skipped:<kind>` markers of every response of one read, deduplicated; query id, root, operation and `list:*` keys dropped. Past `max`, the overflow collapses into WPGraphQL's own `skipped:<kind>` keys (one per kind), which Smart Cache purges on any change of that kind — a collapsed read is flushed more often, never less. Keep `max` above what an entry resolves: `skipped:post` is purged by every post save.
+- `entryGraphqlKeys(headers[], max, options?)` — the same, or `GRAPHQL_UNKNOWN_DEPENDENCIES` (`['skipped:post', 'skipped:term']`) when no response named a node. That happens on a Smart Cache object-cache hit ("Use Object Cache" answers without running the resolvers, so the analyzer sees nothing); an entry tagged with nothing would miss every change to what it embeds. Tagged with the fallback it goes stale on the next post/term save, and the refill runs the resolvers and gets real keys — self-healing. **Use it for entries only** (a page, a product): a listing, a menu or global settings would collapse into `skipped:post` and be flushed by every post save; tag those with what they list (`type-*`, `index-*`, `menu-*`).
+- `ignoreTypes` drops the type-level nodes (`post_type:<name>`, `taxonomy:<name>`) and `skipped:<name>` markers of post types / taxonomies the frontend doesn't render (e.g. `graphql_document`, which every APQ registration publishes). Individual posts and terms are `post:<id>` / `term:<id>` whatever their type, so the webhook side (`createInvalidation`) ignores the purge keys of an unrendered type instead.
+- `hasGraphqlNodeKeys(headers)`, `decodeRelayId(key)` — the predicates the above use.
+
+`parseGraphqlKeys` also reads WPGraphQL 2.x's `operation:<Name>` token as the operation (it used to land in `nodeIds`).
+
 ## Bring-your-own-fetch
 
 **The package never calls Node's global `fetch` on its own.** That's deliberate: every project ends up wanting some combination of retries, observability wrapping, custom headers, abort-signal plumbing, or buyer-injection on the transport layer, and the cleanest way to support all of those is to make the consumer pass the `fetch` they want used.
@@ -571,7 +598,7 @@ You normally don't call it directly — `wpGraphqlSmartCachePresetConfig()` wire
 | `@perimetre/graphql/apq`               | `createApqExecutor`, `createPassthroughExecutor`, `errorResponseMeta`                                                                                                                                  |
 | `@perimetre/graphql/trusted-documents` | `createTrustedDocumentExecutor`, `registerTrustedDocuments`, `TrustedDocumentNotRegisteredError`                                                                                                       |
 | `@perimetre/graphql/codegen`           | `hashOperationForWpGraphqlSmartCache`, `wpGraphqlSmartCachePresetConfig`, `printForWpGraphqlSmartCache`, `trustedDocumentsCodegenHook`                                                                 |
-| `@perimetre/graphql/keys`              | `parseGraphqlKeys`, `GRAPHQL_KEYS_HEADER`                                                                                                                                                              |
+| `@perimetre/graphql/keys`              | `parseGraphqlKeys`, `collapseGraphqlKeys`, `entryGraphqlKeys`, `hasGraphqlNodeKeys`, `decodeRelayId`, `GRAPHQL_UNKNOWN_DEPENDENCIES`, `GRAPHQL_KEYS_HEADER`                                            |
 | `@perimetre/graphql/print`             | `printForWpGraphqlSmartCache`                                                                                                                                                                          |
 
 The `tanstack` subpath is the only one that pulls in `@tanstack/react-query`. Server-only modules can import everything else without dragging the React tree in. The `apq`, `trusted-documents`, `keys`, and `print` subpaths are pure (no `node:` builtins) and run anywhere; the `codegen` subpath imports `node:crypto` + `node:fs/promises` (Node-only — it's for your `codegen.ts` / deploy scripts).

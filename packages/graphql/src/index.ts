@@ -59,8 +59,14 @@ export {
   type GraphqlClientPlugin
 } from './client.js';
 export {
+  collapseGraphqlKeys,
+  decodeRelayId,
+  entryGraphqlKeys,
   GRAPHQL_KEYS_HEADER,
+  GRAPHQL_UNKNOWN_DEPENDENCIES,
+  hasGraphqlNodeKeys,
   parseGraphqlKeys,
+  type CollapseGraphqlKeysOptions,
   type GraphqlKeys
 } from './keys.js';
 export {
