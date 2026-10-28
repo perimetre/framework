@@ -4,7 +4,8 @@ import {
   createPassthroughExecutor,
   type ApqPostFallback,
   type GraphqlExecutor,
-  type GraphqlRequestPlugin
+  type GraphqlRequestPlugin,
+  type PostFallback
 } from './apq.js';
 import {
   createGraphqlClient,
@@ -50,7 +51,8 @@ export {
   type GraphqlResponseOutcome,
   type GraphqlTransport,
   type GraphqlTransportArgs,
-  type GraphqlTransportResult
+  type GraphqlTransportResult,
+  type PostFallback
 } from './apq.js';
 export {
   createGraphqlClient,
@@ -173,7 +175,8 @@ export const createWpGraphql = ({
   requestTimeout,
   requestTimeoutMs,
   startSpan,
-  trustedDocuments = false
+  trustedDocuments = false,
+  trustedDocumentsPostFallback
 }: {
   /**
    * Opt into APQ routing (learn-at-runtime). When `true` **and**
@@ -255,6 +258,14 @@ export const createWpGraphql = ({
    * `fetch` when enabled. Mutually exclusive with `apq`.
    */
   trustedDocuments?: boolean;
+  /**
+   * When a failed Trusted Documents GET is re-sent as a POST. `'get-specific'`
+   * (default): only a 414 / 405, re-sent as a POST **by id** (no document
+   * text, so the safelist holds); everything else is rethrown. `'any'`
+   * restores the pre-0.6 "POST the document text on any failure". See
+   * {@link PostFallback}.
+   */
+  trustedDocumentsPostFallback?: PostFallback;
 }): WpGraphqlBundle => {
   if (apq && trustedDocuments) {
     throw new Error(
@@ -317,6 +328,7 @@ export const createWpGraphql = ({
       client,
       fetch: fetchImpl,
       logger,
+      postFallback: trustedDocumentsPostFallback,
       requestPlugins,
       startSpan
     });

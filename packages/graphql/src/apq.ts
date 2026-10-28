@@ -181,7 +181,8 @@ export type GraphqlTransport =
   | 'apq-get'
   | 'apq-register-post'
   | 'post'
-  | 'trusted-get';
+  | 'trusted-get'
+  | 'trusted-post';
 
 /**
  * Builds the {@link GraphqlRequestContext} for a document — the single place
@@ -288,26 +289,31 @@ export const notifyResponse = (
   }
 };
 
-type ApqResponse = {
+/** A persisted-query response body, as WPGraphQL Smart Cache answers it. */
+export type PersistedQueryResponse = {
   data?: unknown;
   errors?: { message: string }[];
   extensions?: unknown;
 };
 
+type ApqResponse = PersistedQueryResponse;
+
 /**
- * The error a persisted-query GET throws for a non-2xx or a GraphQL-errors
+ * The error a persisted-query request throws for a non-2xx or a GraphQL-errors
  * response: the same graphql-request `ClientError` the client's POST throws
  * for that response (`response.status`, `response.headers`, `response.body`,
- * plus `errors` / `data` when the body was GraphQL JSON), tagged `'apq-get'`
- * for {@link errorResponseMeta}. Catch sites and `onResponse` observers can't
- * tell the transports apart by the error's shape.
+ * plus `errors` / `data` when the body was GraphQL JSON), tagged with its
+ * transport for {@link errorResponseMeta}. Catch sites and `onResponse`
+ * observers can't tell the transports apart by the error's shape. Shared by
+ * the APQ and Trusted Documents executors.
  */
-const apqClientError = (
+export const persistedQueryClientError = (
   res: Response,
   text: string,
-  body: ApqResponse | undefined,
+  body: PersistedQueryResponse | undefined,
   document: unknown,
-  variables: unknown
+  variables: unknown,
+  transport: GraphqlTransport = 'apq-get'
 ): ClientError =>
   tagErrorTransport(
     new ClientError(
@@ -323,7 +329,7 @@ const apqClientError = (
         variables: variables as Record<string, unknown> | undefined
       }
     ),
-    'apq-get'
+    transport
   );
 
 /**
@@ -423,10 +429,21 @@ export type ApqExecutorOptions = {
  * `PersistedQueryNotFound` is not a failure: it always registers the document
  * with one POST, whatever this says. A caller abort never falls back.
  */
-export type ApqPostFallback = 'any' | 'get-specific';
+export type ApqPostFallback = PostFallback;
 
-/** Statuses that mean "this server won't take the request as a GET". */
-const GET_REJECTED_STATUSES = new Set([405, 414]);
+/**
+ * When a persisted-query executor (APQ or Trusted Documents) re-sends a failed
+ * GET as a POST. See {@link ApqPostFallback} for the APQ rules; the Trusted
+ * Documents executor follows the same ones, with its own POST.
+ */
+export type PostFallback = 'any' | 'get-specific';
+
+/**
+ * Statuses that mean "this server won't take the request as a GET": 414 (the
+ * URL is too long — nginx's default `large_client_header_buffers` is 8 KB) and
+ * 405 (a proxy that only allows POST). Only these are fixed by changing method.
+ */
+export const GET_REJECTED_STATUSES: ReadonlySet<number> = new Set([405, 414]);
 
 /**
  * The transport each response-carrying error came from, so `onResponse` (and a
@@ -891,7 +908,7 @@ export const createApqExecutor = ({
 
         if (!res.ok) {
           return await failGet(
-            apqClientError(res, text, body, document, variables),
+            persistedQueryClientError(res, text, body, document, variables),
             { ...failure, status: res.status }
           );
         }
@@ -935,7 +952,13 @@ export const createApqExecutor = ({
           // `ClientError` under `errorPolicy: 'none'` (the default), hand back
           // the data under `'all'` / `'ignore'`.
           if ((client.requestConfig.errorPolicy ?? 'none') === 'none') {
-            throw apqClientError(res, text, body, document, variables);
+            throw persistedQueryClientError(
+              res,
+              text,
+              body,
+              document,
+              variables
+            );
           }
         }
 

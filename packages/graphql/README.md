@@ -341,6 +341,25 @@ export const {
 
 Mutations and subscriptions still POST through the underlying client, exactly as with APQ. The persisted-documents map isn't needed at runtime for this transport (the executor reads `__meta__.hash` off each generated document) — it's only used by the deploy-time registrar.
 
+### When the GET fails (`trustedDocumentsPostFallback`)
+
+The Trusted Documents executor follows the same rule as APQ (see [`apqPostFallback`](#a-failed-get-is-not-re-sent-as-a-post-apqpostfallback)). Only a failure that is about the GET itself is retried with another method, and it never sends document text:
+
+| GET outcome                                                     | `'get-specific'` (default)                                                                              | `'any'` (pre-0.6)      |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `PersistedQueryNotFound`                                        | throws `TrustedDocumentNotRegisteredError`                                                              | same                   |
+| HTTP 414 (URL too long), 405                                    | **POST by id**: `{ queryId, operationName, variables }`, no document text (`transport: 'trusted-post'`) | same                   |
+| `fetch` throws, 401 / 403 / 429 / 5xx                           | rethrows (the same error object / a `ClientError`)                                                      | client POST, full text |
+| GraphQL `errors` (e.g. "This query document has been blocked.") | `ClientError` from the GET body under `errorPolicy: 'none'`, the data under `'all'`; no second request  | client POST, full text |
+
+Why POST **by id** rather than the client's POST:
+
+- **It keeps the safelist contract.** No operation text leaves the client. A POST carrying both `query` and `queryId` would _register_ the document (Smart Cache's `graphql_request_data` filter saves it), which is exactly what Trusted Documents forbids at runtime.
+- **The server treats it exactly like the GET.** Against WPGraphQL Smart Cache 2.2.1 (stelpro's local CMS), a POST with only `queryId` returns the same data and the same `X-GraphQL-Keys` as the GET, and goes through the same "Allow only specific queries" check. An unknown id answers `PersistedQueryNotFound`, which still throws.
+- **It only covers what a POST fixes.** nginx answers a 20 KB variables URL with `414 Request-URI Too Large`, and the POST carries the variables in its body. A blocked document or a sick server gets the same answer over POST, so re-sending only doubles the load. That matches Apollo's persisted-query link, which re-sends the full query only on `PersistedQueryNotFound` / `PersistedQueryNotSupported`, never on an HTTP or network error.
+
+POSTs bypass Smart Cache's network cache, so a request that keeps hitting 414 should be shortened (fewer or smaller variables).
+
 ## Reading response headers / `X-GraphQL-Keys`
 
 Every executor (`createApqExecutor`, `createTrustedDocumentExecutor`, `createPassthroughExecutor`, and the `executeGraphqlRequest` that `createWpGraphql` returns) is callable as before — data only — **and** exposes `.withMeta(document, variables?, options?)`, which resolves to:
