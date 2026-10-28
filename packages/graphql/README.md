@@ -519,6 +519,68 @@ export const { executeGraphqlRequest } = createWpGraphql({
 
 The same wrapper is available on its own: `createTimeoutFetch({ fetch, timeoutMs, enabled?, messagePrefix? })` and the plugin `withRequestTimeout(…)` from `@perimetre/graphql/middlewares`.
 
+## Stale-if-error: `withLastGood`
+
+`'use cache'` has no stale-if-error. A flushed, expired, evicted or previous-deployment entry is discarded before the function runs, so if the CMS throws on that miss (an expired certificate, a WAF 403, a timeout) nothing is left to serve. `withLastGood` wraps an executor (the data call and `.withMeta`) and keeps a copy of every successful query response in a store you inject. When the CMS fails, or is too slow, a read is answered from that copy.
+
+```ts
+// src/server/cms/cache.ts (Next.js on Vercel)
+import { withLastGood } from '@perimetre/graphql/last-good';
+import { getCache, waitUntil } from '@vercel/functions';
+import { cacheLife } from 'next/cache';
+import { PHASE_PRODUCTION_BUILD } from 'next/constants';
+import { createHash } from 'node:crypto';
+
+export const cmsQuery = withLastGood(executeGraphqlRequest, {
+  // The Vercel Runtime Cache: shared by every instance, survives deploys, and
+  // carries no tags, so no `revalidateTag` ever reaches a copy.
+  store: getCache({
+    namespace: 'cms-last-good',
+    // The default key hash is 32-bit: a collision serves one page on another's URL.
+    keyHashFunction: (key) => createHash('sha256').update(key).digest('hex')
+  }),
+  defer: waitUntil, // writes never block the read
+  enabled: () => process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD,
+  onFallback: ({ reason, operationName, error }) => {
+    // Lower the scope's life so the copy isn't pinned; the next visit retries.
+    try {
+      cacheLife({ revalidate: 60 });
+    } catch {
+      // Not inside a 'use cache' scope.
+    }
+    Sentry.logger.warn(`cms.stale_on_${reason}`, { operationName });
+  }
+});
+```
+
+What it does:
+
+- **Stores** every successful hashed query response, keyed by persisted-query hash + operation + stable-stringified variables. Codegen's hash covers the whole document, so a deploy that changes a query's selection never meets a copy of the old shape. It skips empty answers (`isEmptyAnswer`, default: no data, or every root field `null`), skips copies over `maxBytes` (default 1.9 MB, because Vercel's Runtime Cache silently drops items over 2 MB), and writes through `defer`, so the read never waits on the store.
+- **A failure**, with a copy: answers from the copy (`stale: true` on `.withMeta`) and calls `onFallback({ reason: 'error' })`. With no copy, the original error is rethrown unchanged. A response with no `data` at all counts as a failure.
+- **A slow CMS**: when a copy exists, the live request races a soft deadline, `softTimeoutMs` (3000). For `slowWindowMs` (30 s) after this wrapper saw a failure or a missed deadline, the deadline drops to `slowSoftTimeoutMs` (500). Past the deadline the copy answers (`reason: 'slow'`) and the live request finishes in the background to refresh it. With **no** copy the read awaits the live request: there is nothing else to serve, and the hard limit is `requestTimeoutMs`.
+- **Object-cache hits keep their keys.** A WPGraphQL Smart Cache object-cache hit's `X-GraphQL-Keys` names no node, so it is lent the keys stored with the last response that did. A keyed read doesn't lose its tags.
+- **Off when `enabled()` is false** (e.g. during `next build`, where no copy is served and the Runtime Cache build client only times out).
+- `clock` is injectable for tests.
+
+**Deliberately no circuit breaker.** A breaker is modal: while it's open, every read _without_ a copy fails instead of waiting, and closing it adds recovery time (AWS Builders' Library, "Timeouts, retries and backoff with jitter"). The soft deadline only changes how long a read _with_ a copy waits, and every read still asks the CMS. Because the fallback runs whenever the CMS is merely slow, it gets exercised all the time instead of being discovered broken during an outage ("Avoiding fallback in distributed systems"). Load on a sick CMS stays bounded without a breaker: only cache misses read it, and a scope answered from a copy retries on its shortened life.
+
+**Readers must let errors throw** out of their cached scope. With a copy, the reader never sees the error. Without one, a `catch { return null }` would cache the failure as content for the scope's whole life.
+
+**Not Next.js-specific.** The package never imports Next.js or Vercel. Everything platform-specific is injected: any `{ get, set }` works as the store, `defer` is optional, and `onFallback` is where your framework's cache hint goes. For example, a React Router or Astro server with Redis:
+
+```ts
+const cmsQuery = withLastGood(executeGraphqlRequest, {
+  store: {
+    get: async (key) => JSON.parse((await redis.get(`cms:${key}`)) ?? 'null'),
+    set: (key, value, { ttl }) =>
+      redis.set(`cms:${key}`, JSON.stringify(value), { EX: ttl })
+  },
+  onFallback: ({ reason }) => log.warn(`cms.stale_on_${reason}`)
+  // Shorten the HTTP cache of a response served stale here, e.g. by setting a
+  // flag your loader turns into `Cache-Control: max-age=60`.
+});
+```
+
 ## Codegen setup
 
 Two pieces:
@@ -600,8 +662,9 @@ You normally don't call it directly — `wpGraphqlSmartCachePresetConfig()` wire
 | `@perimetre/graphql/codegen`           | `hashOperationForWpGraphqlSmartCache`, `wpGraphqlSmartCachePresetConfig`, `printForWpGraphqlSmartCache`, `trustedDocumentsCodegenHook`                                                                 |
 | `@perimetre/graphql/keys`              | `parseGraphqlKeys`, `collapseGraphqlKeys`, `entryGraphqlKeys`, `hasGraphqlNodeKeys`, `decodeRelayId`, `GRAPHQL_UNKNOWN_DEPENDENCIES`, `GRAPHQL_KEYS_HEADER`                                            |
 | `@perimetre/graphql/print`             | `printForWpGraphqlSmartCache`                                                                                                                                                                          |
+| `@perimetre/graphql/last-good`         | `withLastGood`, `isEmptyGraphqlAnswer`, `stableStringify`, types                                                                                                                                       |
 
-The `tanstack` subpath is the only one that pulls in `@tanstack/react-query`. Server-only modules can import everything else without dragging the React tree in. The `apq`, `trusted-documents`, `keys`, and `print` subpaths are pure (no `node:` builtins) and run anywhere; the `codegen` subpath imports `node:crypto` + `node:fs/promises` (Node-only — it's for your `codegen.ts` / deploy scripts).
+The `tanstack` subpath is the only one that pulls in `@tanstack/react-query`. Server-only modules can import everything else without dragging the React tree in. The `apq`, `trusted-documents`, `keys`, `last-good` and `print` subpaths are pure (no `node:` builtins) and run anywhere; the `codegen` subpath imports `node:crypto` + `node:fs/promises` (Node-only — it's for your `codegen.ts` / deploy scripts).
 
 ## Logger interface
 

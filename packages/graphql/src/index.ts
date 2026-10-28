@@ -70,6 +70,17 @@ export {
   type GraphqlKeys
 } from './keys.js';
 export {
+  isEmptyGraphqlAnswer,
+  stableStringify,
+  withLastGood,
+  type LastGoodClock,
+  type LastGoodExecutor,
+  type LastGoodFallback,
+  type LastGoodOptions,
+  type LastGoodResult,
+  type LastGoodStore
+} from './last-good.js';
+export {
   createTimeoutFetch,
   RequestTimeoutError,
   type TimeoutFetchOptions
