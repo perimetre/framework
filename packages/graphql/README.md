@@ -8,21 +8,25 @@ APQ is **opt-in** (`apq: true`) and built around a `graphql-php`-compatible hash
 
 The package is opinionated about **what** goes in your `src/server/graphql/index.ts`, but every layer is opt-in. Pick the slice you need and ignore the rest.
 
-| Layer                                      | Use when…                                                        |
-| ------------------------------------------ | ---------------------------------------------------------------- |
-| `createGraphqlClient`                      | You just want a `graphql-request` `GraphQLClient`.               |
-| `withRequestLogger` / `withResponseLogger` | You want structured request/error logs (Sentry, console, pino).  |
-| `withInstrumentedFetch`                    | You want DNS/TCP/TLS/TTFB phase timings per request.             |
-| `withRetryFetch`                           | You want bounded retries on transient network/upstream failures. |
-| `createApqExecutor`                        | APQ (learn-at-runtime) on `wp-graphql-smart-cache`.              |
-| `createTrustedDocumentExecutor`            | Trusted Documents (safelist) — GET-by-id only, no runtime learn. |
-| `parseGraphqlKeys`                         | You want to tag cached reads with WPGraphQL's `X-GraphQL-Keys`.  |
-| `registerTrustedDocuments`                 | Pre-register the safelist on the CMS at deploy time.             |
-| `trustedDocumentsCodegenHook`              | Register documents straight from your `codegen.ts` hooks.        |
-| `createGraphqlTanstack`                    | You want `graphqlOptions` / `graphqlMutationOptions` helpers.    |
-| `createWpGraphql`                          | You want a one-shot, batteries-included factory.                 |
-| `hashOperationForWpGraphqlSmartCache`      | You want a Smart Cache-compatible hasher for codegen.            |
-| `printForWpGraphqlSmartCache`              | You want the raw `graphql-php`-compatible printer.               |
+| Layer                                      | Use when…                                                                       |
+| ------------------------------------------ | ------------------------------------------------------------------------------- |
+| `createGraphqlClient`                      | You just want a `graphql-request` `GraphQLClient`.                              |
+| `withRequestLogger` / `withResponseLogger` | You want structured request/error logs (Sentry, console, pino).                 |
+| `withInstrumentedFetch`                    | You want DNS/TCP/TLS/TTFB phase timings per request.                            |
+| `withRetryFetch`                           | You want bounded retries on transient network/upstream failures.                |
+| `createApqExecutor`                        | APQ (learn-at-runtime) on `wp-graphql-smart-cache`.                             |
+| `createTrustedDocumentExecutor`            | Trusted Documents (safelist) — GET-by-id only, no runtime learn.                |
+| `parseGraphqlKeys`                         | You want to tag cached reads with WPGraphQL's `X-GraphQL-Keys`.                 |
+| `requestTimeoutMs` / `createTimeoutFetch`  | A hung CMS must fail in bounded time, in words Sentry won't filter.             |
+| `entryGraphqlKeys` / `collapseGraphqlKeys` | You tag entry reads with node keys, within Vercel's 128-tag budget.             |
+| `withLastGood`                             | Serve the last good response when the CMS fails or is slow (stale-if-error).    |
+| `@perimetre/graphql/wp-cache`              | Map Perimetre Core webhooks to cache tags; `/revalidate` handler; tag contract. |
+| `registerTrustedDocuments`                 | Pre-register the safelist on the CMS at deploy time.                            |
+| `trustedDocumentsCodegenHook`              | Register documents straight from your `codegen.ts` hooks.                       |
+| `createGraphqlTanstack`                    | You want `graphqlOptions` / `graphqlMutationOptions` helpers.                   |
+| `createWpGraphql`                          | You want a one-shot, batteries-included factory.                                |
+| `hashOperationForWpGraphqlSmartCache`      | You want a Smart Cache-compatible hasher for codegen.                           |
+| `printForWpGraphqlSmartCache`              | You want the raw `graphql-php`-compatible printer.                              |
 
 ## Installation
 
@@ -581,6 +585,108 @@ const cmsQuery = withLastGood(executeGraphqlRequest, {
 });
 ```
 
+## CMS-coupled invalidation: `@perimetre/graphql/wp-cache`
+
+Tag every cached read with the CMS things it depends on (an entry id, a post type, a taxonomy, a term, a menu location, an options page), never with a frontend path. The Perimetre Core webhook reports what changed in the CMS's own terms, and `createInvalidation` turns that into the same tag strings. A new listing or block needs no new webhook branch: it tags what it reads, and every save of that thing reaches it. Entry reads also carry WPGraphQL's node keys (`entryGraphqlKeys`), and the webhook relays the keys Smart Cache purged, so a change to anything an entry _embeds_ reaches it too.
+
+Each project keeps only its content model, its read tags and its custom events:
+
+```ts
+// src/server/cms/tags.ts — the only per-project file
+import { createInvalidation, WP_CACHE_TAGS } from '@perimetre/graphql/wp-cache';
+
+export const CMS_TAGS = {
+  ...WP_CACHE_TAGS, // cms, entry-<id>, index-<type>, menu-<loc>, options-<page>, taxonomy-<tax>, term-<tax>-<slug>, type-<type>
+  form: (id: number | string) => `form-${String(id)}`
+};
+
+export const CONTENT_MODEL = {
+  types: ['page', 'product', 'document'], // post types the site renders
+  taxonomies: ['product_category', 'document_type'],
+  menuLocations: ['primary', 'footer'],
+  optionsPage: 'stelpro-us-global-settings' // its save also flushes Yoast (options-seo)
+  // graphqlSingleNames: { news: 'newsArticle' } when list:<name> differs from the type
+};
+
+export const READ_TAGS = {
+  page: (id: number) => [CMS_TAGS.all, CMS_TAGS.entry(id)],
+  pageIndex: [CMS_TAGS.all, CMS_TAGS.index('page')],
+  primaryMenu: [CMS_TAGS.all, CMS_TAGS.menu('primary')]
+  // …one row per cached read
+} as const;
+
+export const resolveInvalidation = createInvalidation({
+  contentModel: CONTENT_MODEL,
+  extraEvents: {
+    'form.*': ({ raw }) => ({
+      tags: raw.form_id ? [CMS_TAGS.form(String(raw.form_id))] : []
+    })
+  },
+  // Optional: entries whose dependents the payload doesn't name.
+  lookUpDependents: (payload) =>
+    payload.postType === 'document' && !payload.embedders?.length
+});
+```
+
+`resolveInvalidation(body)` returns `{ event, expire, stale, saved? }`:
+
+- **`expire`**: whatever the change names: the entry, its translations / descendants / embedders, its type, the terms it has or just lost, the node keys Smart Cache purged (posts and terms), menus, options. Flush these with an immediate expiry so the editor's **first** reload is fresh.
+- **`stale`**: the catch-all `cms`, `skipped:*` markers, and every tag of a broad flush (an import, an event the mapping doesn't model). Flush these stale-while-revalidate: a site-wide flush serves one stale response per entry instead of a blocking CMS miss for every visitor.
+- The **index** (`index-<type>`) is flushed only by events that move a URL (publish, unpublish, trash, delete, or an `old_permalink`). Every route resolves its URL through it, and one product save used to expire 203 of 285 routes. The **taxonomy** (`taxonomy-<tax>`) is flushed only when term membership changed.
+- A post type the site doesn't render flushes only its own type/index tags, and its purge keys are ignored (they carry `skipped:post`; every APQ registration publishes a `graphql_document`).
+- `options.saved` ignores its `purge_all` (Core purges all of Smart Cache before every options save, because options have no node). An unknown event flushes `cms`, stale. A flush is never empty.
+
+The `/revalidate` handler takes a Web `Request` and flushes nothing itself, so the same code serves Next.js, React Router actions and Astro endpoints:
+
+```ts
+// src/app/revalidate/route.ts (Next.js)
+import { createRevalidateHandler } from '@perimetre/graphql/wp-cache';
+import { revalidateTag } from 'next/cache';
+
+const handle = createRevalidateHandler({
+  invalidate: resolveInvalidation,
+  secret: () => process.env.REVALIDATION_SECRET, // Authorization: Bearer <secret>, compared in constant time
+  dependents: async (saved) => (await listDependents(saved)).map(CMS_TAGS.entry) // optional
+});
+
+export async function POST(request: Request) {
+  const { body, expire, stale, status } = await handle(request);
+  expire.forEach((tag) => revalidateTag(tag, { expire: 0 }));
+  stale.forEach((tag) => revalidateTag(tag, 'max'));
+  return Response.json(body, { status });
+}
+```
+
+No `revalidatePath`: a tag flush already expires the HTML of every route that rendered the tagged data. A path flush's implicit tag also discards every _other_ scope read on that path, which means re-reading menus, footer and settings from the CMS.
+
+**Test the contract.** `post(fields)` builds a Core 2.4.0 `post.*` body, and `assertTagContract(resolveInvalidation, rows)` checks that every read × every change that alters it shares an **expired** tag, and that every read carries the catch-all. Add a row per new read:
+
+```ts
+import { assertTagContract, post } from '@perimetre/graphql/wp-cache';
+
+test('tag contract', () => {
+  assertTagContract(resolveInvalidation, [
+    ['page', READ_TAGS.page(30), [post({ post_id: 30, post_type: 'page' })]],
+    [
+      'page index',
+      READ_TAGS.pageIndex,
+      [post({ event: 'post.trashed', post_id: 30, post_type: 'page' })]
+    ],
+    ['primary menu', READ_TAGS.primaryMenu, [{ event: 'menu.saved' }]]
+  ]);
+});
+```
+
+### Cache life: `'max'`, no time floor
+
+Tag CMS reads `cacheLife('max')`. A CMS read changes when the CMS says so, never on a timer. **Never put a time floor on scopes that every route renders** (menus, settings, SEO globals). On stelpro (2026-10-28) an hourly floor on every CMS read took the CMS down an hour after each deploy:
+
+- The shortest `revalidate` on a route wins, and every route renders the layout's reads, so all ~290 prerendered routes went stale at the same minute, one hour after `next build`.
+- `'use cache: remote'` entries are keyed by deployment, so they were written at build time and expired **with** the routes. Each route's background revalidation missed every scope it renders.
+- One visitor's link prefetches fired 25+ revalidations in a second. The CMS hung (15 s timeouts), the APQ executor re-sent each timeout as a POST (fixed in 0.6, see `apqPostFallback`), and Imunify360 started answering 403.
+
+A jittered or longer floor only moves the herd. Changes reach the site through webhooks instead. In WordPress → Settings → Perimetre Core → Watched Events, turn on **"GraphQL Cache Purged"** (term, media, user and menu-location changes, which reach entries through their node keys) and **"Draft"** (unpublishing). Yoast's own screens send nothing; re-saving the site settings page pushes Yoast changes. Stale-if-error (`withLastGood`) covers the CMS failing on a refill.
+
 ## Codegen setup
 
 Two pieces:
@@ -663,8 +769,9 @@ You normally don't call it directly — `wpGraphqlSmartCachePresetConfig()` wire
 | `@perimetre/graphql/keys`              | `parseGraphqlKeys`, `collapseGraphqlKeys`, `entryGraphqlKeys`, `hasGraphqlNodeKeys`, `decodeRelayId`, `GRAPHQL_UNKNOWN_DEPENDENCIES`, `GRAPHQL_KEYS_HEADER`                                            |
 | `@perimetre/graphql/print`             | `printForWpGraphqlSmartCache`                                                                                                                                                                          |
 | `@perimetre/graphql/last-good`         | `withLastGood`, `isEmptyGraphqlAnswer`, `stableStringify`, types                                                                                                                                       |
+| `@perimetre/graphql/wp-cache`          | `createInvalidation`, `createRevalidateHandler`, `parseWebhookPayload`, `WP_CACHE_TAGS`, `assertTagContract`, `post`, `wpRelayId`, types                                                               |
 
-The `tanstack` subpath is the only one that pulls in `@tanstack/react-query`. Server-only modules can import everything else without dragging the React tree in. The `apq`, `trusted-documents`, `keys`, `last-good` and `print` subpaths are pure (no `node:` builtins) and run anywhere; the `codegen` subpath imports `node:crypto` + `node:fs/promises` (Node-only — it's for your `codegen.ts` / deploy scripts).
+The `tanstack` subpath is the only one that pulls in `@tanstack/react-query`. Server-only modules can import everything else without dragging the React tree in. The `apq`, `trusted-documents`, `keys`, `last-good`, `wp-cache` and `print` subpaths are pure (no `node:` builtins) and run anywhere; the `codegen` subpath imports `node:crypto` + `node:fs/promises` (Node-only — it's for your `codegen.ts` / deploy scripts).
 
 ## Logger interface
 
