@@ -12,10 +12,12 @@ import {
   type GraphqlClientPlugin
 } from './client.js';
 import {
+  createTimeoutFetch,
   withInstrumentedFetch,
   withRequestLogger,
   withResponseLogger,
-  type StartSpanFn
+  type StartSpanFn,
+  type TimeoutFetchOptions
 } from './middlewares.js';
 import { createGraphqlTanstack, type GraphqlTanstack } from './tanstack.js';
 import { createTrustedDocumentExecutor } from './trusted-documents.js';
@@ -61,6 +63,11 @@ export {
   parseGraphqlKeys,
   type GraphqlKeys
 } from './keys.js';
+export {
+  createTimeoutFetch,
+  RequestTimeoutError,
+  type TimeoutFetchOptions
+} from './middlewares.js';
 export {
   createTrustedDocumentExecutor,
   registerTrustedDocuments,
@@ -140,12 +147,14 @@ export const createWpGraphql = ({
   captureException,
   debug = false,
   endpoint,
-  fetch: fetchImpl,
+  fetch: callerFetch,
   logger,
   options,
   persistedDocuments,
   plugins = [],
   requestPlugins,
+  requestTimeout,
+  requestTimeoutMs,
   startSpan,
   trustedDocuments = false
 }: {
@@ -202,6 +211,22 @@ export const createWpGraphql = ({
    * the active executor (APQ / Trusted Documents) and the TanStack helper.
    */
   requestPlugins?: GraphqlRequestPlugin[];
+  /**
+   * Tunes `requestTimeoutMs`: `enabled` (evaluated per request — e.g. off
+   * during `next build`) and `messagePrefix` (default `'CMS request'`).
+   */
+  requestTimeout?: Pick<TimeoutFetchOptions, 'enabled' | 'messagePrefix'>;
+  /**
+   * A hard per-request limit, in ms, on every request this bundle sends
+   * (persisted-query GET, register POST, client POST). Server-only — ignored
+   * in the browser. On expiry the request rejects with a
+   * `RequestTimeoutError` reading `CMS request timed out after <ms>ms (no
+   * response)`, not the platform's abort text, which Sentry's
+   * cancelled-request filters would drop. Composed with the caller's
+   * `signal`; a caller abort still rejects as an abort. Requires `fetch`.
+   * See `createTimeoutFetch`.
+   */
+  requestTimeoutMs?: number;
   /** Optional Sentry-style `startSpan` for tracing fetch + executor calls. */
   startSpan?: StartSpanFn;
   /**
@@ -219,6 +244,22 @@ export const createWpGraphql = ({
       '@perimetre/graphql: `apq` and `trustedDocuments` are mutually exclusive transports — enable one, not both.'
     );
   }
+  if (requestTimeoutMs !== undefined && !callerFetch) {
+    throw new Error(
+      '@perimetre/graphql: createWpGraphql requires `fetch` when `requestTimeoutMs` is set (the timeout wraps it).'
+    );
+  }
+  // Every transport below — the client's POST and the persisted-query GETs —
+  // goes through the timed fetch, so no CMS request can outlive the limit.
+  const fetchImpl =
+    callerFetch && requestTimeoutMs !== undefined
+      ? createTimeoutFetch({
+          ...requestTimeout,
+          fetch: callerFetch,
+          timeoutMs: requestTimeoutMs
+        })
+      : callerFetch;
+
   const stack: GraphqlClientPlugin[] = [...plugins];
   if (logger) {
     stack.push(
@@ -228,6 +269,9 @@ export const createWpGraphql = ({
   }
   if ((logger || startSpan) && fetchImpl) {
     stack.push(withInstrumentedFetch({ fetch: fetchImpl, logger, startSpan }));
+  } else if (fetchImpl && fetchImpl !== callerFetch) {
+    // No instrumentation to carry it: install the timed fetch on its own.
+    stack.push(() => ({ fetch: fetchImpl }));
   }
 
   const client = createGraphqlClient({ endpoint, options, plugins: stack });

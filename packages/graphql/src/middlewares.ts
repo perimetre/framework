@@ -331,6 +331,128 @@ export const withInstrumentedFetch = (params: {
 };
 
 // ---------------------------------------------------------------------------
+// Request timeout (wraps a provided fetch — never calls global fetch)
+// ---------------------------------------------------------------------------
+
+/** Options for {@link createTimeoutFetch}. */
+export type TimeoutFetchOptions = {
+  /**
+   * Evaluated per request: return `false` to send it with no limit. Typical
+   * use: skip the timeout during `next build`, where the build's request burst
+   * can queue on the CMS, there is no stale copy to fall back on, and a failed
+   * read fails the build instead of waiting.
+   * @example
+   * ```ts
+   * enabled: () => process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD
+   * ```
+   */
+  enabled?: () => boolean;
+  /** The `fetch` to wrap. */
+  fetch: typeof fetch;
+  /**
+   * What the error message calls the request: `${messagePrefix} timed out
+   * after ${ms}ms (no response)`. Defaults to `'CMS request'`.
+   */
+  messagePrefix?: string;
+  /** The hard limit, in milliseconds (a positive integer). */
+  timeoutMs: number;
+};
+
+/**
+ * Thrown by {@link createTimeoutFetch} when a request got no response in time.
+ * Its message is the package's own (`CMS request timed out after 15000ms (no
+ * response)`), never the platform's abort text — see `createTimeoutFetch`.
+ */
+export class RequestTimeoutError extends Error {
+  /** The limit that expired, in milliseconds. */
+  readonly timeoutMs: number;
+
+  /** Builds the error with its message and the limit that expired. */
+  constructor(message: string, timeoutMs: number) {
+    super(message);
+    this.name = 'RequestTimeoutError';
+    this.timeoutMs = timeoutMs;
+  }
+}
+
+/**
+ * Wraps a caller-supplied `fetch` with a hard per-request timeout, composed
+ * with the caller's own `signal` (`AbortSignal.any`). Server-only: in a
+ * browser (`window` defined) the request goes out unchanged.
+ *
+ * WHY: a CMS that is DOWN fails fast (connection refused, expired
+ * certificate). A CMS that is overloaded or hung never answers, and without a
+ * limit every read waits out the platform's own timeout (Next's 50s
+ * `'use cache'` fill) and the render fails.
+ *
+ * On expiry it throws a {@link RequestTimeoutError} in its OWN words. The
+ * platform's "The operation was aborted due to timeout" matches the
+ * cancelled-request patterns Sentry filters usually drop, which would hide a
+ * CMS that stopped answering — a fault a visitor feels. A caller abort still
+ * rethrows the caller's abort error unchanged.
+ *
+ * The limit covers the wait for the response (`fetch` resolving). The signal
+ * stays attached, so a body still streaming at expiry rejects with the
+ * platform's abort error instead.
+ *
+ * **The package never calls Node's global `fetch` on its own.** Pass a
+ * `fetch` here — usually `globalThis.fetch`.
+ */
+export const createTimeoutFetch = ({
+  enabled,
+  fetch: fetchImpl,
+  messagePrefix = 'CMS request',
+  timeoutMs
+}: TimeoutFetchOptions): typeof fetch => {
+  if (!Number.isInteger(timeoutMs) || timeoutMs <= 0) {
+    throw new Error(
+      `@perimetre/graphql: request timeout must be a positive integer of milliseconds, got ${String(timeoutMs)}.`
+    );
+  }
+
+  // Cast: see `createInstrumentedFetch` — bun-types' `typeof fetch` requires
+  // `preconnect`.
+  return (async (
+    input: Parameters<typeof fetch>[0],
+    init?: Parameters<typeof fetch>[1]
+  ) => {
+    if (typeof window !== 'undefined' || (enabled && !enabled())) {
+      return fetchImpl(input, init);
+    }
+
+    const timeout = AbortSignal.timeout(timeoutMs);
+    const callerSignal = init?.signal ?? undefined;
+    const signal = callerSignal
+      ? AbortSignal.any([callerSignal, timeout])
+      : timeout;
+
+    try {
+      return await fetchImpl(input, { ...init, signal });
+    } catch (error) {
+      if (timeout.aborted && !callerSignal?.aborted) {
+        throw new RequestTimeoutError(
+          `${messagePrefix} timed out after ${String(timeoutMs)}ms (no response)`,
+          timeoutMs
+        );
+      }
+      throw error;
+    }
+  }) as typeof fetch;
+};
+
+/**
+ * Plugin form of `createTimeoutFetch`: installs the timed `fetch` on the
+ * client. `createWpGraphql({ requestTimeoutMs })` does this for you, and also
+ * hands the timed `fetch` to the persisted-query executors.
+ */
+export const withRequestTimeout = (
+  params: TimeoutFetchOptions
+): GraphqlClientPlugin => {
+  const fetchImpl = createTimeoutFetch(params);
+  return () => ({ fetch: fetchImpl });
+};
+
+// ---------------------------------------------------------------------------
 // Retry fetch (wraps a provided fetch — never calls global fetch)
 // ---------------------------------------------------------------------------
 
