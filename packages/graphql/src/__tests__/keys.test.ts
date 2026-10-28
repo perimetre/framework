@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test';
-import { GRAPHQL_KEYS_HEADER, parseGraphqlKeys } from '../keys.js';
+import {
+  collapseGraphqlKeys,
+  decodeRelayId,
+  entryGraphqlKeys,
+  GRAPHQL_KEYS_HEADER,
+  GRAPHQL_UNKNOWN_DEPENDENCIES,
+  hasGraphqlNodeKeys,
+  parseGraphqlKeys
+} from '../keys.js';
 
 const HASH = '3f2a'.repeat(16);
 const POST_1 = btoa('post:1'); // cG9zdDox
@@ -87,5 +95,159 @@ describe('parseGraphqlKeys', () => {
     expect(parseGraphqlKeys('graphql:Mutation UpdatePost').root).toBe(
       'Mutation'
     );
+  });
+});
+
+describe('parseGraphqlKeys — WPGraphQL 2.x', () => {
+  test('reads the operation:<Name> token as the operation, not a node id', () => {
+    const keys = parseGraphqlKeys(
+      `${HASH} graphql:Query operation:PageById list:page ${POST_1}`
+    );
+    expect(keys.operation).toBe('PageById');
+    expect(keys.nodeIds).toEqual([POST_1]);
+  });
+});
+
+/** The Relay id WPGraphQL gives a node (`post:42` → `cG9zdDo0Mg==`). */
+const relay = (kind: string, id: number | string) =>
+  btoa(`${kind}:${String(id)}`);
+
+describe('decodeRelayId', () => {
+  test('decodes Relay ids, and nothing else', () => {
+    expect(decodeRelayId(POST_42)).toEqual({ id: '42', kind: 'post' });
+    expect(decodeRelayId(PAGE_TYPE)).toEqual({ id: 'page', kind: 'post_type' });
+    expect(decodeRelayId('list:post')).toBeNull();
+    expect(decodeRelayId('GetPosts')).toBeNull();
+    expect(decodeRelayId('42')).toBeNull();
+  });
+});
+
+describe('hasGraphqlNodeKeys', () => {
+  test('a node id or a skipped marker counts; the query id, root, operation and lists do not', () => {
+    expect(hasGraphqlNodeKeys(`${HASH} graphql:Query GetPosts ${POST_1}`)).toBe(
+      true
+    );
+    expect(hasGraphqlNodeKeys(`${HASH} graphql:Query skipped:post`)).toBe(true);
+    expect(
+      hasGraphqlNodeKeys(`${HASH} graphql:Query operation:PageById list:page`)
+    ).toBe(false);
+    expect(hasGraphqlNodeKeys(null)).toBe(false);
+  });
+});
+
+describe('collapseGraphqlKeys', () => {
+  test('keeps node ids, drops the query id, root, list and operation keys', () => {
+    const header = [
+      HASH,
+      'graphql:Query',
+      'operation:PageById',
+      'list:page',
+      relay('post', 30),
+      relay('term', 7)
+    ].join(' ');
+
+    expect(collapseGraphqlKeys([header], 96)).toEqual([
+      relay('post', 30),
+      relay('term', 7)
+    ]);
+  });
+
+  test('deduplicates across the responses of one read', () => {
+    expect(
+      collapseGraphqlKeys(
+        [relay('post', 1), `${relay('post', 1)} ${relay('post', 2)}`],
+        96
+      )
+    ).toEqual([relay('post', 1), relay('post', 2)]);
+  });
+
+  test('a missing header is no keys', () => {
+    expect(
+      collapseGraphqlKeys([null, undefined, '', new Headers()], 96)
+    ).toEqual([]);
+  });
+
+  test('keeps the analyzer’s own skipped markers', () => {
+    expect(
+      collapseGraphqlKeys([`${relay('post', 1)} skipped:post`], 96)
+    ).toEqual([relay('post', 1), 'skipped:post']);
+  });
+
+  test('past the budget, the overflow collapses into skipped:<kind>, and nothing is left unreachable', () => {
+    const ids = Array.from({ length: 10 }, (_, i) => relay('post', i + 1));
+    const all = [...ids, relay('term', 3)];
+    const collapsed: { keys: number; max: number }[] = [];
+    const keys = collapseGraphqlKeys([all.join(' ')], 5, {
+      /** Records the collapse. */
+      onCollapse: (info) => collapsed.push(info)
+    });
+
+    expect(keys.length).toBeLessThanOrEqual(5);
+    expect(keys).toContain('skipped:post');
+    expect(collapsed).toEqual([{ keys: 11, max: 5 }]);
+    for (const id of all) {
+      const kind = atob(id).split(':')[0] ?? '';
+      expect(keys.includes(id) || keys.includes(`skipped:${kind}`)).toBe(true);
+    }
+  });
+
+  // A budget below the number of node kinds can't hold one marker per kind;
+  // any real budget (stelpro: 96) is far above WPGraphQL's handful of kinds.
+  test('never more than max (at least one marker per kind), whatever the response resolved', () => {
+    const kinds = ['post', 'term', 'user', 'comment', 'nav_menu_item'];
+    const header = Array.from({ length: 300 }, (_, i) =>
+      relay(kinds[i % kinds.length] ?? 'post', i)
+    ).join(' ');
+    for (const max of [5, 6, 20, 96]) {
+      expect(collapseGraphqlKeys([header], max).length).toBeLessThanOrEqual(
+        max
+      );
+    }
+  });
+
+  test('a token that is not a Relay id has no coarser key: it is kept', () => {
+    const header = [
+      '42',
+      ...Array.from({ length: 6 }, (_, i) => relay('post', i))
+    ];
+    const keys = collapseGraphqlKeys([header.join(' ')], 3);
+    expect(keys).toContain('42');
+    expect(keys).toContain('skipped:post');
+  });
+
+  test('ignoreTypes drops the type-level nodes and markers of types the site does not render', () => {
+    const header = [
+      relay('post', 1),
+      relay('post_type', 'graphql_document'),
+      relay('post_type', 'page'),
+      relay('taxonomy', 'graphql_document_group'),
+      'skipped:graphql_document'
+    ].join(' ');
+
+    expect(
+      collapseGraphqlKeys([header], 96, {
+        ignoreTypes: ['graphql_document', 'graphql_document_group']
+      })
+    ).toEqual([relay('post', 1), relay('post_type', 'page')]);
+  });
+});
+
+describe('entryGraphqlKeys', () => {
+  test('an entry whose response named no node may depend on anything', () => {
+    // A Smart Cache object-cache hit: the query id and its list keys, no node.
+    const hit = [HASH, 'graphql:Query', 'operation:PageById', 'list:page'].join(
+      ' '
+    );
+
+    expect(entryGraphqlKeys([hit], 96)).toEqual([
+      'skipped:post',
+      'skipped:term'
+    ]);
+    expect(entryGraphqlKeys([null], 96)).toEqual([
+      ...GRAPHQL_UNKNOWN_DEPENDENCIES
+    ]);
+    expect(entryGraphqlKeys([relay('post', 30)], 96)).toEqual([
+      relay('post', 30)
+    ]);
   });
 });

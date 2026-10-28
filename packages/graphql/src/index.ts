@@ -2,8 +2,10 @@ import type { GraphQLClient } from 'graphql-request';
 import {
   createApqExecutor,
   createPassthroughExecutor,
+  type ApqPostFallback,
   type GraphqlExecutor,
-  type GraphqlRequestPlugin
+  type GraphqlRequestPlugin,
+  type PostFallback
 } from './apq.js';
 import {
   createGraphqlClient,
@@ -11,10 +13,12 @@ import {
   type GraphqlClientPlugin
 } from './client.js';
 import {
+  createTimeoutFetch,
   withInstrumentedFetch,
   withRequestLogger,
   withResponseLogger,
-  type StartSpanFn
+  type StartSpanFn,
+  type TimeoutFetchOptions
 } from './middlewares.js';
 import { createGraphqlTanstack, type GraphqlTanstack } from './tanstack.js';
 import { createTrustedDocumentExecutor } from './trusted-documents.js';
@@ -30,10 +34,12 @@ export {
   createApqExecutor,
   createExecutor,
   createPassthroughExecutor,
+  errorResponseMeta,
   notifyResponse,
   postViaClient,
   resolveRequestOptions,
   type ApqExecutorOptions,
+  type ApqPostFallback,
   type ExecuteGraphqlRequest,
   type ExecuteGraphqlRequestWithMeta,
   type GraphqlExecuteResult,
@@ -45,7 +51,8 @@ export {
   type GraphqlResponseOutcome,
   type GraphqlTransport,
   type GraphqlTransportArgs,
-  type GraphqlTransportResult
+  type GraphqlTransportResult,
+  type PostFallback
 } from './apq.js';
 export {
   createGraphqlClient,
@@ -54,10 +61,32 @@ export {
   type GraphqlClientPlugin
 } from './client.js';
 export {
+  collapseGraphqlKeys,
+  decodeRelayId,
+  entryGraphqlKeys,
   GRAPHQL_KEYS_HEADER,
+  GRAPHQL_UNKNOWN_DEPENDENCIES,
+  hasGraphqlNodeKeys,
   parseGraphqlKeys,
+  type CollapseGraphqlKeysOptions,
   type GraphqlKeys
 } from './keys.js';
+export {
+  isEmptyGraphqlAnswer,
+  stableStringify,
+  withLastGood,
+  type LastGoodClock,
+  type LastGoodExecutor,
+  type LastGoodFallback,
+  type LastGoodOptions,
+  type LastGoodResult,
+  type LastGoodStore
+} from './last-good.js';
+export {
+  createTimeoutFetch,
+  RequestTimeoutError,
+  type TimeoutFetchOptions
+} from './middlewares.js';
 export {
   createTrustedDocumentExecutor,
   registerTrustedDocuments,
@@ -133,17 +162,21 @@ export type WpGraphqlBundle = {
  */
 export const createWpGraphql = ({
   apq = false,
+  apqPostFallback,
   captureException,
   debug = false,
   endpoint,
-  fetch: fetchImpl,
+  fetch: callerFetch,
   logger,
   options,
   persistedDocuments,
   plugins = [],
   requestPlugins,
+  requestTimeout,
+  requestTimeoutMs,
   startSpan,
-  trustedDocuments = false
+  trustedDocuments = false,
+  trustedDocumentsPostFallback
 }: {
   /**
    * Opt into APQ routing (learn-at-runtime). When `true` **and**
@@ -153,6 +186,14 @@ export const createWpGraphql = ({
    * exclusive with `trustedDocuments`.
    */
   apq?: boolean;
+  /**
+   * When a failed APQ GET is re-sent as a POST. `'get-specific'` (default):
+   * only for a 414 / 405, the failures a POST actually fixes; a timeout, a
+   * network error, 401/403/429/5xx and GraphQL errors are rethrown. `'any'`
+   * restores the pre-0.6 "POST on any failure", which doubles the load on a
+   * CMS that is already failing — see {@link ApqPostFallback}.
+   */
+  apqPostFallback?: ApqPostFallback;
   /** Optional `Sentry.captureException` for hard errors. */
   captureException?: (
     error: unknown,
@@ -190,6 +231,22 @@ export const createWpGraphql = ({
    * the active executor (APQ / Trusted Documents) and the TanStack helper.
    */
   requestPlugins?: GraphqlRequestPlugin[];
+  /**
+   * Tunes `requestTimeoutMs`: `enabled` (evaluated per request — e.g. off
+   * during `next build`) and `messagePrefix` (default `'CMS request'`).
+   */
+  requestTimeout?: Pick<TimeoutFetchOptions, 'enabled' | 'messagePrefix'>;
+  /**
+   * A hard per-request limit, in ms, on every request this bundle sends
+   * (persisted-query GET, register POST, client POST). Server-only — ignored
+   * in the browser. On expiry the request rejects with a
+   * `RequestTimeoutError` reading `CMS request timed out after <ms>ms (no
+   * response)`, not the platform's abort text, which Sentry's
+   * cancelled-request filters would drop. Composed with the caller's
+   * `signal`; a caller abort still rejects as an abort. Requires `fetch`.
+   * See `createTimeoutFetch`.
+   */
+  requestTimeoutMs?: number;
   /** Optional Sentry-style `startSpan` for tracing fetch + executor calls. */
   startSpan?: StartSpanFn;
   /**
@@ -201,12 +258,36 @@ export const createWpGraphql = ({
    * `fetch` when enabled. Mutually exclusive with `apq`.
    */
   trustedDocuments?: boolean;
+  /**
+   * When a failed Trusted Documents GET is re-sent as a POST. `'get-specific'`
+   * (default): only a 414 / 405, re-sent as a POST **by id** (no document
+   * text, so the safelist holds); everything else is rethrown. `'any'`
+   * restores the pre-0.6 "POST the document text on any failure". See
+   * {@link PostFallback}.
+   */
+  trustedDocumentsPostFallback?: PostFallback;
 }): WpGraphqlBundle => {
   if (apq && trustedDocuments) {
     throw new Error(
       '@perimetre/graphql: `apq` and `trustedDocuments` are mutually exclusive transports — enable one, not both.'
     );
   }
+  if (requestTimeoutMs !== undefined && !callerFetch) {
+    throw new Error(
+      '@perimetre/graphql: createWpGraphql requires `fetch` when `requestTimeoutMs` is set (the timeout wraps it).'
+    );
+  }
+  // Every transport below — the client's POST and the persisted-query GETs —
+  // goes through the timed fetch, so no CMS request can outlive the limit.
+  const fetchImpl =
+    callerFetch && requestTimeoutMs !== undefined
+      ? createTimeoutFetch({
+          ...requestTimeout,
+          fetch: callerFetch,
+          timeoutMs: requestTimeoutMs
+        })
+      : callerFetch;
+
   const stack: GraphqlClientPlugin[] = [...plugins];
   if (logger) {
     stack.push(
@@ -216,6 +297,9 @@ export const createWpGraphql = ({
   }
   if ((logger || startSpan) && fetchImpl) {
     stack.push(withInstrumentedFetch({ fetch: fetchImpl, logger, startSpan }));
+  } else if (fetchImpl && fetchImpl !== callerFetch) {
+    // No instrumentation to carry it: install the timed fetch on its own.
+    stack.push(() => ({ fetch: fetchImpl }));
   }
 
   const client = createGraphqlClient({ endpoint, options, plugins: stack });
@@ -244,6 +328,7 @@ export const createWpGraphql = ({
       client,
       fetch: fetchImpl,
       logger,
+      postFallback: trustedDocumentsPostFallback,
       requestPlugins,
       startSpan
     });
@@ -254,6 +339,7 @@ export const createWpGraphql = ({
       persistedDocuments,
       fetch: fetchImpl,
       logger,
+      postFallback: apqPostFallback,
       requestPlugins,
       startSpan
     });

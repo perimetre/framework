@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'bun:test';
+import { ClientError } from 'graphql-request';
 import {
   createApqExecutor,
   createPassthroughExecutor,
+  errorResponseMeta,
+  type ApqPostFallback,
   type GraphqlRequestContext,
   type GraphqlRequestPlugin,
   type GraphqlResponseOutcome
@@ -31,10 +34,12 @@ const setup = (
   script: FetchScript,
   {
     errorPolicy,
-    persistedDocuments = { [GET_POSTS_HASH]: GET_POSTS_SOURCE }
+    persistedDocuments = { [GET_POSTS_HASH]: GET_POSTS_SOURCE },
+    postFallback
   }: {
     errorPolicy?: 'all' | 'none';
     persistedDocuments?: Record<string, string>;
+    postFallback?: ApqPostFallback;
   } = {}
 ) => {
   const mock = createFetchMock(script);
@@ -57,6 +62,7 @@ const setup = (
     endpoint: ENDPOINT,
     fetch: mock.fetch,
     persistedDocuments,
+    postFallback,
     requestPlugins: [observer]
   });
   return { calls: mock.calls, execute, outcomes };
@@ -165,39 +171,154 @@ describe('createApqExecutor', () => {
     expect(keysOf(meta.headers)).toBe(GET_POSTS_KEYS);
   });
 
-  test('GET with GraphQL errors falls back to POST and surfaces the POST headers', async () => {
-    const { execute } = setup(
-      (call) =>
-        call.init?.method === 'GET'
-          ? jsonResponse(
-              { errors: [{ message: 'Internal server error' }] },
-              { headers: { 'X-GraphQL-Keys': 'from-get' } }
-            )
-          : jsonResponse(
-              { data: GET_POSTS_DATA },
-              { headers: { 'X-GraphQL-Keys': GET_POSTS_KEYS } }
-            ),
+  test('GET with GraphQL errors rejects with a ClientError carrying the GET headers, without a POST', async () => {
+    const { calls, execute, outcomes } = setup(() =>
+      jsonResponse(
+        { errors: [{ message: 'Internal server error' }] },
+        { headers: { 'X-GraphQL-Keys': 'from-get' } }
+      )
+    );
+
+    const error = await execute.withMeta(GetPosts).catch((e: unknown) => e);
+
+    expect(calls.map((c) => c.init?.method)).toEqual(['GET']);
+    // The same shape the client's POST throws for this body.
+    expect(error).toBeInstanceOf(ClientError);
+    expect((error as ClientError).response.status).toBe(200);
+    expect((error as ClientError).response.errors?.[0]?.message).toBe(
+      'Internal server error'
+    );
+    expect(keysOf(errorResponseMeta(error).headers)).toBe('from-get');
+    expect(errorResponseMeta(error).transport).toBe('apq-get');
+    expect(keysOf(outcomes[0]?.result.headers)).toBe('from-get');
+    expect(outcomes[0]?.result.transport).toBe('apq-get');
+  });
+
+  test("GET with GraphQL errors under errorPolicy 'all' answers the GET's data, like the POST would", async () => {
+    const partial = { posts: null };
+    const { calls, execute } = setup(
+      () =>
+        jsonResponse(
+          { data: partial, errors: [{ message: 'Internal server error' }] },
+          { headers: { 'X-GraphQL-Keys': 'from-get' } }
+        ),
       { errorPolicy: 'all' }
     );
 
     const meta = await execute.withMeta(GetPosts);
-    expect(meta.transport).toBe('post');
-    expect(keysOf(meta.headers)).toBe(GET_POSTS_KEYS);
+    expect(calls).toHaveLength(1);
+    expect(meta.data).toEqual(partial as never);
+    expect(meta.transport).toBe('apq-get');
   });
 
-  test('GET transport failure (non-2xx) falls back to POST and surfaces the POST headers', async () => {
-    const { execute } = setup((call) =>
-      call.init?.method === 'GET'
-        ? jsonResponse({}, { status: 503 })
-        : jsonResponse(
-            { data: GET_POSTS_DATA },
-            { headers: { 'X-GraphQL-Keys': GET_POSTS_KEYS } }
-          )
+  for (const status of [401, 403, 429, 500, 503]) {
+    test(`GET answering HTTP ${String(status)} rejects without a POST`, async () => {
+      const { calls, execute, outcomes } = setup(() =>
+        jsonResponse(
+          { errors: [{ message: 'Forbidden' }] },
+          { headers: { 'X-GraphQL-Keys': 'from-get' }, status }
+        )
+      );
+
+      const error = await execute.withMeta(GetPosts).catch((e: unknown) => e);
+
+      expect(calls.map((c) => c.init?.method)).toEqual(['GET']);
+      expect(error).toBeInstanceOf(ClientError);
+      expect((error as ClientError).response.status).toBe(status);
+      expect(outcomes[0]?.result.transport).toBe('apq-get');
+      expect(keysOf(outcomes[0]?.result.headers)).toBe('from-get');
+    });
+  }
+
+  test('a non-JSON 403 (a WAF block page) rejects with its status, without a POST', async () => {
+    const { calls, execute } = setup(
+      () => new Response('<html>blocked</html>', { status: 403 })
     );
 
-    const meta = await execute.withMeta(GetPosts);
-    expect(meta.transport).toBe('post');
-    expect(keysOf(meta.headers)).toBe(GET_POSTS_KEYS);
+    const error = await execute.withMeta(GetPosts).catch((e: unknown) => e);
+
+    expect(calls).toHaveLength(1);
+    expect((error as ClientError).response.status).toBe(403);
+    expect((error as ClientError).response.body).toBe('<html>blocked</html>');
+  });
+
+  test('a throwing fetch (timeout, network) rejects with the same error object, without a POST', async () => {
+    const timeout = new Error(
+      'CMS request timed out after 15000ms (no response)'
+    );
+    const { calls, execute, outcomes } = setup(() => {
+      throw timeout;
+    });
+
+    expect(await execute.withMeta(GetPosts).catch((e: unknown) => e)).toBe(
+      timeout
+    );
+    expect(calls).toHaveLength(1);
+    expect(outcomes[0]?.result.error).toBe(timeout);
+    expect(outcomes[0]?.result.headers).toBeUndefined();
+    expect(outcomes[0]?.result.transport).toBeUndefined();
+  });
+
+  for (const status of [414, 405]) {
+    test(`GET rejected as a GET (HTTP ${String(status)}) falls back to POST and surfaces the POST headers`, async () => {
+      const { calls, execute } = setup((call) =>
+        call.init?.method === 'GET'
+          ? jsonResponse({}, { status })
+          : jsonResponse(
+              { data: GET_POSTS_DATA },
+              { headers: { 'X-GraphQL-Keys': GET_POSTS_KEYS } }
+            )
+      );
+
+      const meta = await execute.withMeta(GetPosts);
+      expect(calls.map((c) => c.init?.method)).toEqual(['GET', 'POST']);
+      expect(meta.transport).toBe('post');
+      expect(keysOf(meta.headers)).toBe(GET_POSTS_KEYS);
+    });
+  }
+
+  test("postFallback 'any' restores POST on any GET failure", async () => {
+    const scripts: Parameters<typeof setup>[0][] = [
+      (call) =>
+        call.init?.method === 'GET'
+          ? Promise.reject(new TypeError('fetch failed'))
+          : jsonResponse({ data: GET_POSTS_DATA }),
+      (call) =>
+        call.init?.method === 'GET'
+          ? jsonResponse({}, { status: 503 })
+          : jsonResponse({ data: GET_POSTS_DATA }),
+      (call) =>
+        call.init?.method === 'GET'
+          ? jsonResponse({ errors: [{ message: 'Internal server error' }] })
+          : jsonResponse({ data: GET_POSTS_DATA })
+    ];
+
+    for (const script of scripts) {
+      const { calls, execute } = setup(script, { postFallback: 'any' });
+      const meta = await execute.withMeta(GetPosts);
+      expect(calls.map((c) => c.init?.method)).toEqual(['GET', 'POST']);
+      expect(meta.transport).toBe('post');
+      expect(meta.data).toEqual(GET_POSTS_DATA);
+    }
+  });
+
+  test("a caller abort never falls back, even under postFallback 'any'", async () => {
+    const controller = new AbortController();
+    const { calls, execute } = setup(
+      () => {
+        controller.abort();
+        throw new DOMException('The operation was aborted.', 'AbortError');
+      },
+      { postFallback: 'any' }
+    );
+
+    const error = await execute
+      .withMeta(GetPosts, undefined, { signal: controller.signal })
+      .catch((e: unknown) => e);
+
+    expect((error as Error).name).toBe('AbortError');
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.init?.signal).toBe(controller.signal);
   });
 
   test('mutations always POST via the client and surface its headers', async () => {
@@ -243,32 +364,30 @@ describe('createApqExecutor', () => {
     expect(calls[0]?.url).toContain('edgeCache=300');
   });
 
-  test('a thrown ClientError still hands onResponse the response headers', async () => {
-    const { execute, outcomes } = setup((call) =>
-      call.init?.method === 'GET'
-        ? jsonResponse(
-            { errors: [{ message: 'Cannot query field "nope"' }] },
-            { headers: { 'X-GraphQL-Keys': 'from-get' } }
-          )
-        : jsonResponse(
-            { errors: [{ message: 'Cannot query field "nope"' }] },
-            { headers: { 'X-GraphQL-Keys': GET_POSTS_KEYS } }
-          )
+  test('a ClientError from the client POST hands onResponse its headers and transport', async () => {
+    const { execute, outcomes } = setup(() =>
+      jsonResponse(
+        { errors: [{ message: 'Cannot query field "nope"' }] },
+        { headers: { 'X-GraphQL-Keys': GET_POSTS_KEYS } }
+      )
     );
+    const Unhashed = documentWithHash<typeof GET_POSTS_DATA>(GET_POSTS_SOURCE);
 
-    const error = await execute.withMeta(GetPosts).catch((e: unknown) => e);
-    expect(error).toBeInstanceOf(Error);
+    const error = await execute.withMeta(Unhashed).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ClientError);
     expect((error as Error).message).toContain('Cannot query field');
 
     expect(outcomes).toHaveLength(1);
     expect(outcomes[0]?.result.error).toBeDefined();
     expect(outcomes[0]?.result.data).toBeUndefined();
     expect(keysOf(outcomes[0]?.result.headers)).toBe(GET_POSTS_KEYS);
+    expect(outcomes[0]?.result.transport).toBe('post');
+    expect(errorResponseMeta(error).transport).toBe('post');
   });
 
-  test('a network failure before any response leaves headers undefined', async () => {
+  test('a network failure on the POST leaves headers undefined', async () => {
     const { execute, outcomes } = setup((call) => {
-      if (call.init?.method === 'GET') return jsonResponse({}, { status: 502 });
+      if (call.init?.method === 'GET') return jsonResponse({}, { status: 414 });
       throw new TypeError('fetch failed');
     });
 

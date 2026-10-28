@@ -1,6 +1,6 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { print } from 'graphql';
-import type { GraphQLClient } from 'graphql-request';
+import { ClientError, type GraphQLClient } from 'graphql-request';
 import type { GraphqlSpan, StartSpanFn } from './middlewares.js';
 import { OPERATION_DEFINITION_KIND, type GraphqlLogger } from './utils.js';
 
@@ -130,6 +130,12 @@ export type GraphqlRequestOptions = {
    * key, so it must stay byte-stable).
    */
   edgeCache?: number;
+  /**
+   * The caller's abort signal, handed to every `fetch` the request makes (the
+   * persisted-query GET, the register POST, the client POST). An aborted
+   * request is never re-sent over another transport: the caller gave up.
+   */
+  signal?: AbortSignal;
 };
 
 /**
@@ -153,8 +159,9 @@ export type GraphqlResponseMeta = {
 /**
  * The outcome handed to a plugin's `onResponse` hook. `data` and `error` are
  * mutually exclusive. `headers` / `transport` are present whenever a response
- * was received — including on a GraphQL error thrown as a `ClientError` —
- * and absent only when the request failed before any response arrived.
+ * was received — including on a GraphQL error or non-2xx thrown as a
+ * `ClientError` — and absent only when the request failed before any response
+ * arrived (a timeout, an abort, a network error).
  */
 export type GraphqlResponseOutcome = {
   data?: unknown;
@@ -174,7 +181,8 @@ export type GraphqlTransport =
   | 'apq-get'
   | 'apq-register-post'
   | 'post'
-  | 'trusted-get';
+  | 'trusted-get'
+  | 'trusted-post';
 
 /**
  * Builds the {@link GraphqlRequestContext} for a document — the single place
@@ -281,10 +289,48 @@ export const notifyResponse = (
   }
 };
 
-type ApqResponse = {
+/** A persisted-query response body, as WPGraphQL Smart Cache answers it. */
+export type PersistedQueryResponse = {
   data?: unknown;
   errors?: { message: string }[];
+  extensions?: unknown;
 };
+
+type ApqResponse = PersistedQueryResponse;
+
+/**
+ * The error a persisted-query request throws for a non-2xx or a GraphQL-errors
+ * response: the same graphql-request `ClientError` the client's POST throws
+ * for that response (`response.status`, `response.headers`, `response.body`,
+ * plus `errors` / `data` when the body was GraphQL JSON), tagged with its
+ * transport for {@link errorResponseMeta}. Catch sites and `onResponse`
+ * observers can't tell the transports apart by the error's shape. Shared by
+ * the APQ and Trusted Documents executors.
+ */
+export const persistedQueryClientError = (
+  res: Response,
+  text: string,
+  body: PersistedQueryResponse | undefined,
+  document: unknown,
+  variables: unknown,
+  transport: GraphqlTransport = 'apq-get'
+): ClientError =>
+  tagErrorTransport(
+    new ClientError(
+      {
+        ...body,
+        body: text,
+        data: body?.data,
+        headers: res.headers,
+        status: res.status
+      } as ConstructorParameters<typeof ClientError>[0],
+      {
+        query: print(document as TypedDocumentNode),
+        variables: variables as Record<string, unknown> | undefined
+      }
+    ),
+    transport
+  );
 
 /**
  * Appends the shared edge-cache query param to a persisted-query URL when a
@@ -356,11 +402,88 @@ export type ApqExecutorOptions = {
   logger?: GraphqlLogger;
   /** The hash → printed query string map from codegen. */
   persistedDocuments: Record<string, string>;
+  /**
+   * When a failed APQ GET is re-sent as a POST through `client` (see
+   * {@link ApqPostFallback}). Defaults to `'get-specific'`.
+   */
+  postFallback?: ApqPostFallback;
   /** Per-request before/after hooks (see {@link GraphqlRequestPlugin}). */
   requestPlugins?: GraphqlRequestPlugin[];
   /** Optional Sentry-style span wrapper. */
   startSpan?: StartSpanFn;
 };
+
+/**
+ * When the APQ executor re-sends a failed persisted-query GET as a POST.
+ *
+ * - `'get-specific'` (default): only when the failure is about the GET itself
+ *   — HTTP 414 (URL too long) or 405 (GET not allowed). Everything else is
+ *   rethrown as is: a timeout, an abort, a network error, 401/403/429/5xx, or
+ *   GraphQL `errors` in the body. A POST would hit the same sick server, wait
+ *   out the same timeout, and skip Smart Cache's network cache on the way.
+ * - `'any'`: the pre-0.6 behaviour — any failure is re-sent as a POST. During
+ *   an outage this doubles the load on the CMS and every read's latency, and
+ *   keeps POSTing into a WAF that already answers 403. Only for a server whose
+ *   GETs fail while POSTs work (a proxy that mangles query strings).
+ *
+ * `PersistedQueryNotFound` is not a failure: it always registers the document
+ * with one POST, whatever this says. A caller abort never falls back.
+ */
+export type ApqPostFallback = PostFallback;
+
+/**
+ * When a persisted-query executor (APQ or Trusted Documents) re-sends a failed
+ * GET as a POST. See {@link ApqPostFallback} for the APQ rules; the Trusted
+ * Documents executor follows the same ones, with its own POST.
+ */
+export type PostFallback = 'any' | 'get-specific';
+
+/**
+ * Statuses that mean "this server won't take the request as a GET": 414 (the
+ * URL is too long — nginx's default `large_client_header_buffers` is 8 KB) and
+ * 405 (a proxy that only allows POST). Only these are fixed by changing method.
+ */
+export const GET_REJECTED_STATUSES: ReadonlySet<number> = new Set([405, 414]);
+
+/**
+ * The transport each response-carrying error came from, so `onResponse` (and a
+ * `.withMeta` caller, through {@link errorResponseMeta}) can tell a GET's
+ * error from a POST's. Only errors raised from a received response are tagged:
+ * a timeout or a network error has no transport to report.
+ */
+const errorTransports = new WeakMap<object, GraphqlTransport>();
+
+/** Records which transport produced `error`'s response; returns `error`. */
+const tagErrorTransport = <T>(error: T, transport: GraphqlTransport): T => {
+  if (typeof error === 'object' && error !== null) {
+    errorTransports.set(error, transport);
+  }
+  return error;
+};
+
+/**
+ * The response metadata a thrown executor error carries: the headers of the
+ * response that failed (a graphql-request `ClientError`'s
+ * `response.headers`) and the transport it came back on. Both are absent when
+ * the request failed before any response arrived.
+ * @example Read `X-GraphQL-Keys` off a failed request
+ * ```ts
+ * try {
+ *   await executeGraphqlRequest.withMeta(GetPageDocument, { uri });
+ * } catch (error) {
+ *   const { headers, transport } = errorResponseMeta(error);
+ * }
+ * ```
+ */
+export const errorResponseMeta = (
+  error: unknown
+): { headers?: Headers; transport?: GraphqlTransport } => ({
+  headers: headersFromError(error),
+  transport:
+    typeof error === 'object' && error !== null
+      ? errorTransports.get(error)
+      : undefined
+});
 
 /**
  * The data-only execute signature. Resolves to the operation's `data`, the
@@ -451,18 +574,30 @@ const headersFromError = (error: unknown): Headers | undefined => {
  * Uses `client.rawRequest` (which runs the same request/response middlewares
  * and `errorPolicy` as `client.request`, but keeps `headers`/`status`) so the
  * POST path can surface headers like the GET paths do. Shared by every
- * executor's POST fallback.
+ * executor's POST fallback. A thrown `ClientError` is tagged `'post'` for
+ * {@link errorResponseMeta}.
  */
 export const postViaClient = async <TResult, TVariables>(
   client: GraphQLClient,
   document: TypedDocumentNode<TResult, TVariables>,
-  variables: TVariables | undefined
+  variables: TVariables | undefined,
+  signal?: AbortSignal
 ): Promise<GraphqlTransportResult<TResult>> => {
-  const response = await client.rawRequest<TResult>(
-    print(document),
-    variables as object | undefined
-  );
-  return { data: response.data, headers: response.headers, transport: 'post' };
+  try {
+    const response = await client.rawRequest<TResult>({
+      query: print(document),
+      signal,
+      variables: variables as object | undefined
+    });
+    return {
+      data: response.data,
+      headers: response.headers,
+      transport: 'post'
+    };
+  } catch (error) {
+    if (error instanceof ClientError) tagErrorTransport(error, 'post');
+    throw error;
+  }
 };
 
 /**
@@ -508,7 +643,7 @@ export const createExecutor = ({
       notifyResponse(requestPlugins, context, {
         durationMs: Date.now() - startedAt,
         error,
-        headers: headersFromError(error)
+        ...errorResponseMeta(error)
       });
       throw error;
     }
@@ -524,8 +659,9 @@ export const createExecutor = ({
 /**
  * Creates an `executeGraphqlRequest` helper that routes queries through
  * WPGraphQL Smart Cache's APQ flow when the codegen-embedded hash is
- * present, and falls back to the supplied client's POST transport for
- * mutations, unhashed documents, or any APQ transport failure.
+ * present, and uses the supplied client's POST transport for mutations,
+ * unhashed documents, and GETs the server refuses as GETs (414 / 405 — see
+ * {@link ApqPostFallback}; any other failure is rethrown, not re-sent).
  *
  * Because the codegen hash matches the server's normalized persisted-query
  * id, the executor issues an APQ **GET** first. On the rare
@@ -544,6 +680,7 @@ export const createApqExecutor = ({
   fetch: fetchImpl,
   logger,
   persistedDocuments,
+  postFallback = 'get-specific',
   requestPlugins,
   startSpan
 }: ApqExecutorOptions): GraphqlExecutor => {
@@ -573,7 +710,8 @@ export const createApqExecutor = ({
     hash: string,
     operationName: string,
     variables: unknown,
-    edgeCache?: number
+    edgeCache?: number,
+    signal?: AbortSignal
   ): Promise<{ body: ApqResponse; headers: Headers } | null> => {
     const query = persistedDocuments[hash];
     if (!query) return null;
@@ -595,7 +733,8 @@ export const createApqExecutor = ({
         query,
         queryId: hash,
         variables: variables ?? {}
-      })
+      }),
+      signal
     });
 
     if (!res.ok) {
@@ -615,7 +754,8 @@ export const createApqExecutor = ({
     operationName: string,
     document: TypedDocumentNode<TResult, TVariables>,
     variables?: TVariables,
-    edgeCache?: number
+    edgeCache?: number,
+    signal?: AbortSignal
   ): Promise<GraphqlTransportResult<TResult>> => {
     return wrapSpan(
       `graphql.apq.register.${operationName}`,
@@ -627,7 +767,8 @@ export const createApqExecutor = ({
             hash,
             operationName,
             variables,
-            edgeCache
+            edgeCache,
+            signal
           );
 
           if (
@@ -648,6 +789,8 @@ export const createApqExecutor = ({
             hadErrors: !!registered?.body.errors
           });
         } catch (error) {
+          // The caller gave up: nothing to re-send.
+          if (signal?.aborted) throw error;
           logger?.warn('graphql.apq.register_threw', {
             operationName,
             hash,
@@ -655,16 +798,51 @@ export const createApqExecutor = ({
           });
         }
 
-        return postViaClient(client, document, variables);
+        return postViaClient(client, document, variables, signal);
       }
     );
+  };
+
+  /**
+   * A failed APQ GET: rethrown, or — only under `postFallback: 'any'`, and
+   * never after a caller abort — re-sent as a POST through the client.
+   */
+  const failGet = async <TResult, TVariables>(
+    error: unknown,
+    {
+      document,
+      operationName,
+      signal,
+      status,
+      variables
+    }: {
+      document: TypedDocumentNode<TResult, TVariables>;
+      operationName: string;
+      signal?: AbortSignal;
+      status?: number;
+      variables: TVariables | undefined;
+    }
+  ): Promise<GraphqlTransportResult<TResult>> => {
+    const fallback = postFallback === 'any' && !signal?.aborted;
+    logger?.warn('graphql.apq.transport_failed', {
+      operationName,
+      ...(status === undefined ? {} : { status }),
+      fallback: fallback ? 'post' : 'none',
+      message: error instanceof Error ? error.message : String(error)
+    });
+    if (!fallback) throw error;
+    return postViaClient(client, document, variables, signal);
   };
 
   /**
    * The APQ transport: queries with a codegen-embedded hash go out as an APQ
    * GET — with a one-off register POST then GET if the server reports
    * `PersistedQueryNotFound`. Everything else (mutations, subscriptions,
-   * unhashed documents) falls back to the supplied client's POST.
+   * unhashed documents) uses the supplied client's POST.
+   *
+   * A GET that fails is NOT re-sent as a POST unless the failure is about the
+   * GET itself (414 / 405): see {@link ApqPostFallback}. A timeout, a 5xx or a
+   * WAF 403 says the server is sick, and a POST only doubles the load on it.
    */
   const run: TransportRunner = async <TResult, TVariables>({
     context,
@@ -675,10 +853,10 @@ export const createApqExecutor = ({
     GraphqlTransportResult<TResult>
   > => {
     const { hash, operationKind, operationName } = context;
-    const edgeCache = options.edgeCache;
+    const { edgeCache, signal } = options;
 
     if (operationKind !== 'query' || !hash) {
-      return postViaClient(client, document, variables);
+      return postViaClient(client, document, variables, signal);
     }
 
     const apqUrl = buildApqGetUrl(
@@ -688,64 +866,107 @@ export const createApqExecutor = ({
       variables ?? {},
       edgeCache
     );
+    const failure = { document, operationName, signal, variables };
     return wrapSpan(
       `graphql.apq.${operationName}`,
       'graphql.query',
       { operationName, hash, transport: 'apq-get' },
       async (span) => {
+        let res: Response;
+        let text: string;
         try {
-          const res = await fetchImpl(apqUrl, {
+          res = await fetchImpl(apqUrl, {
             method: 'GET',
-            headers: { Accept: 'application/json' }
+            headers: { Accept: 'application/json' },
+            signal
           });
 
-          if (!res.ok) {
-            throw new Error(`APQ GET returned HTTP ${String(res.status)}`);
-          }
-
-          const body = (await res.json()) as ApqResponse;
-
-          const apqMiss = body.errors?.some(
-            (err) => err.message === APQ_NOT_FOUND_ERROR
-          );
-          if (apqMiss) {
-            span?.setAttribute('graphql.apq.miss', true);
-            logger?.info('graphql.apq.miss_register', {
+          if (GET_REJECTED_STATUSES.has(res.status)) {
+            // The server (or a proxy in front of it) won't take this as a GET:
+            // the URL is too long, or GET isn't allowed. The POST is the fix.
+            span?.setAttribute('graphql.apq.get_rejected', res.status);
+            logger?.warn('graphql.apq.get_rejected_fallback_post', {
               operationName,
-              hash
+              status: res.status
             });
-            // The document was never registered on this server. Register it
-            // with one POST (same id we already use) and execute in the same
-            // round trip; the next caller for this hash gets the GET fast path.
-            return await registerAndExecute(
-              hash,
-              operationName,
-              document,
-              variables,
-              edgeCache
-            );
+            return await postViaClient(client, document, variables, signal);
           }
 
-          if (body.errors && body.errors.length > 0) {
+          text = await res.text();
+        } catch (error) {
+          return await failGet(error, failure);
+        }
+
+        let body: ApqResponse | undefined;
+        try {
+          body = JSON.parse(text) as ApqResponse;
+        } catch (error) {
+          // A 2xx that isn't JSON (a WAF challenge page) is a failure; a non-2xx
+          // that isn't JSON is reported by its status below.
+          if (res.ok) return await failGet(error, failure);
+        }
+
+        if (!res.ok) {
+          return await failGet(
+            persistedQueryClientError(res, text, body, document, variables),
+            { ...failure, status: res.status }
+          );
+        }
+
+        const apqMiss = body?.errors?.some(
+          (err) => err.message === APQ_NOT_FOUND_ERROR
+        );
+        if (apqMiss) {
+          span?.setAttribute('graphql.apq.miss', true);
+          logger?.info('graphql.apq.miss_register', {
+            operationName,
+            hash
+          });
+          // The document was never registered on this server. Register it
+          // with one POST (same id we already use) and execute in the same
+          // round trip; the next caller for this hash gets the GET fast path.
+          return await registerAndExecute(
+            hash,
+            operationName,
+            document,
+            variables,
+            edgeCache,
+            signal
+          );
+        }
+
+        if (body?.errors && body.errors.length > 0) {
+          if (postFallback === 'any' && !signal?.aborted) {
             logger?.warn('graphql.apq.errors_fallback_post', {
               operationName,
               errorCount: body.errors.length
             });
-            return await postViaClient(client, document, variables);
+            return await postViaClient(client, document, variables, signal);
           }
 
-          return {
-            data: body.data as TResult,
-            headers: res.headers,
-            transport: 'apq-get'
-          };
-        } catch (error) {
-          logger?.warn('graphql.apq.transport_failed', {
+          logger?.warn('graphql.apq.errors', {
             operationName,
-            message: error instanceof Error ? error.message : String(error)
+            errorCount: body.errors.length
           });
-          return await postViaClient(client, document, variables);
+          // What the client's POST would do with the same body: throw a
+          // `ClientError` under `errorPolicy: 'none'` (the default), hand back
+          // the data under `'all'` / `'ignore'`.
+          if ((client.requestConfig.errorPolicy ?? 'none') === 'none') {
+            throw persistedQueryClientError(
+              res,
+              text,
+              body,
+              document,
+              variables
+            );
+          }
         }
+
+        return {
+          data: body?.data as TResult,
+          headers: res.headers,
+          transport: 'apq-get'
+        };
       }
     );
   };
