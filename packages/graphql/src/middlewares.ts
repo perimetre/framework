@@ -453,6 +453,217 @@ export const withRequestTimeout = (
 };
 
 // ---------------------------------------------------------------------------
+// Concurrency limit (wraps a provided fetch — never calls global fetch)
+// ---------------------------------------------------------------------------
+
+/** Options for {@link createConcurrencyLimitFetch}. */
+export type ConcurrencyLimitFetchOptions = {
+  /**
+   * Evaluated per request: return `false` to send it outside the limit.
+   * Typical use: no limit during `next build`, which bounds its own burst
+   * (`staticGenerationMaxConcurrency`) and where a queue only lengthens the
+   * build.
+   * @example
+   * ```ts
+   * enabled: () => process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD
+   * ```
+   */
+  enabled?: () => boolean;
+  /** The `fetch` to wrap. */
+  fetch: typeof fetch;
+  /**
+   * The longest one request may hold its slot, in milliseconds, response and
+   * body included. Past it the request is aborted and the slot handed on. A
+   * backstop for a caller with no deadline of its own, or a body that never
+   * finishes; with a request timeout in front (`createWpGraphql`'s
+   * `requestTimeoutMs`), that timeout already bounds both. Unset: no bound.
+   */
+  holdLimitMs?: number;
+  /** The most requests in flight at once (a positive integer). */
+  maxConcurrent: number;
+  /**
+   * Shares the limit, per process, with every other limiter created with the
+   * same `scope`. Next.js evaluates a server module once per bundle (each
+   * page, each route handler), so a limiter per module instance would
+   * multiply the limit by the number of bundles. Limiters sharing a scope
+   * must share `maxConcurrent` (a mismatch throws). Unset: this limiter
+   * counts only its own requests. `createWpGraphql` passes the endpoint.
+   */
+  scope?: string;
+};
+
+/** The limit, requests holding a slot, and requests waiting for one. */
+type ConcurrencyState = {
+  active: number;
+  max: number;
+  queue: { grant: () => void }[];
+};
+
+/** Statuses whose response carries no body (`new Response` rejects one). */
+const NULL_BODY_STATUSES = new Set([101, 204, 205, 304]);
+
+/**
+ * The state a limiter counts against: its own, or the process-wide one for
+ * its `scope` (on `globalThis`, the one thing every bundle shares). Two
+ * limits on one scope would each admit against their own, so neither would
+ * hold: a mismatch throws.
+ */
+const concurrencyState = (
+  scope: string | undefined,
+  max: number
+): ConcurrencyState => {
+  if (scope === undefined) return { active: 0, max, queue: [] };
+  const store = globalThis as Record<symbol, ConcurrencyState | undefined> &
+    typeof globalThis;
+  const key = Symbol.for(`@perimetre/graphql.concurrency:${scope}`);
+  store[key] ??= { active: 0, max, queue: [] };
+  if (store[key].max !== max) {
+    throw new Error(
+      `@perimetre/graphql: the concurrency scope "${scope}" already has a limit of ${String(store[key].max)}, not ${String(max)}. Limiters sharing a scope must share their limit.`
+    );
+  }
+  return store[key];
+};
+
+/** Why a signal aborted, as an `Error`: its reason when it is one. */
+const abortReason = (signal: AbortSignal): Error =>
+  signal.reason instanceof Error
+    ? signal.reason
+    : new DOMException('The operation was aborted.', 'AbortError');
+
+/**
+ * Wraps a caller-supplied `fetch` so at most `maxConcurrent` requests are in
+ * flight at once; the rest wait in line, in order. Server-only: in a browser
+ * (`window` defined) the request goes out unchanged.
+ *
+ * WHY: a CMS behind PHP-FPM answers a handful of uncached reads at once and
+ * queues the rest, each one slower. A herd (every route re-rendering after a
+ * broad cache flush) sends far more than that, the CMS slows for everyone,
+ * and a firewall such as Imunify360 can ban the frontend's IPs. The limit
+ * keeps the herd's queue on the frontend.
+ *
+ * - **A slot covers the request and the read of its body**, so the response
+ *   is read whole before it is returned (a GraphQL answer is small JSON). A
+ *   response nobody reads still frees its slot.
+ * - **The caller's `signal` is honoured while queued**: an abort leaves the
+ *   line and rejects with the signal's reason, never taking a slot. With a
+ *   request timeout in front, time spent queued counts against it.
+ * - **A slot is returned on every path**: an answer, an error, an abort while
+ *   sending or while reading the body, and `holdLimitMs`.
+ * - **Per process, not per fleet.** On a serverless platform each instance
+ *   has its own limit.
+ *
+ * **The package never calls Node's global `fetch` on its own.** Pass a
+ * `fetch` here — usually `globalThis.fetch`.
+ */
+export const createConcurrencyLimitFetch = ({
+  enabled,
+  fetch: fetchImpl,
+  holdLimitMs,
+  maxConcurrent,
+  scope
+}: ConcurrencyLimitFetchOptions): typeof fetch => {
+  if (!Number.isInteger(maxConcurrent) || maxConcurrent <= 0) {
+    throw new Error(
+      `@perimetre/graphql: the concurrency limit must be a positive integer, got ${String(maxConcurrent)}.`
+    );
+  }
+  if (
+    holdLimitMs !== undefined &&
+    (!Number.isInteger(holdLimitMs) || holdLimitMs <= 0)
+  ) {
+    throw new Error(
+      `@perimetre/graphql: the hold limit must be a positive integer of milliseconds, got ${String(holdLimitMs)}.`
+    );
+  }
+  const state = concurrencyState(scope, maxConcurrent);
+
+  /** Waits for a slot, or rejects when `signal` aborts first. */
+  const acquire = (signal: AbortSignal | undefined): Promise<void> => {
+    if (signal?.aborted) return Promise.reject(abortReason(signal));
+    if (state.active < maxConcurrent) {
+      state.active++;
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve, reject) => {
+      const waiter = {
+        /** Takes the slot. */
+        grant: () => {
+          signal?.removeEventListener('abort', onAbort);
+          state.active++;
+          resolve();
+        }
+      };
+      /** Leaves the line (only ever called by `signal`). */
+      const onAbort = () => {
+        const index = state.queue.indexOf(waiter);
+        if (index !== -1) state.queue.splice(index, 1);
+        if (signal) reject(abortReason(signal));
+      };
+      signal?.addEventListener('abort', onAbort, { once: true });
+      state.queue.push(waiter);
+    });
+  };
+
+  /** Returns a slot and hands the free ones to the line, in order. */
+  const release = () => {
+    state.active--;
+    while (state.queue.length > 0 && state.active < maxConcurrent) {
+      state.queue.shift()?.grant();
+    }
+  };
+
+  // Cast: see `createInstrumentedFetch` — bun-types' `typeof fetch` requires
+  // `preconnect`.
+  return (async (
+    input: Parameters<typeof fetch>[0],
+    init?: Parameters<typeof fetch>[1]
+  ) => {
+    if (typeof window !== 'undefined' || (enabled && !enabled())) {
+      return fetchImpl(input, init);
+    }
+
+    const callerSignal = init?.signal ?? undefined;
+    await acquire(callerSignal);
+    // From here the slot is held: it goes back in `finally`, on every path.
+    const hold =
+      holdLimitMs === undefined ? undefined : AbortSignal.timeout(holdLimitMs);
+    const signal =
+      hold && callerSignal
+        ? AbortSignal.any([callerSignal, hold])
+        : (hold ?? callerSignal);
+    try {
+      const response = await fetchImpl(
+        input,
+        signal === callerSignal ? init : { ...init, signal }
+      );
+      const body = NULL_BODY_STATUSES.has(response.status)
+        ? null
+        : await response.arrayBuffer();
+      return new Response(body, {
+        headers: response.headers,
+        status: response.status,
+        statusText: response.statusText
+      });
+    } finally {
+      release();
+    }
+  }) as typeof fetch;
+};
+
+/**
+ * Plugin form of `createConcurrencyLimitFetch`: installs the limited `fetch`
+ * on the client. `createWpGraphql({ maxConcurrentRequests })` does this for
+ * you, and also hands the limited `fetch` to the persisted-query executors.
+ */
+export const withConcurrencyLimit = (
+  params: ConcurrencyLimitFetchOptions
+): GraphqlClientPlugin => {
+  const fetchImpl = createConcurrencyLimitFetch(params);
+  return () => ({ fetch: fetchImpl });
+};
+
+// ---------------------------------------------------------------------------
 // Retry fetch (wraps a provided fetch — never calls global fetch)
 // ---------------------------------------------------------------------------
 
