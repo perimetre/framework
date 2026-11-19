@@ -86,6 +86,7 @@ describe('createTrustedDocumentExecutor', () => {
     expect(calls[1]?.init?.method).toBe('GET');
     expect(calls[1]?.url).toContain(`queryId=${GET_POSTS_HASH}`);
     expect(calls[1]?.url).toContain('edgeCache=120');
+    expect(calls[1]?.url).toMatch(/[?&]edgeWindow=\d+/);
 
     expect(meta.data).toEqual(GET_POSTS_DATA);
     expect(meta.transport).toBe('trusted-get');

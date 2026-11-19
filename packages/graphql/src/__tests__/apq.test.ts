@@ -362,6 +362,7 @@ describe('createApqExecutor', () => {
     );
     await execute.withMeta(GetPosts, undefined, { edgeCache: 300 });
     expect(calls[0]?.url).toContain('edgeCache=300');
+    expect(calls[0]?.url).toMatch(/[?&]edgeWindow=\d+/);
   });
 
   test('a ClientError from the client POST hands onResponse its headers and transport', async () => {
