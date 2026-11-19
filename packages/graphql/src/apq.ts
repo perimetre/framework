@@ -128,6 +128,12 @@ export type GraphqlRequestOptions = {
    * short (≈30–60s) for anything where staleness is user-visible. A
    * non-integer / negative TTL is dropped (the var stays part of the edge cache
    * key, so it must stay byte-stable).
+   *
+   * The TTL is enforced by the URL, not by the edge: a positive TTL also sends
+   * `edgeWindow=floor(now / ttl)`, because Cloudways' Varnish ignores the
+   * server's `s-maxage` and keeps copies for its own Cache Lifetime (see
+   * `applyEdgeCacheParam`). Set that Cache Lifetime to its minimum (4 hours)
+   * as a backstop.
    */
   edgeCache?: number;
   /**
@@ -333,6 +339,19 @@ export const persistedQueryClientError = (
   );
 
 /**
+ * Query param carrying the edge-cache time window (see
+ * {@link applyEdgeCacheParam}).
+ */
+export const EDGE_WINDOW_PARAM = 'edgeWindow';
+
+/**
+ * The longest TTL the server honours for `edgeCache`: Perimetre Core's
+ * `GraphQL\CacheControl` caps the requested value at 3600 s (`MAX_TTL`). The
+ * window follows the TTL the server actually sends, not the one requested.
+ */
+export const EDGE_CACHE_MAX_TTL = 3600;
+
+/**
  * Appends the shared edge-cache query param to a persisted-query URL when a
  * TTL is supplied. Shared by the APQ and Trusted Documents transports so the
  * param shape stays identical across both.
@@ -344,10 +363,27 @@ export const persistedQueryClientError = (
  * separate entries for `300`, `300.0`, etc. (and a fractional `max-age` is
  * meaningless anyway). A non-integer, non-finite, or negative TTL is dropped
  * rather than written as a bad cache directive.
+ *
+ * A positive TTL also adds `edgeWindow=floor(now / ttl)`, so the copy expires
+ * on time even when the edge ignores the TTL. Perimetre Core answers
+ * `edgeCache=N` with `s-maxage=N`, but the Varnish in front of WordPress on
+ * Cloudways ignores it and keeps the copy for the server's Varnish *Cache
+ * Lifetime* (default 30 days; measured: HITs at `age` 330 on `s-maxage=300`
+ * and 3640 on `s-maxage=3600`). Because the key is the full URL, a window
+ * number that changes every `ttl` seconds gives each window its own entry:
+ * every request in a window shares one copy, and the next window reads fresh.
+ * `floor`, not `now - ttl`, so the number is the same for every caller in the
+ * window. The window follows the TTL the server honours (capped at
+ * {@link EDGE_CACHE_MAX_TTL}), and `edgeCache=0` gets none.
+ * @param url - The persisted-query URL to add the params to.
+ * @param edgeCache - The requested TTL in seconds.
+ * @param now - The clock, read only when a window is added. Injectable for
+ *   tests.
  */
 export const applyEdgeCacheParam = (
   url: URL,
-  edgeCache: number | undefined
+  edgeCache: number | undefined,
+  now: () => number = Date.now
 ): void => {
   if (
     typeof edgeCache === 'number' &&
@@ -355,6 +391,13 @@ export const applyEdgeCacheParam = (
     edgeCache >= 0
   ) {
     url.searchParams.set('edgeCache', String(edgeCache));
+    if (edgeCache > 0) {
+      const ttl = Math.min(edgeCache, EDGE_CACHE_MAX_TTL);
+      url.searchParams.set(
+        EDGE_WINDOW_PARAM,
+        String(Math.floor(now() / 1000 / ttl))
+      );
+    }
   }
 };
 

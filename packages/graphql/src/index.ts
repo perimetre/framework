@@ -34,6 +34,8 @@ export {
   createApqExecutor,
   createExecutor,
   createPassthroughExecutor,
+  EDGE_CACHE_MAX_TTL,
+  EDGE_WINDOW_PARAM,
   errorResponseMeta,
   notifyResponse,
   postViaClient,
