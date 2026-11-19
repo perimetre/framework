@@ -8,25 +8,26 @@ APQ is **opt-in** (`apq: true`) and built around a `graphql-php`-compatible hash
 
 The package is opinionated about **what** goes in your `src/server/graphql/index.ts`, but every layer is opt-in. Pick the slice you need and ignore the rest.
 
-| Layer                                      | Use when…                                                                       |
-| ------------------------------------------ | ------------------------------------------------------------------------------- |
-| `createGraphqlClient`                      | You just want a `graphql-request` `GraphQLClient`.                              |
-| `withRequestLogger` / `withResponseLogger` | You want structured request/error logs (Sentry, console, pino).                 |
-| `withInstrumentedFetch`                    | You want DNS/TCP/TLS/TTFB phase timings per request.                            |
-| `withRetryFetch`                           | You want bounded retries on transient network/upstream failures.                |
-| `createApqExecutor`                        | APQ (learn-at-runtime) on `wp-graphql-smart-cache`.                             |
-| `createTrustedDocumentExecutor`            | Trusted Documents (safelist) — GET-by-id only, no runtime learn.                |
-| `parseGraphqlKeys`                         | You want to tag cached reads with WPGraphQL's `X-GraphQL-Keys`.                 |
-| `requestTimeoutMs` / `createTimeoutFetch`  | A hung CMS must fail in bounded time, in words Sentry won't filter.             |
-| `entryGraphqlKeys` / `collapseGraphqlKeys` | You tag entry reads with node keys, within Vercel's 128-tag budget.             |
-| `withLastGood`                             | Serve the last good response when the CMS fails or is slow (stale-if-error).    |
-| `@perimetre/graphql/wp-cache`              | Map Perimetre Core webhooks to cache tags; `/revalidate` handler; tag contract. |
-| `registerTrustedDocuments`                 | Pre-register the safelist on the CMS at deploy time.                            |
-| `trustedDocumentsCodegenHook`              | Register documents straight from your `codegen.ts` hooks.                       |
-| `createGraphqlTanstack`                    | You want `graphqlOptions` / `graphqlMutationOptions` helpers.                   |
-| `createWpGraphql`                          | You want a one-shot, batteries-included factory.                                |
-| `hashOperationForWpGraphqlSmartCache`      | You want a Smart Cache-compatible hasher for codegen.                           |
-| `printForWpGraphqlSmartCache`              | You want the raw `graphql-php`-compatible printer.                              |
+| Layer                                                   | Use when…                                                                          |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `createGraphqlClient`                                   | You just want a `graphql-request` `GraphQLClient`.                                 |
+| `withRequestLogger` / `withResponseLogger`              | You want structured request/error logs (Sentry, console, pino).                    |
+| `withInstrumentedFetch`                                 | You want DNS/TCP/TLS/TTFB phase timings per request.                               |
+| `withRetryFetch`                                        | You want bounded retries on transient network/upstream failures.                   |
+| `createApqExecutor`                                     | APQ (learn-at-runtime) on `wp-graphql-smart-cache`.                                |
+| `createTrustedDocumentExecutor`                         | Trusted Documents (safelist) — GET-by-id only, no runtime learn.                   |
+| `parseGraphqlKeys`                                      | You want to tag cached reads with WPGraphQL's `X-GraphQL-Keys`.                    |
+| `requestTimeoutMs` / `createTimeoutFetch`               | A hung CMS must fail in bounded time, in words Sentry won't filter.                |
+| `maxConcurrentRequests` / `createConcurrencyLimitFetch` | A herd of re-renders must not send the CMS more requests at once than it can take. |
+| `entryGraphqlKeys` / `collapseGraphqlKeys`              | You tag entry reads with node keys, within Vercel's 128-tag budget.                |
+| `withLastGood`                                          | Serve the last good response when the CMS fails or is slow (stale-if-error).       |
+| `@perimetre/graphql/wp-cache`                           | Map Perimetre Core webhooks to cache tags; `/revalidate` handler; tag contract.    |
+| `registerTrustedDocuments`                              | Pre-register the safelist on the CMS at deploy time.                               |
+| `trustedDocumentsCodegenHook`                           | Register documents straight from your `codegen.ts` hooks.                          |
+| `createGraphqlTanstack`                                 | You want `graphqlOptions` / `graphqlMutationOptions` helpers.                      |
+| `createWpGraphql`                                       | You want a one-shot, batteries-included factory.                                   |
+| `hashOperationForWpGraphqlSmartCache`                   | You want a Smart Cache-compatible hasher for codegen.                              |
+| `printForWpGraphqlSmartCache`                           | You want the raw `graphql-php`-compatible printer.                                 |
 
 ## Installation
 
@@ -429,16 +430,17 @@ export async function getPage(id: string) {
 
 **The package never calls Node's global `fetch` on its own.** That's deliberate: every project ends up wanting some combination of retries, observability wrapping, custom headers, abort-signal plumbing, or buyer-injection on the transport layer, and the cleanest way to support all of those is to make the consumer pass the `fetch` they want used.
 
-| API                             | `fetch` requirement                                                                                            |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `createGraphqlClient`           | Optional. If not provided, graphql-request uses its own built-in fetch.                                        |
-| `withInstrumentedFetch`         | Required — it wraps whatever you pass.                                                                         |
-| `withRetryFetch`                | Required — it wraps whatever you pass.                                                                         |
-| `createTimeoutFetch`            | Required — it wraps whatever you pass.                                                                         |
-| `createApqExecutor`             | Required — APQ makes raw POST/GET calls outside graphql-request.                                               |
-| `createTrustedDocumentExecutor` | Required — makes raw GET calls outside graphql-request.                                                        |
-| `registerTrustedDocuments`      | Required — pushes register mutations to the CMS.                                                               |
-| `createWpGraphql`               | Required when `apq` / `trustedDocuments` / `requestTimeoutMs` / `logger` / `startSpan` are set; else optional. |
+| API                             | `fetch` requirement                                                                                                                      |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `createGraphqlClient`           | Optional. If not provided, graphql-request uses its own built-in fetch.                                                                  |
+| `withInstrumentedFetch`         | Required — it wraps whatever you pass.                                                                                                   |
+| `withRetryFetch`                | Required — it wraps whatever you pass.                                                                                                   |
+| `createTimeoutFetch`            | Required — it wraps whatever you pass.                                                                                                   |
+| `createConcurrencyLimitFetch`   | Required — it wraps whatever you pass.                                                                                                   |
+| `createApqExecutor`             | Required — APQ makes raw POST/GET calls outside graphql-request.                                                                         |
+| `createTrustedDocumentExecutor` | Required — makes raw GET calls outside graphql-request.                                                                                  |
+| `registerTrustedDocuments`      | Required — pushes register mutations to the CMS.                                                                                         |
+| `createWpGraphql`               | Required when `apq` / `trustedDocuments` / `requestTimeoutMs` / `maxConcurrentRequests` / `logger` / `startSpan` are set; else optional. |
 
 Pass `globalThis.fetch` if you're happy with the built-in. Compose freely:
 
@@ -541,6 +543,46 @@ export const { executeGraphqlRequest } = createWpGraphql({
 - Pick it well under the platform limit and generous enough for a cold heavy query. Reads with a stale copy should not wait this long — see `withLastGood` — so this limit is for reads that have no copy and for the background refresh.
 
 The same wrapper is available on its own: `createTimeoutFetch({ fetch, timeoutMs, enabled?, messagePrefix? })` and the plugin `withRequestTimeout(…)` from `@perimetre/graphql/middlewares`.
+
+## Concurrency limit (server)
+
+A CMS behind PHP-FPM answers a handful of uncached reads at once and queues the rest, each one slower. After a broad cache flush (a menu or a site option saved), every route re-renders together and asks for the same shared data, which can send the CMS several times what it takes: it slows for every site on the server, and a firewall such as Imunify360 can ban the frontend's IPs. `maxConcurrentRequests` caps how many requests a process sends the CMS at once; the rest wait in line, in order.
+
+**It is off unless you set it.** Read the limit from an env var the app owns; unset or empty means no limit, and nothing is wrapped:
+
+```ts
+import { PHASE_PRODUCTION_BUILD } from 'next/constants';
+
+// Unset or empty: no limit. Anything else must be a positive integer (the
+// package throws otherwise, so a typo fails loudly at startup).
+const maxConcurrentRequests = process.env.CMS_MAX_CONCURRENCY
+  ? Number(process.env.CMS_MAX_CONCURRENCY)
+  : undefined;
+
+export const { executeGraphqlRequest } = createWpGraphql({
+  apq: true,
+  endpoint,
+  fetch: globalThis.fetch,
+  maxConcurrentRequests,
+  concurrencyLimit: {
+    // No limit during `next build`: `staticGenerationMaxConcurrency` already
+    // bounds the build, and a queue would only lengthen it.
+    enabled: () => process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD
+  },
+  persistedDocuments,
+  requestTimeoutMs: 15_000
+});
+```
+
+- **Every request the bundle sends** goes through it: the persisted-query GET, the register POST and the client POST.
+- **Per process, shared across bundles.** Next.js evaluates `src/server/graphql/index.ts` once per server bundle (each page, each route handler), so the limit is kept per process under a `scope`, the endpoint by default: every bundle reading that CMS shares one limit. Pass `concurrencyLimit.scope` to share it differently. Bundles sharing a scope must set the same limit; a mismatch throws.
+- **Not across a fleet.** On Vercel each function instance has its own limit, so N busy instances can still send N × the limit. What keeps a herd rare is caching with no time floor (see `wp-cache`), not this.
+- **Waiting counts against the timeout.** The limit sits inside `requestTimeoutMs`, so a request that waits too long in line fails with the usual `RequestTimeoutError` and never reaches the CMS. A caller's own `signal` is honoured in line too. Because the body is read inside the limit, a body still streaming when the timeout expires also fails with `RequestTimeoutError` (without the limit, it rejects with the platform's abort error).
+- **A slot covers the request and the read of its body**, so the response is read whole before it is returned (a GraphQL answer is small JSON); a response nobody reads still frees its slot. A slot comes back on every path: answer, error, abort, and `concurrencyLimit.holdLimitMs`, an optional backstop for a request with no deadline (with `requestTimeoutMs` set, the timeout already bounds it).
+- **Server-only.** In a browser (`window` defined) requests go out unchanged. **`enabled`** is evaluated per request.
+- **Picking the number.** Stay under the point where the CMS starts queueing: on a Cloudways PHP-FPM stack, six uncached reads at once already took 4–5× their solo time (measured on stelpro-us). One render's fan-out (a layout's parallel reads) only waits a round trip more under a lower limit; it never deadlocks, because a slot is held for one request, never while waiting on another.
+
+The same wrapper is available on its own: `createConcurrencyLimitFetch({ fetch, maxConcurrent, enabled?, holdLimitMs?, scope? })` and the plugin `withConcurrencyLimit(…)` from `@perimetre/graphql/middlewares`. Without a `scope`, a standalone limiter counts only its own requests.
 
 ## Stale-if-error: `withLastGood`
 
@@ -777,18 +819,18 @@ You normally don't call it directly — `wpGraphqlSmartCachePresetConfig()` wire
 
 ## Subpath exports
 
-| Import path                            | Exports                                                                                                                                                                                                |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `@perimetre/graphql`                   | `createGraphqlClient`, `createWpGraphql`, `createPassthroughExecutor`, `createApqExecutor`, `createTrustedDocumentExecutor`, `registerTrustedDocuments`, `TrustedDocumentNotRegisteredError`, types    |
-| `@perimetre/graphql/middlewares`       | `withRequestLogger`, `withResponseLogger`, `withInstrumentedFetch`, `withRetryFetch`, `withRequestTimeout`, `createInstrumentedFetch`, `createRetryFetch`, `createTimeoutFetch`, `RequestTimeoutError` |
-| `@perimetre/graphql/tanstack`          | `createGraphqlTanstack`                                                                                                                                                                                |
-| `@perimetre/graphql/apq`               | `createApqExecutor`, `createPassthroughExecutor`, `errorResponseMeta`                                                                                                                                  |
-| `@perimetre/graphql/trusted-documents` | `createTrustedDocumentExecutor`, `registerTrustedDocuments`, `TrustedDocumentNotRegisteredError`                                                                                                       |
-| `@perimetre/graphql/codegen`           | `hashOperationForWpGraphqlSmartCache`, `wpGraphqlSmartCachePresetConfig`, `printForWpGraphqlSmartCache`, `trustedDocumentsCodegenHook`                                                                 |
-| `@perimetre/graphql/keys`              | `parseGraphqlKeys`, `collapseGraphqlKeys`, `entryGraphqlKeys`, `hasGraphqlNodeKeys`, `decodeRelayId`, `GRAPHQL_UNKNOWN_DEPENDENCIES`, `GRAPHQL_KEYS_HEADER`                                            |
-| `@perimetre/graphql/print`             | `printForWpGraphqlSmartCache`                                                                                                                                                                          |
-| `@perimetre/graphql/last-good`         | `withLastGood`, `isEmptyGraphqlAnswer`, `stableStringify`, types                                                                                                                                       |
-| `@perimetre/graphql/wp-cache`          | `createInvalidation`, `createRevalidateHandler`, `parseWebhookPayload`, `WP_CACHE_TAGS`, `assertTagContract`, `post`, `wpRelayId`, types                                                               |
+| Import path                            | Exports                                                                                                                                                                                                                                                       |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@perimetre/graphql`                   | `createGraphqlClient`, `createWpGraphql`, `createPassthroughExecutor`, `createApqExecutor`, `createTrustedDocumentExecutor`, `registerTrustedDocuments`, `TrustedDocumentNotRegisteredError`, types                                                           |
+| `@perimetre/graphql/middlewares`       | `withRequestLogger`, `withResponseLogger`, `withInstrumentedFetch`, `withRetryFetch`, `withRequestTimeout`, `withConcurrencyLimit`, `createInstrumentedFetch`, `createRetryFetch`, `createTimeoutFetch`, `createConcurrencyLimitFetch`, `RequestTimeoutError` |
+| `@perimetre/graphql/tanstack`          | `createGraphqlTanstack`                                                                                                                                                                                                                                       |
+| `@perimetre/graphql/apq`               | `createApqExecutor`, `createPassthroughExecutor`, `errorResponseMeta`                                                                                                                                                                                         |
+| `@perimetre/graphql/trusted-documents` | `createTrustedDocumentExecutor`, `registerTrustedDocuments`, `TrustedDocumentNotRegisteredError`                                                                                                                                                              |
+| `@perimetre/graphql/codegen`           | `hashOperationForWpGraphqlSmartCache`, `wpGraphqlSmartCachePresetConfig`, `printForWpGraphqlSmartCache`, `trustedDocumentsCodegenHook`                                                                                                                        |
+| `@perimetre/graphql/keys`              | `parseGraphqlKeys`, `collapseGraphqlKeys`, `entryGraphqlKeys`, `hasGraphqlNodeKeys`, `decodeRelayId`, `GRAPHQL_UNKNOWN_DEPENDENCIES`, `GRAPHQL_KEYS_HEADER`                                                                                                   |
+| `@perimetre/graphql/print`             | `printForWpGraphqlSmartCache`                                                                                                                                                                                                                                 |
+| `@perimetre/graphql/last-good`         | `withLastGood`, `isEmptyGraphqlAnswer`, `stableStringify`, types                                                                                                                                                                                              |
+| `@perimetre/graphql/wp-cache`          | `createInvalidation`, `createRevalidateHandler`, `parseWebhookPayload`, `WP_CACHE_TAGS`, `assertTagContract`, `post`, `wpRelayId`, types                                                                                                                      |
 
 The `tanstack` subpath is the only one that pulls in `@tanstack/react-query`. Server-only modules can import everything else without dragging the React tree in. The `apq`, `trusted-documents`, `keys`, `last-good`, `wp-cache` and `print` subpaths are pure (no `node:` builtins) and run anywhere; the `codegen` subpath imports `node:crypto` + `node:fs/promises` (Node-only — it's for your `codegen.ts` / deploy scripts).
 

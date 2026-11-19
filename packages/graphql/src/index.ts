@@ -13,10 +13,12 @@ import {
   type GraphqlClientPlugin
 } from './client.js';
 import {
+  createConcurrencyLimitFetch,
   createTimeoutFetch,
   withInstrumentedFetch,
   withRequestLogger,
   withResponseLogger,
+  type ConcurrencyLimitFetchOptions,
   type StartSpanFn,
   type TimeoutFetchOptions
 } from './middlewares.js';
@@ -85,8 +87,10 @@ export {
   type LastGoodStore
 } from './last-good.js';
 export {
+  createConcurrencyLimitFetch,
   createTimeoutFetch,
   RequestTimeoutError,
+  type ConcurrencyLimitFetchOptions,
   type TimeoutFetchOptions
 } from './middlewares.js';
 export {
@@ -139,6 +143,10 @@ export type WpGraphqlBundle = {
  *      of time via `registerTrustedDocuments`. An unknown id is a hard error,
  *      never learned at runtime.
  *
+ * Origin protection, server-only and opt-in: `requestTimeoutMs` (a hard limit
+ * per request) and `maxConcurrentRequests` (the most requests in flight at
+ * once, per process).
+ *
  * Every layer is opt-in. The full toolkit (logging, retry, instrumented
  * fetch, TanStack helpers) works **with or without** a persisted-query
  * transport — neither APQ nor Trusted Documents is an implicit side effect of
@@ -166,10 +174,12 @@ export const createWpGraphql = ({
   apq = false,
   apqPostFallback,
   captureException,
+  concurrencyLimit,
   debug = false,
   endpoint,
   fetch: callerFetch,
   logger,
+  maxConcurrentRequests,
   options,
   persistedDocuments,
   plugins = [],
@@ -201,6 +211,16 @@ export const createWpGraphql = ({
     error: unknown,
     context?: { tags?: Record<string, string> }
   ) => void;
+  /**
+   * Tunes `maxConcurrentRequests`: `enabled` (evaluated per request — e.g. off
+   * during `next build`), `holdLimitMs`, and `scope` (default: `endpoint`, so
+   * every bundle reading this CMS in one process shares one limit). See
+   * `createConcurrencyLimitFetch`.
+   */
+  concurrencyLimit?: Pick<
+    ConcurrencyLimitFetchOptions,
+    'enabled' | 'holdLimitMs' | 'scope'
+  >;
   /** If true, also dump query/variables at debug level. */
   debug?: boolean;
   /** WPGraphQL endpoint URL (required). */
@@ -214,6 +234,15 @@ export const createWpGraphql = ({
   fetch?: typeof fetch;
   /** Optional structured logger (Sentry, console, pino…). */
   logger?: GraphqlLogger;
+  /**
+   * The most requests this bundle sends at once, per process (persisted-query
+   * GET, register POST, client POST); the rest wait in line, in order.
+   * Server-only — ignored in the browser. Unset: no limit, and nothing is
+   * wrapped. Read it from an env var the app owns, unset or empty meaning
+   * off. Time spent waiting counts against `requestTimeoutMs`. Requires
+   * `fetch`. See `createConcurrencyLimitFetch`.
+   */
+  maxConcurrentRequests?: number;
   /** Extra `graphql-request` options merged after all plugins. */
   options?: GraphqlClientOptions;
   /**
@@ -279,16 +308,32 @@ export const createWpGraphql = ({
       '@perimetre/graphql: createWpGraphql requires `fetch` when `requestTimeoutMs` is set (the timeout wraps it).'
     );
   }
+  if (maxConcurrentRequests !== undefined && !callerFetch) {
+    throw new Error(
+      '@perimetre/graphql: createWpGraphql requires `fetch` when `maxConcurrentRequests` is set (the limit wraps it).'
+    );
+  }
   // Every transport below — the client's POST and the persisted-query GETs —
-  // goes through the timed fetch, so no CMS request can outlive the limit.
-  const fetchImpl =
-    callerFetch && requestTimeoutMs !== undefined
-      ? createTimeoutFetch({
-          ...requestTimeout,
+  // goes through the limited, then timed, fetch: at most
+  // `maxConcurrentRequests` CMS requests at once, and none outlives the
+  // timeout, time spent waiting for a slot included.
+  const limitedFetch =
+    callerFetch && maxConcurrentRequests !== undefined
+      ? createConcurrencyLimitFetch({
+          ...concurrencyLimit,
           fetch: callerFetch,
-          timeoutMs: requestTimeoutMs
+          maxConcurrent: maxConcurrentRequests,
+          scope: concurrencyLimit?.scope ?? endpoint
         })
       : callerFetch;
+  const fetchImpl =
+    limitedFetch && requestTimeoutMs !== undefined
+      ? createTimeoutFetch({
+          ...requestTimeout,
+          fetch: limitedFetch,
+          timeoutMs: requestTimeoutMs
+        })
+      : limitedFetch;
 
   const stack: GraphqlClientPlugin[] = [...plugins];
   if (logger) {
@@ -300,7 +345,7 @@ export const createWpGraphql = ({
   if ((logger || startSpan) && fetchImpl) {
     stack.push(withInstrumentedFetch({ fetch: fetchImpl, logger, startSpan }));
   } else if (fetchImpl && fetchImpl !== callerFetch) {
-    // No instrumentation to carry it: install the timed fetch on its own.
+    // No instrumentation to carry it: install the wrapped fetch on its own.
     stack.push(() => ({ fetch: fetchImpl }));
   }
 
