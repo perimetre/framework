@@ -23,7 +23,8 @@ Shared packages, configurations, and architectural patterns for Perimetre projec
 
 ### Component Libraries
 
-- `@perimetre/ui` - Reusable React component library with brand-aware theming built on Tailwind CSS v4 and Radix UI primitives
+- `@perimetre/ui-behaviors` - Unstyled, accessible UI behaviours built on [UI SDK](https://ui-sdk.dev): magnify, sequence, locator, and Google Places and Maps. Use this, with UI SDK, for new work
+- `@perimetre/ui` - React component library with brand-aware theming built on Tailwind CSS v4 and Radix UI primitives. Deprecated for new work in favour of `@perimetre/ui-behaviors`; kept for the projects that already use it
 
 ## Documentation
 
@@ -37,6 +38,7 @@ Working example projects:
 
 - `examples/trpc/` - Full tRPC + service layer implementation
 - `examples/tanstack-query-and-graphql/` - GraphQL + TanStack Query integration
+- `examples/ui-sdk-forms/` - React Hook Form + Zod with UI SDK form controls
 
 ## Setup for Contributors
 

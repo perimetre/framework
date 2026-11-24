@@ -33,7 +33,8 @@ framework/
 ├── .github/workflows/                    # CI/CD pipelines
 ├── examples/                            # Working example projects
 │   ├── trpc/                            # Full tRPC + service layer example
-│   └── tanstack-query-and-graphql/      # GraphQL + TanStack Query example
+│   ├── tanstack-query-and-graphql/      # GraphQL + TanStack Query example
+│   └── ui-sdk-forms/                    # React Hook Form + UI SDK form controls
 ├── packages/                            # Published packages
 │   ├── eslint-config-base/              # Base ESLint rules
 │   ├── eslint-config-nextjs/            # Next.js ESLint config
@@ -46,7 +47,8 @@ framework/
 │   ├── helpers/                         # Shared TypeScript utilities
 │   ├── icons/                           # Accessible React icon wrapper
 │   ├── classnames/                      # Classname utility (clsx + tailwind-merge)
-│   └── ui/                              # React component library (brand-aware)
+│   ├── ui/                              # React component library (brand-aware, deprecated for new work)
+│   └── ui-behaviors/                    # Unstyled UI behaviours on UI SDK (replaces ui)
 ├── package.json                         # Root package (private)
 ├── pnpm-workspace.yaml                  # Workspace configuration
 ├── turbo.json                           # Turborepo pipeline config
@@ -130,7 +132,8 @@ Each package has:
 
 ### Component Libraries
 
-- **@perimetre/ui** - React component library with brand-aware theming built on Tailwind CSS v4 and Radix UI primitives. Supports visual polymorphism across multiple brands (Acorn, Sprig, Stelpro) with three-tier design token system
+- **@perimetre/ui-behaviors** - Unstyled, accessible UI behaviours built on UI SDK (https://ui-sdk.dev). Replaces `@perimetre/ui` for new work: use UI SDK directly for what it covers (accordion, tabs, drawer, carousel, form controls) and this package for what it lacks. One entry per behaviour, no root import: `magnify`, `sequence`, `locator`, and `google` (Places autocomplete and Maps, the one entry tied to a product). Ships no styles, tokens or brands. UI SDK is in beta and pinned to an exact version: when working on this package, check the "Status" table in its README against `npm view @ui-sdk/react version`, and follow `packages/ui-behaviors/docs/updating-ui-sdk.md` if UI SDK has moved on or the last review is over a month old. See `packages/ui-behaviors/README.md` and `packages/ui-behaviors/docs/migrating-from-perimetre-ui.md`
+- **@perimetre/ui** - React component library with brand-aware theming built on Tailwind CSS v4 and Radix UI primitives. Supports visual polymorphism across multiple brands (Acorn, Sprig, Stelpro) with three-tier design token system. **Deprecated for new work**: kept published and working for the projects that use it, with no new components
 
 ### Package Relationships
 
@@ -190,6 +193,18 @@ GraphQL integration with:
 
 **Key files**: See `examples/tanstack-query-and-graphql/README.md` for details
 
+### UI SDK Forms Example (`examples/ui-sdk-forms/`)
+
+React Hook Form + Zod with UI SDK form controls:
+
+- `register()` for `Input`, `Textarea` and a native `<select>`
+- `Controller` for `Checkbox`, `RadioGroup`, `Select` and `Combobox`
+- Errors through `Field invalid` and `FieldError`
+
+Standalone, not part of the pnpm workspace: install with `pnpm install --ignore-workspace`.
+
+**Key files**: See `examples/ui-sdk-forms/README.md` for details
+
 ## Important Notes
 
 - Configuration packages are configs only (no `dev` scripts needed)
@@ -230,10 +245,11 @@ pnpm release              # Build + publish (usually in CI)
 
 ## Current State
 
-- 13 published packages (7 configs + 4 utilities + 1 component library)
+- 14 published packages (7 configs + 4 utilities + 2 component libraries)
 - CI/CD pipelines with automated releases
 - Pattern guides maintained in the ai-toolkit repo (`perimetre-apps` plugin)
-- Working examples for tRPC and GraphQL patterns
+- Working examples for tRPC, GraphQL and UI SDK form patterns
+- `@perimetre/ui-behaviors` replaces `@perimetre/ui` for new work
 - Authentication via GitHub CLI for developers
 
 **For contributing and commit guidelines**: `@CONTRIBUTING.md`

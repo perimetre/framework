@@ -1,0 +1,39 @@
+{
+  "dependencies": {
+    "@hookform/resolvers": "7.0.9",
+    "@ui-sdk/core": "0.1.0-beta.17",
+    "@ui-sdk/react": "0.1.0-beta.17",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-hook-form": "7.92.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@perimetre/eslint-config-base": "^0.2.9",
+    "@perimetre/eslint-config-nextjs": "^1.0.0",
+    "@perimetre/eslint-config-react": "^0.1.4",
+    "@perimetre/prettier-config": "^0.0.7",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^24",
+    "@types/react": "^19.3.1",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "license": "GPL-3.0",
+  "name": "ui-sdk-forms-example",
+  "prettier": "@perimetre/prettier-config",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "eslint",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "version": "0.1.0"
+}

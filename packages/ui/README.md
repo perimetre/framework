@@ -1,5 +1,9 @@
 # @perimetre/ui
 
+> **Deprecated for new work.** Use [`@perimetre/ui-behaviors`](../ui-behaviors) with [UI SDK](https://ui-sdk.dev) instead. `@perimetre/ui` stays published and working for the projects that already use it, but it gets no new components.
+>
+> [Migrating from @perimetre/ui](../ui-behaviors/docs/migrating-from-perimetre-ui.md) lists what each component here becomes.
+
 A React component library with composable, brand-aware theming built on Tailwind CSS v4 and Radix UI primitives.
 
 ## Features
@@ -78,7 +82,9 @@ PUI tokens are available as CSS custom properties on any element under `[data-pu
 ```html
 <!-- PUI semantic tokens (recommended) -->
 <p class="text-pui-fg-default bg-pui-surface-primary">...</p>
-<button class="bg-pui-button-primary-fill text-pui-interactive-on-primary">...</button>
+<button class="bg-pui-button-primary-fill text-pui-interactive-on-primary">
+  ...
+</button>
 
 <!-- PUI primitive scales (for brand-specific values not covered by semantics) -->
 <div class="bg-pui-primary-9 text-pui-overlay-1">...</div>

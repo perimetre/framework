@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    // Enable composite builds for project references
+    "composite": true,
+
+    // Generate source maps for debugging
+    "declarationMap": true,
+    // Emit both .js and .d.ts files (override base's emitDeclarationOnly: true)
+    "emitDeclarationOnly": false,
+
+    // JSX configuration for React
+    "jsx": "react-jsx",
+
+    // Include DOM types
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+
+    // Output and source directories
+    "outDir": "./dist",
+
+    // Keep comments: the "use client" directive and JSDoc must survive
+    "removeComments": false,
+    "rootDir": "./src",
+    "sourceMap": true
+  },
+  "exclude": ["node_modules", "dist"],
+  "extends": "../../tsconfig.base.json",
+  "include": ["src/**/*"]
+}
