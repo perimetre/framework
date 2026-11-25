@@ -59,6 +59,20 @@ const eslintConfig = defineConfig([
     rules: {
       'react/prop-types': 'off'
     }
+  },
+  // A deprecated package, built on what the conventions now ban
+  {
+    rules: {
+      'no-restricted-imports': 'off',
+      'no-restricted-properties': 'off'
+    }
+  },
+  // The package's existing casts predate this rule. Each needs a reason or a
+  // fix before it is turned on here
+  {
+    rules: {
+      '@typescript-eslint/no-unsafe-type-assertion': 'off'
+    }
   }
 ]);
 

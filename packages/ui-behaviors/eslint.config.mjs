@@ -1,4 +1,4 @@
-import base from '@perimetre/eslint-config-base';
+import base, { restrictedImports } from '@perimetre/eslint-config-base';
 import end from '@perimetre/eslint-config-base/end';
 import react from '@perimetre/eslint-config-react';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
@@ -19,12 +19,13 @@ const eslintConfig = defineConfig([
     }
     return config;
   }),
-  // The deprecated packages point here. Nothing here points back.
+  // The deprecated packages point here. Nothing here points back. The base
+  // config bans them too; this keeps the package's own message
   {
     rules: {
       'no-restricted-imports': [
         'error',
-        {
+        restrictedImports({
           patterns: [
             {
               group: [
@@ -39,7 +40,7 @@ const eslintConfig = defineConfig([
                 'Deprecated. @perimetre/ui-behaviors must not depend on it.'
             }
           ]
-        }
+        })
       ]
     }
   },

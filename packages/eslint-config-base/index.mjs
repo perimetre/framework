@@ -1,13 +1,27 @@
 import { FlatCompat } from '@eslint/eslintrc';
 import eslint from '@eslint/js';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
+import importX from 'eslint-plugin-import-x';
 import jsdoc from 'eslint-plugin-jsdoc';
 import eslintPluginJsonc from 'eslint-plugin-jsonc';
 import perfectionist from 'eslint-plugin-perfectionist';
 import playwright from 'eslint-plugin-playwright';
+import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import { dirname } from 'path';
 import tseslint from 'typescript-eslint';
 import { fileURLToPath } from 'url';
+import {
+  cachedFailureSyntax,
+  NAV_LINK_FILES,
+  okFalseSyntax,
+  restrictedImports,
+  restrictedProperties,
+  restrictedSyntax,
+  SERVER_FILES
+} from './restrictions.mjs';
+
+export { restrictedImports, restrictedSyntax } from './restrictions.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -103,22 +117,62 @@ export default defineConfig(
           fixStyle: 'inline-type-imports'
         }
       ],
-      '@typescript-eslint/no-restricted-imports': [
+      // The core rule, not typescript-eslint's: a project's own
+      // `@typescript-eslint/no-restricted-imports` list, which the ai-toolkit
+      // setup writes, then adds to ours instead of replacing it
+      'no-restricted-imports': ['error', restrictedImports()],
+      // No `as` on network, DB or CMS data; any other `as` says why
+      // (app-best-practices: typescript/index.md, code-hygiene/index.md)
+      '@typescript-eslint/no-unsafe-type-assertion': 'warn',
+      'no-restricted-properties': ['error', ...restrictedProperties]
+    }
+  },
+  {
+    // The one file that wraps next/link
+    files: NAV_LINK_FILES,
+    rules: {
+      'no-restricted-imports': ['error', restrictedImports({ navLink: false })]
+    }
+  },
+
+  // Rules every file follows. Our conventions come from the ai-toolkit
+  // `app-best-practices` skill, and each rule names the topic it enforces:
+  // https://github.com/perimetre/ai-toolkit/blob/main/plugins/perimetre-apps/skills/app-best-practices
+  {
+    plugins: {
+      'import-x': importX,
+      unicorn: eslintPluginUnicorn
+    },
+    rules: {
+      // No circular deps (app-best-practices: services/index.md)
+      'import-x/no-cycle': 'error',
+      'no-restricted-syntax': ['error', ...restrictedSyntax],
+      // A disable comment names the rules it disables
+      // (app-best-practices: code-hygiene/index.md)
+      'unicorn/no-abusive-eslint-disable': 'error'
+    },
+    settings: {
+      // TypeScript's extensions and parser, so import-x follows .ts imports
+      ...Object.fromEntries(
+        Object.entries(importX.flatConfigs.typescript.settings).filter(
+          ([key]) => key !== 'import-x/resolver'
+        )
+      ),
+      'import-x/resolver-next': [createTypeScriptImportResolver()]
+    }
+  },
+  {
+    // A server domain's own files reach into each other
+    files: SERVER_FILES,
+    rules: {
+      'no-restricted-imports': [
         'error',
-        {
-          paths: [
-            {
-              message:
-                'Prefer importing individual functions from "lodash". Eg. import uniqBy from "lodash/uniqBy"',
-              name: 'lodash'
-            },
-            {
-              message: 'Use dayjs instead',
-              name: 'moment'
-            }
-          ],
-          patterns: []
-        }
+        restrictedImports({ serverBoundary: false })
+      ],
+      'no-restricted-syntax': [
+        'error',
+        ...restrictedSyntax,
+        ...cachedFailureSyntax
       ]
     }
   },
@@ -192,7 +246,12 @@ export default defineConfig(
       '**/*.spec.tsx'
     ],
     rules: {
-      ...playwright.configs['flat/recommended'].rules
+      ...playwright.configs['flat/recommended'].rules,
+      // Mocks return { ok: false } for fetch's Response
+      'no-restricted-syntax': [
+        'error',
+        ...restrictedSyntax.filter((entry) => !okFalseSyntax.includes(entry))
+      ]
     }
   }
 );

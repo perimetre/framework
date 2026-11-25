@@ -34,6 +34,22 @@ export default [
       files: ['packages/ui/**/*.{jsx,tsx}']
     };
   }),
+  // The deprecated libraries are built on what the conventions now ban
+  {
+    files: ['packages/ui/**', 'packages/icons/**'],
+    rules: {
+      'no-restricted-imports': 'off',
+      'no-restricted-properties': 'off'
+    }
+  },
+  // The deprecated packages' casts predate this rule. Each needs a reason or a fix
+  // before it is turned on there
+  {
+    files: ['packages/tokens/**', 'packages/ui/**'],
+    rules: {
+      '@typescript-eslint/no-unsafe-type-assertion': 'off'
+    }
+  },
   // Disable JSDoc requirements for story files (Storybook/Ladle documentation)
   {
     files: ['**/*.stories.ts', '**/*.stories.tsx'],
