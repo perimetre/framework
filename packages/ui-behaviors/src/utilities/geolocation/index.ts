@@ -1,15 +1,37 @@
 import type { GeoPosition } from '../geo/index.js';
 
 /**
- * How a request for the user's position ended.
+ * How a request for the user's position ended: the position, or a
+ * `GeolocationError`. Narrow with `'ok' in result`.
+ */
+export type GeolocationResult =
+  | { ok: true; position: GeoPosition }
+  | GeolocationError;
+
+/**
+ * Why a request for the user's position failed.
  *
  * - `denied`: the user or the browser's settings refused.
  * - `unavailable`: the browser has no geolocation, or could not find a
  *   position in time.
  */
-export type GeolocationResult =
-  | { ok: false; reason: 'denied' | 'unavailable' }
-  | { ok: true; position: GeoPosition };
+export class GeolocationError extends Error {
+  override name = 'GeolocationError';
+  readonly reason: 'denied' | 'unavailable';
+
+  /**
+   * Records why no position came back.
+   * @param reason - `denied` or `unavailable`
+   */
+  constructor(reason: 'denied' | 'unavailable') {
+    super(
+      reason === 'denied'
+        ? 'The user or the browser refused to share the position'
+        : 'The browser could not give a position'
+    );
+    this.reason = reason;
+  }
+}
 
 /**
  * Asks the browser for the user's position, as a value and never a throw.
@@ -23,23 +45,23 @@ export const requestGeolocation = (options?: PositionOptions) =>
     const geolocation: Geolocation | null | undefined =
       typeof navigator === 'undefined' ? undefined : navigator.geolocation;
     if (!geolocation) {
-      resolve({ ok: false, reason: 'unavailable' });
+      resolve(new GeolocationError('unavailable'));
       return;
     }
 
     geolocation.getCurrentPosition(
       ({ coords }) => {
         resolve({
-          ok: true,
+          ok: true as const,
           position: { lat: coords.latitude, lng: coords.longitude }
         });
       },
       (error) => {
-        resolve({
-          ok: false,
-          reason:
+        resolve(
+          new GeolocationError(
             error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable'
-        });
+          )
+        );
       },
       options
     );

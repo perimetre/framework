@@ -1,9 +1,12 @@
 import { importLibrary } from '@googlemaps/js-api-loader';
 
-/** How fetching a chosen place's details ended. */
+/**
+ * How fetching a chosen place's details ended: the place, or a
+ * `PlaceDetailsError`. Narrow with `'ok' in result`.
+ */
 export type PlaceDetailsResult =
-  | { error: unknown; ok: false }
-  | { ok: true; place: google.maps.places.Place };
+  | { ok: true; place: google.maps.places.Place }
+  | PlaceDetailsError;
 
 /**
  * What narrows the suggestions: Google's own request, without the text and
@@ -34,6 +37,19 @@ export type PlaceSuggestion = {
   /** The place ID. Identifies the suggestion. */
   value: string;
 };
+
+/** Fetching a chosen place's details failed. `cause` holds Google's error. */
+export class PlaceDetailsError extends Error {
+  override name = 'PlaceDetailsError';
+
+  /**
+   * Wraps the error Google's request threw.
+   * @param cause - What Google threw
+   */
+  constructor(cause: unknown) {
+    super("Could not fetch the chosen place's details", { cause });
+  }
+}
 
 /**
  * Copies what a list needs out of Google's prediction.
@@ -123,9 +139,9 @@ export const createPlacesSession = (
       const place = suggestion.prediction.toPlace();
       try {
         await place.fetchFields({ fields });
-        return { ok: true, place };
+        return { ok: true as const, place };
       } catch (error) {
-        return { error, ok: false };
+        return new PlaceDetailsError(error);
       } finally {
         // A token must not be reused once details were asked for with it.
         token = null;

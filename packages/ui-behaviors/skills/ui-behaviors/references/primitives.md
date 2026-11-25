@@ -81,7 +81,7 @@ A list of places linked to their markers on a map. Hover or focus on one side hi
 - Leave `item-trigger` out when each place links to a page of its own.
 - An item's `children` function gets `{ selected, highlighted, inView, distance }`. `distance` is metres from `origin`.
 - Sort the places before rendering, on the server when the origin is known there: `sortByDistance(stores, origin, (store) => store.position)` from `utilities/geo`.
-- For the user's position, call `requestGeolocation()` from `utilities/geolocation` in a press handler. It resolves `{ ok: true, position }` or `{ ok: false, reason }` and never throws.
+- For the user's position, call `requestGeolocation()` from `utilities/geolocation` in a press handler. It resolves `{ ok: true, position }` or a `GeolocationError` with a `reason`, and never throws. Narrow with `'ok' in result`.
 - Whatever draws the map gets the locator's controller: `createLocatorController()`, passed to the root's `controller` and to the map code. It reports the visible area with `controller.setBounds(bounds, { reason: 'map-move' })` each time the map comes to rest. [google.md](google.md) does this for Google Maps.
 
 Story: `src/primitives/locator/locator.stories.tsx`.

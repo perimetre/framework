@@ -49,7 +49,8 @@ export const Places: Story = () => {
           return;
         }
         void places.select(chosen, ['location']).then((result) => {
-          if (result.ok) setLocation(JSON.stringify(result.place.location));
+          if ('ok' in result)
+            setLocation(JSON.stringify(result.place.location));
         });
       }}
     >

@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { requestGeolocation } from './index';
+import { GeolocationError, requestGeolocation } from './index';
 
 /**
  * Stands in for the browser's geolocation.
@@ -12,15 +12,46 @@ const browser = (getCurrentPosition: Geolocation['getCurrentPosition']) => {
   });
 };
 
+/** A position the browser could report, in Montréal. */
+const montreal = {
+  coords: {
+    accuracy: 10,
+    altitude: null,
+    altitudeAccuracy: null,
+    heading: null,
+    latitude: 45.5,
+    longitude: -73.57,
+    speed: null,
+    /**
+     * Unused by the code under test.
+     * @returns An empty object
+     */
+    toJSON: () => ({})
+  },
+  timestamp: 0,
+  /**
+   * Unused by the code under test.
+   * @returns An empty object
+   */
+  toJSON: () => ({})
+} satisfies GeolocationPosition;
+
+/** The error a browser reports when the user refuses. */
+const refusal = {
+  code: 1,
+  message: 'User denied Geolocation',
+  PERMISSION_DENIED: 1,
+  POSITION_UNAVAILABLE: 2,
+  TIMEOUT: 3
+} satisfies GeolocationPositionError;
+
 afterEach(() => {
   Reflect.deleteProperty(navigator, 'geolocation');
 });
 
 test('requestGeolocation: a position comes back as a value', async () => {
   browser((success) => {
-    success({
-      coords: { latitude: 45.5, longitude: -73.57 }
-    } as GeolocationPosition);
+    success(montreal);
   });
   expect(await requestGeolocation()).toEqual({
     ok: true,
@@ -28,15 +59,16 @@ test('requestGeolocation: a position comes back as a value', async () => {
   });
 });
 
-test('requestGeolocation: a refusal and a missing browser API are values too, never a throw', async () => {
+test('requestGeolocation: a refusal and a missing browser API are errors as values, never a throw', async () => {
   browser((_success, failure) => {
-    failure?.({ code: 1, PERMISSION_DENIED: 1 } as GeolocationPositionError);
+    failure?.(refusal);
   });
-  expect(await requestGeolocation()).toEqual({ ok: false, reason: 'denied' });
+  const denied = await requestGeolocation();
+  expect(denied).toBeInstanceOf(GeolocationError);
+  expect(denied).toMatchObject({ reason: 'denied' });
 
   Reflect.deleteProperty(navigator, 'geolocation');
-  expect(await requestGeolocation()).toEqual({
-    ok: false,
-    reason: 'unavailable'
-  });
+  const unavailable = await requestGeolocation();
+  expect(unavailable).toBeInstanceOf(GeolocationError);
+  expect(unavailable).toMatchObject({ reason: 'unavailable' });
 });

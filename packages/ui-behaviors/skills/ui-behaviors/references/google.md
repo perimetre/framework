@@ -31,7 +31,7 @@ UI SDK's `Autocomplete` is the field, its `useAsyncOptions` debounces the typing
 - **Create the session once per field:** `useState(() => createPlacesSession(() => ({ includedRegionCodes: ['ca'] })))`.
 - **Pass `places.load` to `useAsyncOptions`**, and give `Autocomplete` `filter={false}`. Google ranks the results.
 - **In `onValueChange`, `details.item` is set when a suggestion was chosen.** Then call `places.select(suggestion, fields)` and do not search again. Otherwise call `setQuery(value)`.
-- **`select` returns `{ ok: true, place }` or `{ ok: false, error }`.** It ends Google's billing session, so call it once per chosen suggestion.
+- **`select` returns `{ ok: true, place }` or a `PlaceDetailsError`, never a throw.** Narrow with `'ok' in result`; the error's `cause` holds Google's error. It ends Google's billing session, so call it once per chosen suggestion.
 - **`fields` set the price of the request.** Ask only for what the app uses.
 - **The field's value is the text.** Someone may type an address and never choose a suggestion. Validate for that.
 - **Render "Google Maps" inside the popup**, in an element with `translate="no"`. Google's terms require it wherever suggestions show without a Google map.
