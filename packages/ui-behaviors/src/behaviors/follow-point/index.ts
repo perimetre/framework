@@ -86,8 +86,9 @@ const pointOn = (el: HTMLElement, event: PointerEvent): FollowPoint => {
  * - A keyboard: a trigger starts following, arrow keys move the point and
  *   Escape stops.
  *
- * Whatever started following is the only thing that stops it, so a mouse
- * leaving the surface never hides what the keyboard showed.
+ * Whatever started following is the only thing that stops or moves it, so a
+ * mouse passing over the surface never hides or moves what the keyboard
+ * showed. A point that was already showing goes to the first input that asks.
  *
  * Call it once in `api`, keep it on the api, and wire the surface and the
  * trigger:
@@ -151,7 +152,9 @@ export const createFollowPoint = <
   ) => {
     if (options.disabled?.()) return false;
     if (isActive()) {
-      startedBy = by;
+      // Whatever started it keeps it. A point that was already showing, like
+      // one set by the app, goes to the first input that asks.
+      startedBy ??= by;
       return true;
     }
     const started = options.setActive(true, { event, reason });
@@ -270,6 +273,8 @@ export const createFollowPoint = <
      */
     pointerenter: (event: PointerEvent, el: HTMLElement) => {
       if (event.pointerType === 'touch') return;
+      // Another input is showing the point. The mouse leaves it where it is.
+      if (isActive() && startedBy && startedBy !== 'hover') return;
       const point = pointOn(el, event);
       moveTo(point.x, point.y);
       start('hover', 'trigger-hover', event);

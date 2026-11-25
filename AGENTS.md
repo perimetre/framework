@@ -234,7 +234,7 @@ Two rules hold for every doc in this repo.
 | `AGENTS.md`                         | An agent working in this repo         | How the repo is laid out and how to work in it            |
 | `CONTRIBUTING.md`                   | A person contributing                 | Changesets and versioning                                 |
 
-A README never lists exports, file paths inside `node_modules` or implementation rules. Those belong to the skill or the JSDoc. When a README and a skill say the same thing, cut it from the README.
+A README never lists exports, file paths inside `node_modules` or implementation rules. Those belong to the skill or the JSDoc. The one exception is a prompt the README gives a person to paste into their agent: the prompt is for the agent, so it may name the files the agent must read. When a README and a skill say the same thing, cut it from the README.
 
 **Update a README when** one of these changes, in the same pull request:
 

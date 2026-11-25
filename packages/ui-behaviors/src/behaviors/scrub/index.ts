@@ -76,8 +76,8 @@ export const normalizeProgress = (value: number, loop: boolean) => {
 /**
  * Turns a sideways drag or scroll over a surface into a progress from 0 to 1,
  * for a product that turns, a timelapse, a before and after, or any dense run
- * of frames. A vertical swipe still scrolls the page, and Escape puts a drag
- * back where it started.
+ * of frames. A vertical swipe still scrolls the page, Escape puts a drag back
+ * where it started, and a second finger is ignored while a drag is under way.
  *
  * It has no keyboard of its own: pair it with buttons that step the same
  * value, like `bindRepeat` on a Previous and a Next.
@@ -221,9 +221,11 @@ export const createScrub = <Options, State extends object, Slot extends string>(
       if (options.disabled?.()) return;
       if (event.pointerType === 'mouse' && event.button !== 0) return;
 
+      // A second finger never takes over a drag that is under way.
+      if (stopDrag) return;
+
       const startValue = current();
       const startX = event.clientX;
-      stopDrag?.();
       stopDrag = bindDrag(el, event, {
         cancelOnEscape: true,
         /** The pointer lifted, Escape was pressed, or the browser took over. */

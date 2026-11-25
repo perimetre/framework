@@ -46,6 +46,7 @@ The story is the whole pattern: `src/behaviors/google-map/google-map.stories.tsx
 - **The pin goes in a detached element.** Create one with `document.createElement('div')`, pass it to `bindGoogleMarker`, and render the pin into it with a portal, once `onReady` has given you the map.
 - **Style the pin from that element's attributes:** `data-selected`, `data-highlighted` and `data-in-view`. With Tailwind, `in-data-selected:bg-primary` on a child.
 - **`title` is required.** It is the marker's name for screen readers.
+- **Pass `onError`** to `bindGoogleMap` and `bindGoogleMarker` to handle a bad key or a blocked script. Without it the failure is reported as an uncaught error, and `onReady` never runs.
 - **Bind the marker again when the place moves or is renamed.** In React, an effect that depends on `lat`, `lng`, `title` and `value`.
 
 There is no clustering, no info window and no directions. Use Google's map from `onReady` for those.

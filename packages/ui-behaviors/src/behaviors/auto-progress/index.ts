@@ -64,6 +64,8 @@ export const prefersReducedMotion = () =>
  * the `playing` state: whatever sets it, a toggle, a controller or the app,
  * starts and stops the frames.
  *
+ * Started at the end with `loop` off, it starts over from 0.
+ *
  * Playback that was set to start never does when the user prefers reduced
  * motion. A person who asks for it, through `allow()`, still gets it.
  *
@@ -94,6 +96,8 @@ export const createAutoProgress = <
 ) => {
   let frame: number | undefined;
   let lastFrame: number | undefined;
+  /** Whether a frame is running now. */
+  let ticking = false;
   /** Whether a person asked for playback, which outranks reduced motion. */
   let allowed = false;
 
@@ -108,44 +112,60 @@ export const createAutoProgress = <
   };
 
   /**
-   * One frame: moves on by the time since the last one.
+   * Moves on by the time since the last frame. Returns whether to go on.
    * @param now - The frame's timestamp
    */
-  const tick = (now: number) => {
-    frame = undefined;
-    if (!isPlaying()) {
-      lastFrame = undefined;
-      return;
-    }
+  const advance = (now: number) => {
+    if (!isPlaying()) return false;
 
     const elapsed =
       lastFrame === undefined ? 0 : Math.min(now - lastFrame, MAX_FRAME_GAP);
     lastFrame = now;
 
-    const loop = options.loop?.() ?? true;
     const duration = options.duration?.() ?? DEFAULT_DURATION;
     if (!options.held?.() && elapsed > 0 && duration > 0) {
       options.set(options.value(context.store.get()) + elapsed / duration);
     }
 
-    if (!loop && options.value(context.store.get()) >= 1) {
-      options.setPlaying(false, { reason: 'end' });
-      if (!isPlaying()) {
-        lastFrame = undefined;
-        return;
-      }
-    }
+    const atEnd =
+      !(options.loop?.() ?? true) && options.value(context.store.get()) >= 1;
+    if (atEnd) options.setPlaying(false, { reason: 'end' });
+    return isPlaying();
+  };
 
-    frame = requestAnimationFrame(tick);
+  /**
+   * One frame. It asks for the next one itself, and exactly one: `ticking`
+   * keeps the state changes it makes from asking for another through `sync`.
+   * @param now - The frame's timestamp
+   */
+  const tick = (now: number) => {
+    frame = undefined;
+    ticking = true;
+    let again: boolean;
+    try {
+      again = advance(now);
+    } finally {
+      ticking = false;
+    }
+    if (again) frame = requestAnimationFrame(tick);
+    else lastFrame = undefined;
   };
 
   /** Starts or stops the frames to match the state. Client only. */
   const sync = () => {
-    if (isPlaying() && (allowed || !prefersReducedMotion())) {
-      frame ??= requestAnimationFrame(tick);
-    } else {
+    if (ticking) return;
+    if (!isPlaying() || (!allowed && prefersReducedMotion())) {
       stopFrames();
+      return;
     }
+    if (frame !== undefined) return;
+
+    // Ask for the frame first, so the change below cannot ask for a second.
+    frame = requestAnimationFrame(tick);
+    // Started at the end with nowhere to go: start over, as a player does.
+    const atEnd =
+      !(options.loop?.() ?? true) && options.value(context.store.get()) >= 1;
+    if (atEnd) options.set(0);
   };
 
   context.onDestroy(stopFrames);

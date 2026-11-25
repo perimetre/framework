@@ -19,12 +19,15 @@ export type GeolocationResult =
  */
 export const requestGeolocation = (options?: PositionOptions) =>
   new Promise<GeolocationResult>((resolve) => {
-    if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
+    // Some browsers and embedded views have the property and leave it empty.
+    const geolocation: Geolocation | null | undefined =
+      typeof navigator === 'undefined' ? undefined : navigator.geolocation;
+    if (!geolocation) {
       resolve({ ok: false, reason: 'unavailable' });
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
+    geolocation.getCurrentPosition(
       ({ coords }) => {
         resolve({
           ok: true,

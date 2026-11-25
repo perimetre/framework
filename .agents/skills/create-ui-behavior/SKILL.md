@@ -21,9 +21,10 @@ UI SDK owns the method. Read it before writing, from the version installed in th
 2. `packages/ui-behaviors/node_modules/@ui-sdk/core/docs/core.md`. It is over 300 KB: search it by heading. Read "Compose Behaviors", "Customize a Behavior", "Define a Primitive", "Handle Changes", and "All Behaviors".
 3. One of UI SDK's own behaviours, to copy its shape:
    `gh api repos/vercel-labs/ui/contents/packages/core/src/foundation/direct-manipulation/area.ts -H "Accept: application/vnd.github.raw"`
-4. The nearest thing already here. `src/behaviors/scrub/` is the reference behaviour and `src/primitives/sequence/` the reference primitive.
+4. `packages/ui-behaviors/node_modules/@ui-sdk/core/skills/ui-sdk/references/testing.md`, and "Testing" in `core.md`. They own how a primitive is tested: `mount`, `keys`, `click`, `hover`, `drag`, `checkServer`, `checkDirection`, `checkPattern`, and breaking the code on purpose.
+5. The nearest thing already here. `src/behaviors/scrub/` is the reference behaviour and `src/primitives/sequence/` the reference primitive.
 
-Types are the API: `node_modules/@ui-sdk/core/dist/**/*.d.ts`. Never read or copy compiled `dist/*.js`, and never import `@ui-sdk/core/internal/*`.
+Types are the API: `node_modules/@ui-sdk/core/dist/**/*.d.ts`. Leave compiled `dist/*.js` unread and uncopied, since it changes between betas with no notice, and never import `@ui-sdk/core/internal/*`, which only UI SDK's own repo resolves.
 
 ## Should it be here at all
 
@@ -57,7 +58,7 @@ Follow UI SDK exactly, so an agent that knows UI SDK already knows this package.
 
 ## Grill the name
 
-A name is the first thing an agent reads, and a wrong first guess sends it to the wrong tool. `createHighlight` read as marking search matches. `createPlayback` read as a media player. Both shipped in a draft and had to be renamed everywhere.
+A name is the first thing an agent reads, and a wrong first guess sends it to the wrong tool. `createHighlight` reads as marking search matches, and `createPlayback` as a media player. A name that misleads has to be changed in every folder, type, story and doc that carries it.
 
 Do this before writing code, for every new behaviour, primitive and utility. **You find the facts and suggest. The user picks the name.** Propose candidates, say which one you would choose and why, and say how you expect each to fare in a scenario. What you may not do is settle the name, or count your own answer to a scenario as the user's.
 
@@ -100,7 +101,7 @@ A name passes only when it passes every row. When none does, bring new candidate
 - **Read state through functions, change it through `set`.** Options are `value: (state) => …` and `set: (value, { reason, event }) => boolean`. The behaviour never calls `store.set` for something a user sees, so the primitive decides what a change means and can refuse it.
 - **Return what the slots call:** methods named after the event (`pointerdown(event, el)`, `keydown(event)`) and a `bind(el)` that returns a cleanup.
 - **Type the context by what you use:** `Pick<PrimitiveContext<Options, State, Slot>, 'store' | 'onDestroy'>`, with the three as generics. No `any`.
-- **Build on UI SDK's blocks.** A drag is `bindDrag`, a held press is `bindHold`, a repeating button is `bindRepeat`, maths is `@ui-sdk/core/number`. Rewriting one of them is the mistake this package was restructured to remove.
+- **Build on UI SDK's blocks.** A drag is `bindDrag`, a held press is `bindHold`, a repeating button is `bindRepeat`, maths is `@ui-sdk/core/number`. A second copy of one of them drifts from UI SDK's and misses its fixes.
 - **No framework code and nothing at module scope that touches the DOM.** Every entry must import on a server.
 - **Clean up everything:** timers, frames and listeners, through the cleanup `bind` returns and `context.onDestroy`.
 
@@ -120,9 +121,15 @@ Everything in UI SDK's "Define a Primitive" applies. What gets missed:
 ## What every addition needs
 
 1. **`index.ts`** with JSDoc on every export: what it is for, each option, each reason, each part, each CSS variable, and a `Story:` line with the story's path. The JSDoc ships in the types and is the API reference agents read.
-2. **A story**, `<name>.stories.tsx`: the least code that shows it working, with its data in the same file. Stories ship with the package and are what agents in apps read as the example, so no helper files and nothing that is not needed. A behaviour's story builds something other than the primitive that uses it, to show it composes. Check it in a browser with `pnpm --filter @perimetre/ui-behaviors dev`.
-3. **A test**, `<name>.test.ts`, with `mount` and `checkServer` from `@ui-sdk/core/testing`. Few tests: one per behaviour a person relies on, and one that it renders on the server. Break the code on purpose and confirm a test fails.
-   - **Only a primitive gets an agent test.** UI SDK's bridge lists primitive instances, so a behaviour, a utility and `Icon` have nothing for it to find. Add a new primitive to `src/primitives/agent.test.ts`.
+2. **A story**, `<name>.stories.tsx`, for anything a person can see or touch: the least code that shows it working, with its data in the same file. Stories ship with the package and are what agents in apps read as the example, so no helper files and nothing that is not needed. A behaviour's story builds something other than the primitive that uses it, to show it composes. Check it in a browser with `pnpm --filter @perimetre/ui-behaviors dev`. A pure function with nothing to look at gets no story: its test is its example.
+3. **A test**, `<name>.test.ts`, written the way UI SDK's `references/testing.md` says. Follow it for the tools and for "Break it on purpose", which is not optional. What differs here:
+   - **The runner is `bun test` with happy-dom,** where UI SDK's guide uses Vitest and jsdom. `test/setup.ts` registers the DOM and sets `__UI_SDK_STRICT__`, so a UI SDK development warning fails the test. Its jsdom stubs are not needed.
+   - **Few tests:** one per thing a person relies on, named for that thing. Not one per function or per branch.
+   - **A behaviour is tested on its own,** through a small primitive written in the test file and `mount`. A behaviour tested only through the primitive that uses it is not tested: its pointer, timer and ownership rules never run in isolation. `src/behaviors/scrub/scrub.test.ts` is the pattern.
+   - **A primitive** adds one `checkServer` test, and `checkDirection` when a key or a drag depends on reading direction. Run `checkPattern` when the primitive is one of the WAI-ARIA patterns UI SDK lists. Add the primitive to `src/primitives/agent.test.ts`: UI SDK's bridge lists primitive instances only, so a behaviour, a utility and `Icon` have nothing for it to find.
+   - **A utility** is tested as a plain function.
+   - **Time is waited for, not guessed.** Frames and timers in happy-dom do not keep a browser's pace, so wait until a condition holds, as `src/behaviors/auto-progress/auto-progress.test.ts` does, and never for a fixed number of milliseconds.
+   - **Code that only drives a third-party SDK,** like `behaviors/google-map`, gets a story checked against the live service and no test. A test against a fake of that SDK tests the fake.
 4. **No export to add.** The folder with an `index.ts` is the entry. Inside the package, import another folder by its full relative path, `'../../behaviors/scrub/index.js'`: the built files must resolve in plain Node, which refuses a directory import.
 5. **The shipped skill**, `packages/ui-behaviors/skills/ui-behaviors/`: the entries table in `SKILL.md`, and the catalogue in `references/behaviors.md` or `references/primitives.md`.
 6. **The story list** in `docs/llms.txt`. The README is for people and lists what to ask for, not exports: change it only when the addition is something new to ask for.

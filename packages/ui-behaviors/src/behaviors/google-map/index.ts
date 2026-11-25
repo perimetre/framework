@@ -13,6 +13,12 @@ export type BindGoogleMapOptions = {
    * change once the map exists.
    */
   mapId: string;
+  /**
+   * Runs when Google's library fails to load, like with a bad key or a
+   * blocked script. Without it, the failure is reported to the page as an
+   * uncaught error.
+   */
+  onError?: (error: unknown) => void;
   /** Runs once with Google's map, to bind markers to it and for anything else. */
   onReady?: (map: google.maps.Map) => void;
   /** Google's own map options, passed through when the map is created. */
@@ -31,6 +37,20 @@ export type GoogleMapLocator = {
     ...args: Parameters<LocatorController[Method]>
   ) => ReturnType<LocatorController[Method]> | undefined;
 };
+
+/**
+ * Runs work that loads one of Google's libraries. A failure, thrown or
+ * rejected, goes to `onError`, or to the page's own error reporting.
+ * @param work - Loads the library and uses it
+ * @param onError - Where a failure goes
+ */
+const guarded = (
+  work: () => Promise<void>,
+  onError: ((error: unknown) => void) | undefined
+) =>
+  Promise.resolve()
+    .then(work)
+    .catch(onError ?? reportError);
 
 /**
  * Creates a Google map in an element and links it to a locator: each time
@@ -52,10 +72,13 @@ export const bindGoogleMap = (
   options: BindGoogleMapOptions
 ) => {
   let cancelled = false;
+  let created = false;
   let idle: google.maps.MapsEventListener | undefined;
 
-  void importLibrary('maps').then(({ Map }) => {
+  void guarded(async () => {
+    const { Map } = await importLibrary('maps');
     if (cancelled) return;
+    created = true;
     const map = new Map(el, {
       ...options.options,
       center: options.center,
@@ -71,11 +94,14 @@ export const bindGoogleMap = (
     });
 
     options.onReady?.(map);
-  });
+  }, options.onError);
 
   return () => {
     cancelled = true;
     idle?.remove();
+    // Google has no way to destroy a map. Emptying the element lets the next
+    // one start clean.
+    if (created) el.replaceChildren();
     options.locator.setBounds(null, { reason: 'map-move' });
   };
 };
@@ -84,6 +110,8 @@ export const bindGoogleMap = (
 export type BindGoogleMarkerOptions = {
   /** The locator the marker selects and highlights in. */
   locator: GoogleMapLocator;
+  /** Runs when Google's library fails to load. See `bindGoogleMap`'s `onError`. */
+  onError?: (error: unknown) => void;
   /** Where the place is. */
   position: GeoPosition;
   /**
@@ -203,7 +231,8 @@ export const bindGoogleMarker = (
   write();
   const unsubscribe = locator.subscribe(write);
 
-  void importLibrary('marker').then(({ AdvancedMarkerElement }) => {
+  void guarded(async () => {
+    const { AdvancedMarkerElement } = await importLibrary('marker');
     if (cancelled) return;
     marker = new AdvancedMarkerElement({
       content: el,
@@ -217,7 +246,7 @@ export const bindGoogleMarker = (
     marker.addEventListener('pointerleave', hoverOut);
     marker.addEventListener('focusin', focusIn);
     marker.addEventListener('focusout', focusOut);
-  });
+  }, options.onError);
 
   return () => {
     cancelled = true;

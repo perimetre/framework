@@ -18,13 +18,13 @@ Options and return values are in each one's JSDoc. Its story builds something ot
 **createFollowPoint**
 
 - The point is a pair of fractions from 0 to 1 that changes on every pointer move. List its keys in the primitive's `live`.
-- Whatever showed the point is the only thing that hides it. A mouse leaving never hides what the keyboard showed.
+- Whatever showed the point is the only thing that hides or moves it. A mouse passing over never hides or moves what the keyboard showed. A point the app showed itself goes to the first input that asks.
 - A component needs the trigger (`toggle`, `keydown`, `blur`). Without one a keyboard cannot reach the point.
 
 **createScrub**
 
 - It has no keyboard. Pair it with buttons that step the same value (UI SDK's `bindRepeat`, as `sequence` does), or a slider handle with `stepFromKey` and `stepBy` from `@ui-sdk/core/number`.
-- Escape puts the progress back where the drag started. A vertical swipe still scrolls the page.
+- Escape puts the progress back where the drag started. A vertical swipe still scrolls the page, and a second finger is ignored while a drag is under way.
 - It reports `swipe` and `scroll`, the names a carousel uses.
 
 **createAutoProgress**
@@ -32,6 +32,7 @@ Options and return values are in each one's JSDoc. Its story builds something ot
 - It follows the `playing` state. Whatever sets that state starts and stops the frames.
 - Call `allow()` when a person asks for playback, in the toggle's `press` and in a controller's `play`. Otherwise reduced motion keeps it stopped.
 - `set` gets the next progress before wrapping or clamping. Pass it through `normalizeProgress(value, loop)`.
+- Started at the end with `loop` off, it starts over from 0.
 
 **createLinkedHighlight**
 

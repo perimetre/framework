@@ -23,7 +23,7 @@ This skill covers only what differs from UI SDK. For `definePrimitive`, `createP
 | Something close to one of those, or a component of your own               | [references/behaviors.md](references/behaviors.md)   |
 | An address field with Google's suggestions, or a Google map for a locator | [references/google.md](references/google.md)         |
 
-Start from a primitive when one fits. When the parts or the rules differ, write your own primitive from the behaviours. Never copy a behaviour's code into the app.
+Start from a primitive when one fits. When the parts or the rules differ, write your own primitive from the behaviours. Import a behaviour, never copy its code into the app: a copy misses every later fix.
 
 ## Entries
 
@@ -52,10 +52,11 @@ No entry has `"use client"`, so a Server Component can import any of them. Only 
 - **The app owns the component.** Write it in the app's components folder. This package has no components to import, apart from `Icon`.
 - **Name the parts for the app** as you destructure them: `const { Root: ProductSpin, Viewport: ProductSpinViewport } = createParts(sequence, { … })`.
 - **Style from the app's design tokens.** The app defines its own tokens in its stylesheet (`@theme` in Tailwind CSS v4). A component reads those, never a raw colour, radius or shadow. Add the token to the app when one is missing.
-- **Merge classes with `cn`** from the [`cn`](https://github.com/shadcn-ui/cn) package. Never use `clsx` or `tailwind-merge`.
+- **Merge classes with `cn`** from the [`cn`](https://github.com/shadcn-ui/cn) package. It replaces `clsx` and `tailwind-merge`, so use neither.
 - **Wrap every svg in `Icon`**, from `react/icon`. Give the app's icon components `IconProps`, and pass `aria-hidden` or a `label` where the icon is used, never where it is declared.
 - **Every label comes from the app's translations.** Nothing here renders text. The one exception is the "Google Maps" attribution, which Google's terms fix.
 - **Never bump UI SDK alone.** This package pins one exact version as a peer.
+- **Test what you wired, not what you imported.** The behaviours and primitives are tested in this package. In the app, follow UI SDK's `references/testing.md` for the component's name, labels and callbacks, and add its agent test.
 
 ## Agents
 
