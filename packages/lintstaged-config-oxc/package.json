@@ -1,0 +1,39 @@
+{
+  "description": "lint-staged configuration for Perimetre projects on Oxlint and Oxfmt",
+  "devDependencies": {
+    "lint-staged": "^16.2.7"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "types": "./index.d.mts"
+    }
+  },
+  "files": [
+    "index.mjs",
+    "index.d.mts"
+  ],
+  "license": "GPL-3.0",
+  "main": "index.mjs",
+  "name": "@perimetre/lintstaged-config-oxc",
+  "packageManager": "pnpm@10.30.0",
+  "peerDependencies": {
+    "lint-staged": ">= 16",
+    "oxfmt": ">=0.80.0",
+    "oxlint": ">=1.95.0"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/lintstaged-config-oxc",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "types": "index.d.mts",
+  "version": "0.0.0"
+}

@@ -1,0 +1,50 @@
+{
+  "dependencies": {
+    "@tanstack/eslint-plugin-query": "^5.91.4",
+    "eslint-plugin-react": "^7.37.5"
+  },
+  "description": "React Oxlint configuration for Perimetre projects",
+  "devDependencies": {
+    "@perimetre/oxlint-config-base": "workspace:*",
+    "oxlint": "^1.95.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "types": "./index.d.mts"
+    }
+  },
+  "files": [
+    "index.mjs",
+    "index.d.mts",
+    "presets.mjs",
+    "presets.d.mts"
+  ],
+  "license": "GPL-3.0",
+  "main": "index.mjs",
+  "name": "@perimetre/oxlint-config-react",
+  "packageManager": "pnpm@10.30.0",
+  "peerDependencies": {
+    "oxlint": ">=1.95.0",
+    "react": ">= 19"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/oxlint-config-react",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --max-warnings 0",
+    "test": "oxlint -c test/oxlint.config.mjs --print-config > /dev/null"
+  },
+  "types": "index.d.mts",
+  "version": "0.0.0"
+}

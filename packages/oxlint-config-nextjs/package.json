@@ -1,0 +1,44 @@
+{
+  "description": "Next.js Oxlint configuration for Perimetre projects",
+  "devDependencies": {
+    "@perimetre/oxlint-config-base": "workspace:*",
+    "@perimetre/oxlint-config-react": "workspace:*",
+    "oxlint": "^1.95.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "types": "./index.d.mts"
+    }
+  },
+  "files": [
+    "index.mjs",
+    "index.d.mts",
+    "presets.mjs",
+    "presets.d.mts"
+  ],
+  "license": "GPL-3.0",
+  "main": "index.mjs",
+  "name": "@perimetre/oxlint-config-nextjs",
+  "packageManager": "pnpm@10.30.0",
+  "peerDependencies": {
+    "next": ">= 15",
+    "oxlint": ">=1.95.0"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/oxlint-config-nextjs",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --max-warnings 0",
+    "test": "oxlint -c test/oxlint.config.mjs --print-config > /dev/null"
+  },
+  "types": "index.d.mts",
+  "version": "0.0.0"
+}

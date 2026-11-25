@@ -1,0 +1,150 @@
+// The upstream presets our ESLint config extends, mapped to Oxlint's rule
+// names, keeping the rules Oxlint implements outside nursery. Each preset lists
+// what it leaves out. Oxlint ships no presets of its own, and an unknown rule
+// is a config error, so these are kept in step with upstream by hand.
+
+/**
+ * eslint-plugin-jsx-a11y `recommended`, mapped to Oxlint.
+ * @type {Record<string, import("oxlint").AllowWarnDeny | [import("oxlint").AllowWarnDeny, ...unknown[]]>}
+ */
+export const jsxA11yRecommended = {
+  'jsx-a11y/alt-text': 'error',
+  'jsx-a11y/anchor-has-content': 'error',
+  'jsx-a11y/anchor-is-valid': 'error',
+  'jsx-a11y/aria-activedescendant-has-tabindex': 'error',
+  'jsx-a11y/aria-props': 'error',
+  'jsx-a11y/aria-proptypes': 'error',
+  'jsx-a11y/aria-role': 'error',
+  'jsx-a11y/aria-unsupported-elements': 'error',
+  'jsx-a11y/autocomplete-valid': 'error',
+  'jsx-a11y/click-events-have-key-events': 'error',
+  'jsx-a11y/heading-has-content': 'error',
+  'jsx-a11y/html-has-lang': 'error',
+  'jsx-a11y/iframe-has-title': 'error',
+  'jsx-a11y/img-redundant-alt': 'error',
+  'jsx-a11y/interactive-supports-focus': [
+    'error',
+    {
+      tabbable: [
+        'button',
+        'checkbox',
+        'link',
+        'searchbox',
+        'spinbutton',
+        'switch',
+        'textbox'
+      ]
+    }
+  ],
+  'jsx-a11y/label-has-associated-control': 'error',
+  'jsx-a11y/media-has-caption': 'error',
+  'jsx-a11y/mouse-events-have-key-events': 'error',
+  'jsx-a11y/no-access-key': 'error',
+  'jsx-a11y/no-autofocus': 'error',
+  'jsx-a11y/no-distracting-elements': 'error',
+  'jsx-a11y/no-interactive-element-to-noninteractive-role': [
+    'error',
+    { tr: ['none', 'presentation'], canvas: ['img'] }
+  ],
+  'jsx-a11y/no-noninteractive-element-interactions': [
+    'error',
+    {
+      handlers: [
+        'onClick',
+        'onError',
+        'onLoad',
+        'onMouseDown',
+        'onMouseUp',
+        'onKeyPress',
+        'onKeyDown',
+        'onKeyUp'
+      ],
+      alert: ['onKeyUp', 'onKeyDown', 'onKeyPress'],
+      body: ['onError', 'onLoad'],
+      dialog: ['onKeyUp', 'onKeyDown', 'onKeyPress'],
+      iframe: ['onError', 'onLoad'],
+      img: ['onError', 'onLoad']
+    }
+  ],
+  'jsx-a11y/no-noninteractive-element-to-interactive-role': [
+    'error',
+    {
+      ul: [
+        'listbox',
+        'menu',
+        'menubar',
+        'radiogroup',
+        'tablist',
+        'tree',
+        'treegrid'
+      ],
+      ol: [
+        'listbox',
+        'menu',
+        'menubar',
+        'radiogroup',
+        'tablist',
+        'tree',
+        'treegrid'
+      ],
+      li: [
+        'menuitem',
+        'menuitemradio',
+        'menuitemcheckbox',
+        'option',
+        'row',
+        'tab',
+        'treeitem'
+      ],
+      table: ['grid'],
+      td: ['gridcell'],
+      fieldset: ['radiogroup', 'presentation']
+    }
+  ],
+  'jsx-a11y/no-noninteractive-tabindex': [
+    'error',
+    { tags: [], roles: ['tabpanel'], allowExpressionValues: true }
+  ],
+  'jsx-a11y/no-redundant-roles': 'error',
+  'jsx-a11y/no-static-element-interactions': [
+    'error',
+    {
+      allowExpressionValues: true,
+      handlers: [
+        'onClick',
+        'onMouseDown',
+        'onMouseUp',
+        'onKeyPress',
+        'onKeyDown',
+        'onKeyUp'
+      ]
+    }
+  ],
+  'jsx-a11y/role-has-required-aria-props': 'error',
+  'jsx-a11y/role-supports-aria-props': 'error',
+  'jsx-a11y/scope': 'error',
+  'jsx-a11y/tabindex-no-positive': 'error'
+};
+
+/**
+ * eslint-plugin-react-hooks `recommended-latest`, mapped to Oxlint.
+ * Left out, not in Oxlint: `react-hooks/component-hook-factories`, `react-hooks/config`, `react-hooks/gating`.
+ * @type {Record<string, import("oxlint").AllowWarnDeny | [import("oxlint").AllowWarnDeny, ...unknown[]]>}
+ */
+export const reactHooksRecommended = {
+  'react/rules-of-hooks': 'error',
+  'react/exhaustive-deps': 'warn',
+  'react/static-components': 'error',
+  'react/use-memo': 'error',
+  'react/void-use-memo': 'error',
+  'react/preserve-manual-memoization': 'error',
+  'react/incompatible-library': 'warn',
+  'react/immutability': 'error',
+  'react/globals': 'error',
+  'react/refs': 'error',
+  'react/set-state-in-effect': 'error',
+  'react/error-boundaries': 'error',
+  'react/purity': 'error',
+  'react/set-state-in-render': 'error',
+  'react/unsupported-syntax': 'warn'
+};

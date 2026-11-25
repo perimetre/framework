@@ -1,0 +1,55 @@
+{
+  "dependencies": {
+    "eslint-plugin-jsdoc": "^61.7.1",
+    "eslint-plugin-perfectionist": "^4.15.1",
+    "eslint-plugin-playwright": "^2.5.1",
+    "eslint-plugin-sort-destructure-keys": "^3.0.0"
+  },
+  "description": "Base Oxlint configuration for Perimetre projects, with type-aware rules on tsrs",
+  "devDependencies": {
+    "oxlint": "^1.95.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "types": "./index.d.mts"
+    }
+  },
+  "files": [
+    "index.mjs",
+    "index.d.mts",
+    "plugin.mjs",
+    "plugin.d.mts",
+    "presets.mjs",
+    "presets.d.mts",
+    "restrictions.mjs",
+    "restrictions.d.mts"
+  ],
+  "license": "GPL-3.0",
+  "main": "index.mjs",
+  "name": "@perimetre/oxlint-config-base",
+  "packageManager": "pnpm@10.30.0",
+  "peerDependencies": {
+    "oxlint": ">=1.95.0",
+    "tsrs": ">=7.1.0-beta.tsrs5"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/oxlint-config-base",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --max-warnings 0",
+    "test": "oxlint -c test/oxlint.config.mjs --print-config > /dev/null"
+  },
+  "types": "index.d.mts",
+  "version": "0.0.0"
+}
