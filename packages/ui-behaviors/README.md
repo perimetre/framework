@@ -1,68 +1,72 @@
 # @perimetre/ui-behaviors
 
-Unstyled, accessible UI behaviours for Périmètre projects, built on [UI SDK](https://ui-sdk.dev).
+What Périmètre adds to [UI SDK](https://ui-sdk.dev): the behaviours it does not ship, for an agent to build an app's own components with.
 
-**This package replaces [`@perimetre/ui`](../ui) for new work.** `@perimetre/ui` stays published and working for the projects that already use it, but gets no new components. See [Migrating from @perimetre/ui](docs/migrating-from-perimetre-ui.md) for what each old component becomes.
+You do not write against this package by hand. You give your agent its skill and ask for a component.
 
-## Status: built on a beta
+## Quick start
 
-UI SDK is new and in beta. Its first release was on 2026-11-12, and it published 15 betas in its first 12 days. Expect its API to change, and expect this package to need attention each time it does.
+Copy this prompt into your agent, in the app:
 
-|                              |                                                    |
-| ---------------------------- | -------------------------------------------------- |
-| Built against                | `@ui-sdk/core` and `@ui-sdk/react` `0.1.0-beta.17` |
-| That version published       | 2026-11-24                                         |
-| Last reviewed against UI SDK | 2026-11-24                                         |
+```text
+Set up @perimetre/ui-behaviors in this React project. It needs React 19 or newer.
 
-**Before relying on this package, check whether UI SDK has moved on:**
+1. Check that .npmrc has `@perimetre:registry=https://npm.pkg.github.com`. If it
+   doesn't, or the install is refused, stop and ask me.
+2. Install @perimetre/ui-behaviors, @ui-sdk/core@0.1.0-beta.17,
+   @ui-sdk/react@0.1.0-beta.17 and cn with the project's package manager. The
+   UI SDK version must be exactly that one. If a release-age policy blocks the
+   install, stop and ask me instead of changing it.
+3. Put `@layer ui-sdk;` at the top of the global stylesheet, above
+   `@import "tailwindcss"` if there is one.
+4. Add a note to AGENTS.md/CLAUDE.md, creating it if needed: components live in this app,
+   not in a shared library. Before building one, follow the ui-sdk and
+   ui-behaviors skills if they're installed, and read
+   node_modules/@perimetre/ui-behaviors/skills/ui-behaviors/SKILL.md and
+   node_modules/@ui-sdk/react/docs/llms.txt.
+5. If you support skills, run:
+   npx skills@latest add vercel-labs/ui --skill ui-sdk
+   npx skills@latest add perimetre/framework --skill ui-behaviors
+```
+
+Then ask for a component:
+
+```text
+Build a product zoom with @perimetre/ui-behaviors: the product image with a
+round lens that follows the pointer, and a button that gives keyboards the
+same lens. Put it in our components folder and use our existing styles.
+```
+
+## What you can ask for
+
+- **A product zoom:** a lens that magnifies an image under the pointer.
+- **A 360 viewer:** a run of frames you drag, step through or play.
+- **A store locator:** a list of places linked to a map, with or without Google Maps.
+- **An address field** with Google's place suggestions.
+- **Icons** that are either hidden from screen readers or labelled.
+- **Something nobody ships,** built from the same pieces: a spotlight, a before and after, a timer, a chart with a linked legend.
+
+Everything else, from accordions to form controls, comes from UI SDK itself.
+
+How any of it is built is in [the skill](skills/ui-behaviors/SKILL.md), which your agent reads.
+
+## Status
+
+UI SDK is in beta. Its first release was on 2026-11-12.
+
+|                              |                                |
+| ---------------------------- | ------------------------------ |
+| Built against                | `@ui-sdk/core` `0.1.0-beta.17` |
+| That version published       | 2026-11-24                     |
+| Last reviewed against UI SDK | 2026-11-25                     |
+
+An app installs that exact version of UI SDK. A newer one arrives as a release of this package. Check with `npm view @ui-sdk/core version time.modified`, then follow [Updating UI SDK](docs/updating-ui-sdk.md).
+
+## Working on this package
 
 ```bash
-npm view @ui-sdk/react version time.modified
+pnpm --filter @perimetre/ui-behaviors dev        # Ladle, with every story
+pnpm turbo run build lint typecheck test --filter=@perimetre/ui-behaviors
 ```
 
-If that shows a version newer than the one above, or the last review above is more than a month old, this package is due for a review. Follow [Updating UI SDK](docs/updating-ui-sdk.md), or raise it with whoever maintains the framework repo. Do this even when everything appears to work: the point is to not forget.
-
-What this means in practice:
-
-- **The UI SDK version is pinned exactly**, as a peer dependency. A project must install that exact version of `@ui-sdk/core` and `@ui-sdk/react`. Moving to a newer UI SDK is a release of this package, never something a project does on its own.
-- **Three UI SDK functions this package uses are marked experimental by UI SDK**: `bindRepeat` (the hold-to-repeat buttons in sequence), `createCommit` (sequence's `onValueCommit`) and `css` (inline styles in magnify and sequence). They are the likeliest to change.
-- **There are no automated tests yet.** Each behaviour was checked by hand in a browser. Each doc ends with what was and was not verified.
-
-The replacement is not one package. Use UI SDK directly for everything it covers (accordion, tabs, drawer, carousel, form controls). This package holds only the behaviours UI SDK does not have. Components that were only styling (badge, section headers) move to the project.
-
-| Entry                              | What it is                                                                                   | Docs                         |
-| ---------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------- |
-| `@perimetre/ui-behaviors/magnify`  | A lens that magnifies whatever is on a surface, under the pointer                            | [Magnify](docs/magnify.md)   |
-| `@perimetre/ui-behaviors/sequence` | Moving through a dense run of frames, like a product turning, by drag, buttons or playback   | [Sequence](docs/sequence.md) |
-| `@perimetre/ui-behaviors/locator`  | The link between a list of places and their markers on a map                                 | [Locator](docs/locator.md)   |
-| `@perimetre/ui-behaviors/google`   | Google Places autocomplete, and Google Maps for the locator. The one entry tied to a product | [Google](docs/google.md)     |
-
-## Installation
-
-```bash
-pnpm add @perimetre/ui-behaviors @ui-sdk/react@0.1.0-beta.17 @ui-sdk/core@0.1.0-beta.17
-```
-
-The UI SDK version must match the one in [Status](#status-built-on-a-beta) exactly.
-
-Requires React 19. Declare UI SDK's cascade layer at the top of the global stylesheet, above Tailwind if you use it:
-
-```css
-@layer ui-sdk;
-```
-
-## What every behaviour here follows
-
-The same contract as UI SDK's own parts, so they style and compose the same way:
-
-- **No styles.** Parts ship no class names, CSS, tokens or icons. The only inline styles are the geometry a behaviour cannot work without.
-- **`data-slot` on every part**, state as `data-*` attributes, values as CSS variables.
-- **`render`** to replace a part's element; `className`, `style` and `children` may be functions of state.
-- **Controlled or uncontrolled** state, with `on<Key>Change(value, details)`; `details.reason` says why and `details.cancel()` refuses.
-- **A controller** to drive the behaviour from outside.
-- **No baked-in text.** Labels come from the project. The one exception is the "Google Maps" attribution, which Google's terms fix.
-- **One entry per behaviour.** There is no root import.
-
-Each behaviour is a UI SDK primitive (`definePrimitive`) in `primitive.ts`, with its React parts made by `createParts` in `index.tsx`. The primitive has no React in it. The Google entry is the exception: it is React components composed from UI SDK's `Autocomplete` and from the locator.
-
-Nothing depends on a third-party product except the Google entry, whose Google packages are optional peer dependencies.
+Follow the `create-ui-behavior` skill in the framework repo: `.agents/skills/create-ui-behavior/SKILL.md`. The Google stories need `VITE_GOOGLE_MAPS_API_KEY` in `packages/ui-behaviors/.env.local`.

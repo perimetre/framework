@@ -1,154 +1,139 @@
 # @perimetre/framework
 
-Shared packages, configurations, and architectural patterns for Perimetre projects.
+Shared packages for Périmètre projects: lint and format configs, a service layer, a GraphQL toolkit, and the UI behaviours apps build their components from.
+
+Packages are private and published to GitHub Packages under `@perimetre/*`.
 
 ## Packages
 
-### Configuration Packages
+Each package has its own README with usage.
 
-- `@perimetre/eslint-config-base` - Base ESLint rules for TypeScript projects
-- `@perimetre/eslint-config-nextjs` - Next.js ESLint configuration (extends base)
-- `@perimetre/eslint-config-react` - React ESLint with hooks, a11y, and TanStack Query rules
-- `@perimetre/eslint-config-graphql` - GraphQL ESLint configuration
-- `@perimetre/eslint-config-trpc` - tRPC-optimized ESLint configuration
-- `@perimetre/lintstaged-config-nextjs` - lint-staged configuration for Next.js projects
-- `@perimetre/prettier-config` - Prettier configuration
+### Configuration
 
-### Utility Packages
+| Package                                                         | What it is                                             |
+| --------------------------------------------------------------- | ------------------------------------------------------ |
+| [`eslint-config-base`](packages/eslint-config-base)             | Base ESLint rules for TypeScript                       |
+| [`eslint-config-nextjs`](packages/eslint-config-nextjs)         | ESLint for Next.js                                     |
+| [`eslint-config-react`](packages/eslint-config-react)           | ESLint for React: hooks, accessibility, TanStack Query |
+| [`eslint-config-graphql`](packages/eslint-config-graphql)       | ESLint for GraphQL                                     |
+| [`eslint-config-trpc`](packages/eslint-config-trpc)             | ESLint for tRPC                                        |
+| [`lintstaged-config-nextjs`](packages/lintstaged-config-nextjs) | lint-staged for Next.js                                |
+| [`prettier-config`](packages/prettier-config)                   | Prettier                                               |
 
-- `@perimetre/service-builder` - Type-safe service layer builder with error-as-values pattern
-- `@perimetre/helpers` - Shared TypeScript utilities (Faker, CSV parsing)
-- `@perimetre/icons` - Accessible React icon wrapper with TypeScript enforcement
-- `@perimetre/classnames` - Classname utility combining clsx and tailwind-merge
+### Code
 
-### Component Libraries
+| Package                                       | What it is                                                                        |
+| --------------------------------------------- | --------------------------------------------------------------------------------- |
+| [`service-builder`](packages/service-builder) | A type-safe service layer that returns errors as values                           |
+| [`graphql`](packages/graphql)                 | A GraphQL client toolkit for WPGraphQL projects                                   |
+| [`helpers`](packages/helpers)                 | TypeScript utilities                                                              |
+| [`fancy-log`](packages/fancy-log)             | Log messages with colours, levels and scopes                                      |
+| [`ui-behaviors`](packages/ui-behaviors)       | What we add to [UI SDK](https://ui-sdk.dev), for building an app's own components |
 
-- `@perimetre/ui-behaviors` - Unstyled, accessible UI behaviours built on [UI SDK](https://ui-sdk.dev): magnify, sequence, locator, and Google Places and Maps. Use this, with UI SDK, for new work
-- `@perimetre/ui` - React component library with brand-aware theming built on Tailwind CSS v4 and Radix UI primitives. Deprecated for new work in favour of `@perimetre/ui-behaviors`; kept for the projects that already use it
+### Deprecated
 
-## Documentation
+These stay published and working for the projects that use them. Nothing new is added.
 
-### Pattern Guides
+| Package                             | Use instead                                                                                                                             |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| [`ui`](packages/ui)                 | Components written in the app, from UI SDK and `ui-behaviors`. See its [migration guide](packages/ui/docs/migrating-to-ui-behaviors.md) |
+| [`tokens`](packages/tokens)         | Design tokens defined in the app's own stylesheet                                                                                       |
+| [`icons`](packages/icons)           | `Icon` from `@perimetre/ui-behaviors/react/icon`                                                                                        |
+| [`classnames`](packages/classnames) | The [`cn`](https://github.com/shadcn-ui/cn) package                                                                                     |
 
-The pattern guides that used to live in `LLMs/` now live in the [ai-toolkit](https://github.com/perimetre/ai-toolkit) repo, plugin `perimetre-apps`: see the `app-code-review` skill's `references/*.md` (services, error handling, tRPC, TanStack Query, GraphQL, forms, icons), plus the `app-caching` and `seo` skills.
+## How we build UI
 
-### Examples Directory
+Apps own their components. There is no shared component library to add to.
 
-Working example projects:
+[UI SDK](https://ui-sdk.dev) supplies how a component behaves: keyboard, focus, pointer and accessibility. The app supplies how it looks. `ui-behaviors` holds the few behaviours UI SDK does not have, like a product zoom or a store locator.
 
-- `examples/trpc/` - Full tRPC + service layer implementation
-- `examples/tanstack-query-and-graphql/` - GraphQL + TanStack Query integration
-- `examples/ui-sdk-forms/` - React Hook Form + Zod with UI SDK form controls
+In practice you ask your agent for the component, and it builds it in your app. The [`ui-behaviors` README](packages/ui-behaviors) has the prompt to set a project up.
 
-## Setup for Contributors
+## Using a package in a project
 
-### Prerequisites
-
-1. Install [pnpm](https://pnpm.io/installation)
-2. Install [GitHub CLI](https://cli.github.com/)
-
-### Initial Setup
-
-1. Clone the repository:
-
-   ```bash
-   gh repo clone perimetre/framework
-   cd framework
-   ```
-
-2. Authenticate with GitHub Package Registry:
-
-   ```bash
-   gh auth login -h github.com -s read:packages
-   > Select SSH
-   npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
-   npm config set @perimetre:registry https://npm.pkg.github.com
-   ```
-
-3. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-
-## Development Workflow
-
-### Making Changes
-
-1. Create a feature branch:
-
-   ```bash
-   git checkout -b feature/your-feature
-   ```
-
-2. Make your changes to packages
-
-3. Run tests and linting:
-
-   ```bash
-   pnpm turbo run lint build
-   ```
-
-4. Create a changeset:
-
-   ```bash
-   pnpm changeset
-   ```
-
-5. Commit your changes:
-
-   ```bash
-   git add .
-   git commit -m "feat: your feature description"
-   ```
-
-6. Push and create a pull request:
-   ```bash
-   git push -u origin feature/your-feature
-   ```
-
-### Release Process
-
-Releases are automated when PRs are merged to main:
-
-1. Changesets creates a "Version Packages" PR
-2. Review and merge the PR
-3. Packages are automatically published to GitHub Package Registry
-
-## Using Packages in Projects
-
-### Local Development Setup
-
-1. Create `.npmrc` in your project root:
+1. Point the `@perimetre` scope at GitHub Packages, in the project's `.npmrc`. Commit this file, and never put a token or a `${VAR}` placeholder in it:
 
    ```ini
    @perimetre:registry=https://npm.pkg.github.com
-   //npm.pkg.github.com/:_authToken=${NPM_TOKEN}
    ```
 
-2. Set up authentication token:
+2. Sign in once on your machine. This writes the token to your own `~/.npmrc`:
 
    ```bash
    gh auth login -h github.com -s read:packages
-   > Select SSH
    npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
-   npm config set @perimetre:registry https://npm.pkg.github.com
    ```
 
-3. Install packages:
+3. Install what you need:
+
    ```bash
-   pnpm add @perimetre/eslint-config-nextjs
+   pnpm add -D @perimetre/eslint-config-nextjs
    ```
 
-### CI/CD Setup (Cloudflare, Vercel, etc.)
+### On Vercel
 
-1. Create a GitHub Personal Access Token:
-   - Go to GitHub Settings → Developer settings → Personal access tokens
-   - Create token with `read:packages` scope
-   - Or use: `gh auth token` (for temporary token)
+Set an `NPM_RC` environment variable holding a whole `.npmrc`, token included. Vercel writes it as trusted config before the install ([Vercel's guide](https://vercel.com/kb/guide/using-private-dependencies-with-vercel)).
 
-2. Add environment variable to your CI/CD platform:
-   - **Variable name**: `NPM_TOKEN`
-   - **Value**: Your GitHub PAT
-   - **Scope**: Both production and preview environments
+```ini
+registry=https://registry.npmjs.org
+@perimetre:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=<GitHub classic token with read:packages>
+```
 
-3. Ensure `.npmrc` is committed to your project (the token uses environment variable substitution, so it's safe)
+- Add it per project, for Production and Preview, and mark it Sensitive.
+- Add it with the CLI, so the line breaks survive: `vercel env add NPM_RC production < npmrc`.
+- Do not use `NPM_TOKEN`. Vercel applies it to `registry.npmjs.org` only, and pnpm 10.34.2 and newer ignore a `${NPM_TOKEN}` placeholder in a committed `.npmrc`.
+
+### On GitHub Actions
+
+Give `actions/setup-node` the registry and the scope, and pass the token to the install step:
+
+```yaml
+- uses: actions/setup-node@v6
+  with:
+    registry-url: https://npm.pkg.github.com
+    scope: '@perimetre'
+- run: pnpm install --frozen-lockfile
+  env:
+    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+`NPM_TOKEN` here is a repository secret holding a GitHub classic token with `read:packages`. The run's own `GITHUB_TOKEN` cannot read these packages from another repository.
+
+## Examples
+
+- [`examples/trpc`](examples/trpc): tRPC with the service layer
+- [`examples/tanstack-query-and-graphql`](examples/tanstack-query-and-graphql): GraphQL with TanStack Query
+- [`examples/ui-sdk-forms`](examples/ui-sdk-forms): React Hook Form and Zod with UI SDK form controls
+
+Our coding conventions live in the [ai-toolkit](https://github.com/perimetre/ai-toolkit) repo.
+
+## Contributing
+
+You need [pnpm](https://pnpm.io/installation) and the [GitHub CLI](https://cli.github.com/).
+
+```bash
+gh repo clone perimetre/framework
+cd framework
+pnpm install
+```
+
+`pnpm install` needs the sign-in step from [Using a package in a project](#using-a-package-in-a-project).
+
+Then, for every change:
+
+1. Branch from `main`.
+2. Make the change.
+3. Check it:
+
+   ```bash
+   pnpm turbo run lint typecheck build
+   pnpm test
+   ```
+
+4. Describe it for the changelog with `pnpm changeset`. Pick the packages, the bump and a one-line summary.
+5. Commit with a [conventional commit](https://www.conventionalcommits.org) message, push, and open a pull request.
+
+Merging to `main` opens a "version packages" pull request. Merging that one publishes the packages.
+
+[CONTRIBUTING.md](CONTRIBUTING.md) explains changesets and versioning in full.

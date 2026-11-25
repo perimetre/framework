@@ -6,6 +6,7 @@ import { defineConfig } from 'eslint/config';
 
 const eslintConfig = defineConfig([
   ...base,
+  // React is used by the stories only. The package itself has none.
   ...react.map((config) => {
     // Explicitly register jsx-a11y plugin for monorepo compatibility
     if (config.plugins && Object.keys(config.plugins).length === 0) {
@@ -18,6 +19,30 @@ const eslintConfig = defineConfig([
     }
     return config;
   }),
+  // The deprecated packages point here. Nothing here points back.
+  {
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: [
+                '@perimetre/ui',
+                '@perimetre/ui/*',
+                '@perimetre/icons',
+                '@perimetre/classnames',
+                '@perimetre/tokens',
+                '@perimetre/tokens/*'
+              ],
+              message:
+                'Deprecated. @perimetre/ui-behaviors must not depend on it.'
+            }
+          ]
+        }
+      ]
+    }
+  },
   ...end,
   // Override parser options to use correct project root
   {

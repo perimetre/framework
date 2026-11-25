@@ -6,6 +6,20 @@ Thank you for contributing to the Perimetre Framework monorepo! This guide will 
 
 This monorepo uses [Changesets](https://github.com/changesets/changesets) to manage versioning and changelog generation. Changesets allow you to declare version bumps and document changes alongside your code.
 
+## Before You Open a Pull Request
+
+```bash
+pnpm turbo run lint typecheck build   # what ci.yml runs
+pnpm test                             # what tests.yml runs
+```
+
+Tests are Turbo tasks cached on their inputs, so only the packages you touched run again. Never skip, weaken or delete a test to get a green run.
+
+Working on UI:
+
+- **`@perimetre/ui`, `@perimetre/icons`, `@perimetre/classnames` and `@perimetre/tokens` are deprecated.** Fix what is there; add nothing. Apps still define design tokens, in their own stylesheet.
+- **Components live in the apps now.** What is shared is behaviour, in `packages/ui-behaviors`. To add or change something there, follow the `create-ui-behavior` skill (`.agents/skills/create-ui-behavior/SKILL.md`).
+
 ## When to Create a Changeset
 
 Create a changeset when you:

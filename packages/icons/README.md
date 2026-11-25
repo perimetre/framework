@@ -1,5 +1,22 @@
 # @perimetre/icons
 
+> **Deprecated.** Use `Icon` from [`@perimetre/ui-behaviors/react/icon`](../ui-behaviors). It keeps the same rule, an icon is either hidden with `aria-hidden` or has a `label`, without the Radix dependencies. `@perimetre/icons` stays published and working for the apps that install it.
+>
+> ```tsx
+> import { Icon, type IconProps } from '@perimetre/ui-behaviors/react/icon';
+>
+> const IconStar = (props: IconProps) => (
+>   <Icon {...props}>
+>     <svg viewBox="0 0 24 24">…</svg>
+>   </Icon>
+> );
+> ```
+>
+> - `Icon` is a named export now, not the default one.
+> - Other props still reach the svg, and a `className` joins the svg's own.
+> - A decorative icon no longer renders an empty hidden span.
+> - It has no `"use client"`, so icons stay Server Components.
+
 Accessible React icon wrapper component for Perimetre projects.
 
 ## What it does

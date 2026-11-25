@@ -1,8 +1,8 @@
 # @perimetre/ui
 
-> **Deprecated for new work.** Use [`@perimetre/ui-behaviors`](../ui-behaviors) with [UI SDK](https://ui-sdk.dev) instead. `@perimetre/ui` stays published and working for the projects that already use it, but it gets no new components.
+> **Deprecated.** Apps own their components now: an agent builds them in the app, from [UI SDK](https://ui-sdk.dev) and [`@perimetre/ui-behaviors`](../ui-behaviors). `@perimetre/ui` stays published and working for the apps that install it, and gets no new components.
 >
-> [Migrating from @perimetre/ui](../ui-behaviors/docs/migrating-from-perimetre-ui.md) lists what each component here becomes.
+> [Migrating from @perimetre/ui](docs/migrating-to-ui-behaviors.md) lists what each component here becomes. It ships with the package, at `node_modules/@perimetre/ui/docs/migrating-to-ui-behaviors.md`.
 
 A React component library with composable, brand-aware theming built on Tailwind CSS v4 and Radix UI primitives.
 

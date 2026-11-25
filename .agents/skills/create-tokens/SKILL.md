@@ -1,13 +1,21 @@
 ---
 name: create-tokens
-description: Creates, updates, and overrides design tokens in the Perimetre design system — primitives (raw palette), semantic tokens (the public API components consume), brand overrides (per-brand value changes in Sprig/Stelpro/Cima/Microbird), and synthetic/component tokens. Also wires new tokens into the Tailwind bridge so they become `pui:` utilities. Use this skill whenever the user asks to add, change, override, tweak, expose, or rebuild a design token, give a designer control over a color/radius/shadow/typography/motion value per brand, "make this tokenizable", "add a pui token", "override the button radius for Sprig", "expose a new semantic token for the Card component", "regenerate the tokens CSS", or "turn this hardcoded value into a token Vuong can change".
+description: DEPRECATED. @perimetre/tokens gets no new brand and no new token, because each app now holds its own design tokens in its own stylesheet. Load this skill only to change a token that already exists in packages/tokens for an app that still installs it (a value, a brand override, the Tailwind bridge in packages/ui). For a new token, a new brand, or a request to make something tokenizable, add it in the consumer app instead.
 license: MIT
 metadata:
   author: perimetre
-  version: '1.0.0'
+  version: '1.1.0'
 ---
 
 # Create / Update Design Tokens
+
+> **Deprecated. Do not add a token or a brand to `@perimetre/tokens`.**
+>
+> The package is deprecated; tokens are not. Each app still defines its own design tokens, and its components still read tokens and never raw values. What changes is where they live: in the app's own stylesheet, next to the components it owns. In a Tailwind CSS v4 app that is the `@theme` block of the global stylesheet. A new token, a new brand, or a value a designer wants to control goes there, in the app.
+>
+> What this skill teaches about naming and layering tokens (primitive, semantic, component) still applies in the app.
+>
+> Keep reading this skill only to change a token that already exists here, for an app that still installs `@perimetre/tokens` or `@perimetre/ui`. For new shared UI work, use the `create-ui-behavior` skill.
 
 Design tokens are the shared vocabulary between design and developers. They are how the same component code renders differently per brand, and how a designer can adjust the look of the system without touching code. This skill covers the full token workflow: choosing the right tier, writing the JSON in `@perimetre/tokens`, bridging to Tailwind in `@perimetre/ui`, and rebuilding the generated CSS.
 

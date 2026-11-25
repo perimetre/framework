@@ -1,12 +1,115 @@
-# Perimetre Framework Monorepo - AI Agent Reference
+# Perimetre Framework Monorepo - Project Context
 
-## Overview
+## Project Overview
 
-Quick reference for AI agents working with the Perimetre Framework monorepo.
+**Purpose**: Private monorepo for shared packages, configurations, and patterns used across Perimetre projects.
+**Stack**: Turborepo + pnpm + Changesets + GitHub Package Registry (private)
+**Repository**: `@perimetre/framework` on GitHub
 
-**Total Packages**: 13 (7 configs + 4 utilities + 1 component library)
-**Registry**: GitHub Package Registry (private, org-scoped: `@perimetre/*`)
-**License**: GPL-3.0
+## Quick Reference
+
+**Key Resources:**
+
+- Contributing: `@CONTRIBUTING.md` - Development workflow and changeset usage
+- README: `@README.md` - Setup instructions for developers
+- Pattern guides: ai-toolkit repo, plugin `perimetre-apps` (`app-code-review/references/*.md`, `app-caching`, `seo`)
+- examples/: Working example projects demonstrating integrations
+
+## Technical Architecture
+
+### Core Technologies
+
+- **Monorepo Tool**: Turborepo (caching, parallel builds, dependency management)
+- **Package Manager**: pnpm with workspaces
+- **Versioning**: Changesets (semantic versioning, automated releases)
+- **Registry**: GitHub Package Registry (private, org-scoped: `@perimetre/*`)
+- **CI/CD**: GitHub Actions (automated testing and publishing)
+
+### Directory Structure
+
+```
+framework/
+├── .changeset/                           # Changesets config
+├── .github/workflows/                    # CI/CD pipelines
+├── examples/                            # Working example projects
+│   ├── trpc/                            # Full tRPC + service layer example
+│   ├── tanstack-query-and-graphql/      # GraphQL + TanStack Query example
+│   └── ui-sdk-forms/                    # React Hook Form + UI SDK form controls
+├── packages/                            # Published packages
+│   ├── eslint-config-base/              # Base ESLint rules
+│   ├── eslint-config-nextjs/            # Next.js ESLint config
+│   ├── eslint-config-react/             # React ESLint config
+│   ├── eslint-config-graphql/           # GraphQL ESLint config
+│   ├── eslint-config-trpc/              # tRPC-optimized ESLint config
+│   ├── lintstaged-config-nextjs/        # lint-staged for Next.js
+│   ├── prettier-config/                 # Prettier configuration
+│   ├── service-builder/                 # Type-safe service layer builder
+│   ├── helpers/                         # Shared TypeScript utilities
+│   ├── icons/                           # Accessible React icon wrapper
+│   ├── classnames/                      # Classname utility (clsx + tailwind-merge)
+│   ├── ui/                              # React component library (brand-aware, deprecated for new work)
+│   └── ui-behaviors/                    # UI behaviours and primitives on UI SDK (apps own the components)
+├── package.json                         # Root package (private)
+├── pnpm-workspace.yaml                  # Workspace configuration
+├── turbo.json                           # Turborepo pipeline config
+└── .npmrc                               # Registry configuration
+```
+
+## Key Configuration Files
+
+### Root package.json
+
+- Scripts: `build`, `lint`, `typecheck`, `changeset`, `version`, `release`
+- Workspace root for pnpm
+
+### Package Configuration Pattern
+
+Each package has:
+
+```json
+{
+  "name": "@perimetre/[package-name]",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "repository": {
+    "directory": "packages/[package-name]"
+  }
+}
+```
+
+### Authentication Setup
+
+- **For CI/CD**: Uses `GITHUB_TOKEN` automatically
+- **For developers**: `npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"`
+- **Registry scope**: `@perimetre:registry=https://npm.pkg.github.com`
+
+## Workflows
+
+### Development Flow
+
+1. Branch from main → Make changes → Run `pnpm turbo run lint build`
+2. Create changeset: `pnpm changeset` (select packages, version bump, write summary)
+3. Commit with conventional commits → Push → Create PR
+4. CI runs linting/build on PR
+
+### Release Flow (Automated)
+
+1. PRs with changesets merge to main
+2. Release workflow automatically:
+   - Bumps package versions based on changesets
+   - Generates/updates CHANGELOG.md files
+   - Commits version changes to main
+   - Publishes packages to GitHub Package Registry
+3. No manual intervention required
+
+### Version Strategy
+
+- **Patch**: Bug fixes, dependency updates (0.0.x)
+- **Minor**: New features, backward compatible (0.x.0)
+- **Major**: Breaking changes (x.0.0)
+- Internal dependencies use `workspace:*` protocol
 
 ## Published Packages
 
@@ -24,303 +127,36 @@ Quick reference for AI agents working with the Perimetre Framework monorepo.
 
 - **@perimetre/service-builder** - Type-safe service layer with error-as-values pattern (inspired by tRPC)
 - **@perimetre/helpers** - Shared TypeScript utilities (Faker, CSV parsing)
-- **@perimetre/icons** - Accessible React icon wrapper with TypeScript enforcement
-- **@perimetre/classnames** - Utility combining clsx + tailwind-merge
+- **@perimetre/icons** - Accessible React icon wrapper with TypeScript enforcement. **Deprecated**: use `Icon` from `@perimetre/ui-behaviors/react/icon`. Kept published for the apps that install it
+- **@perimetre/classnames** - Utility combining clsx + tailwind-merge. **Deprecated**: use the `cn` package (https://github.com/shadcn-ui/cn) directly, `cn` from `cn` and `createCn` from `cn/config`. Kept published for the apps that install it
 
-### Component Libraries
+### UI Behaviours and Components
 
-- **@perimetre/ui** - React component library with brand-aware theming built on Tailwind CSS v4 and Radix UI primitives. Supports visual polymorphism across multiple brands (Acorn, Sprig, Stelpro)
+- **@perimetre/ui-behaviors** - A library of UI behaviours built on UI SDK (https://ui-sdk.dev), for an agent to build an app's own components with. It is not a component library: it ships no styles, and apps own their components. `Icon` (`react/icon`) is its one React component, there because every app needs the same one and it has nothing to style; everything else is framework-free. It has no root import: every folder under `src/` is its own entry, like `@perimetre/ui-behaviors/primitives/magnify`. `behaviors/` holds functions shaped like UI SDK's (`createFollowPoint`, `createScrub`, `createAutoProgress`, `createLinkedHighlight`, `bindGoogleMap`), `primitives/` holds `magnify`, `sequence` and `locator` (`definePrimitive`, rendered by the app with `createParts`), and `utilities/` holds pure functions (`sortByDistance`, `accessibleIcon`, `createPlacesSession`). Use UI SDK directly for what it covers (accordion, tabs, drawer, carousel, form controls). When working on this package, follow the `create-ui-behavior` skill (`.agents/skills/create-ui-behavior/SKILL.md`): what belongs here, UI SDK's naming and shape, and what every addition needs (story, test, the shipped skill, a changeset). Never add a component, a style or `"use client"`. Nothing under `packages/ui-behaviors` mentions `@perimetre/ui`, `@perimetre/icons`, `@perimetre/classnames` or `@perimetre/tokens`: the deprecated packages point to it, never the reverse. See `packages/ui-behaviors/README.md`, and `packages/ui/docs/migrating-to-ui-behaviors.md` for the migration guide
+- **@perimetre/ui** - React component library with brand-aware theming built on Tailwind CSS v4 and Radix UI primitives. Supports visual polymorphism across multiple brands (Acorn, Sprig, Stelpro) with three-tier design token system. **Deprecated**: kept published and working for the apps that install it, with no new components. New components are written in the app, from UI SDK and `@perimetre/ui-behaviors`
+- **@perimetre/tokens** - Design tokens as W3C DTCG JSON sets, built to CSS custom properties per brand. **Deprecated as a package**: each app still defines its own tokens, in its own stylesheet, and its components read them. Existing sets still release through `tokens-release.yml` for the apps that install them; no new brand or token is added
 
-## Package Details
+### Package Relationships
 
-### @perimetre/service-builder
+- Packages use `workspace:*` protocol for internal dependencies
+- Changesets handles cross-package version bumps automatically
+- ESLint configs can extend each other (e.g., nextjs extends base)
 
-Type-safe service layer builder with dependency injection.
+## GitHub Actions Pipelines
 
-**Key Features**:
+1. **CI Pipeline** (`ci.yml`): Runs on PRs - lint, typecheck, build
+2. **Release Pipeline** (`release.yml`): Runs on main when changesets detected - auto-versions and publishes packages
+3. **Tests Pipeline** (`tests.yml`): Runs every package's `test` task (`pnpm test`) on PRs and on main, behind one aggregate `Tests` check. Each package's tests are a Turbo task cached on its inputs, with `.turbo/cache` kept between runs. The Changesets release PR is skipped: `.github/scripts/release-only-diff.mjs` detects a diff that only bumps versions, writes changelogs and deletes changesets, since Turbo always hashes `package.json` and would re-run everything
 
-- Perfect type inference like tRPC
-- Zod input validation
-- Dependency injection via `deps` pattern
-- Error-as-values (no throwing)
-- Self-referential service calls
-- Zero runtime dependencies (~200 lines)
-
-**Usage**:
-
-```typescript
-import { ServiceBuilder } from '@perimetre/service-builder';
-
-const s = new ServiceBuilder();
-
-const userService = s
-  .service('user')
-  .input(z.object({ id: z.string() }))
-  .deps(({ db }) => db)
-  .resolve(async ({ input, deps }) => {
-    // Returns { ok: true, data } or { ok: false, error }
-  });
-
-const services = s.router({ user: userService });
-
-// Type-safe usage
-const result = await services.user({ id: '123' });
-if (result.ok) {
-  console.log(result.data); // Fully typed
-}
-```
-
-**Related Docs**: ai-toolkit `perimetre-apps` → `app-code-review/references/services.md`, `error-handling.md`; `examples/trpc/`
-
----
-
-### @perimetre/helpers
-
-Tree-shakeable TypeScript utilities for client and server.
-
-**Client-safe modules**: array, clipboard, object, string, predicates, types, mappers
-**Server-only modules**: csv, file, url
-
-```typescript
-// Client-safe imports
-import { chunk, unique } from '@perimetre/helpers/array';
-import { isNotNullish } from '@perimetre/helpers/predicates';
-
-// Server-only imports
-import { parseCSV } from '@perimetre/helpers/csv';
-import { readFile } from '@perimetre/helpers/file';
-```
-
----
-
-### @perimetre/icons
-
-Accessible React icon wrapper with TypeScript-enforced accessibility.
-
-**Requirements**: Must provide either `aria-hidden` (decorative) or `label` (semantic)
-
-```typescript
-import { Icon } from '@perimetre/icons'
-import { HomeIcon } from 'lucide-react'
-
-// Decorative icon
-<Icon icon={HomeIcon} aria-hidden />
-
-// Semantic icon
-<Icon icon={HomeIcon} label="Home" />
-
-// Use currentColor for dynamic theming
-<div className="text-blue-500">
-  <Icon icon={HomeIcon} aria-hidden />
-</div>
-```
-
-**Related Docs**: ai-toolkit `perimetre-apps` → `app-code-review/references/icons.md`
-
----
-
-### @perimetre/classnames
-
-Classname utility combining clsx + tailwind-merge for Tailwind conflict resolution.
-
-```typescript
-import { cn } from '@perimetre/classnames'
-
-// Conditional classes
-<div className={cn('p-4', isActive && 'bg-blue-500')} />
-
-// Tailwind conflict resolution (p-4 + p-8 → p-8)
-<div className={cn('p-4', someCondition && 'p-8')} />
-
-// With CVA
-const button = cva('px-4 py-2', {
-  variants: { variant: { primary: 'bg-blue-500' } }
-})
-<button className={cn(button({ variant: 'primary' }), 'mt-4')} />
-```
-
----
-
-### @perimetre/ui
-
-Brand-aware React component library built on Tailwind CSS v4 + Radix UI.
-
-**Key Features**:
-
-- Visual polymorphism (same components, different brand styles per CSS import)
-- Three-tier design tokens (primitives → semantic → component)
-- React Server Component compatible
-- Supports: Acorn, Sprig, Stelpro brands
-- Custom `pui:` Tailwind prefix
-- CVA + tailwind-merge composition
-
-```typescript
-// Import brand CSS (determines visual theme)
-import '@perimetre/ui/acorn.css'
-// or '@perimetre/ui/sprig.css' or '@perimetre/ui/stelpro.css'
-
-import { Button, Card, Dialog } from '@perimetre/ui'
-
-<Button variant="primary">Click me</Button>
-<Card>
-  <Card.Header>
-    <Card.Title>Title</Card.Title>
-  </Card.Header>
-  <Card.Content>Content</Card.Content>
-</Card>
-```
-
-**CSS Sizes (gzipped)**: Preflight 1.3 KB, Brand themes 3.3 KB each
-
----
-
-### Configuration Packages Usage
-
-**ESLint Configs**:
-
-```javascript
-// eslint.config.js
-import baseConfig from '@perimetre/eslint-config-base';
-import nextjsConfig from '@perimetre/eslint-config-nextjs';
-import reactConfig from '@perimetre/eslint-config-react';
-import graphqlConfig from '@perimetre/eslint-config-graphql';
-import trpcConfig from '@perimetre/eslint-config-trpc';
-
-export default [...baseConfig];
-// or [...nextjsConfig], [...reactConfig], etc.
-```
-
-**Prettier**:
-
-```javascript
-// prettier.config.js
-export { default } from '@perimetre/prettier-config';
-```
-
-**lint-staged**:
-
-```javascript
-// lint-staged.config.js
-export { default } from '@perimetre/lintstaged-config-nextjs';
-```
-
-## Key Patterns
-
-### Error-as-Values Pattern
-
-Services return `Result<T, E>` instead of throwing:
-
-```typescript
-type Result<T, E> = { ok: true; data: T } | { ok: false; error: E };
-
-const result = await services.createUser({ name: 'Alice' });
-if (!result.ok) {
-  return result.error; // Type-safe error
-}
-const user = result.data; // Type-safe success
-```
-
-**Documentation**: ai-toolkit `perimetre-apps` → `app-code-review/references/error-handling.md`
-
-### Service Layer Architecture
-
-```typescript
-const userService = s
-  .service('user')
-  .input(schema)
-  .deps(({ db }) => db) // Dependency injection
-  .resolve(async ({ input, deps }) => {
-    // Full type safety, can call other services
-  });
-
-const services = s.router({
-  user: userService,
-  post: postService
-});
-```
-
-**Documentation**: ai-toolkit `perimetre-apps` → `app-code-review/references/services.md`; `examples/trpc/`
-
-### Accessibility-First Icons
-
-TypeScript enforces accessibility at compile time:
-
-```typescript
-<Icon icon={X} aria-hidden /> // OK: Decorative
-<Icon icon={X} label="Close" /> // OK: Semantic
-<Icon icon={X} /> // ERROR: Must provide aria-hidden or label
-```
-
-**Documentation**: ai-toolkit `perimetre-apps` → `app-code-review/references/icons.md`
-
-## Package Relationships
-
-```
-eslint-config-base (foundation)
-  └── eslint-config-trpc (extends base via workspace:*)
-
-ui (component library)
-  └── uses classnames internally
-
-All other packages are standalone
-```
-
-## Installation Examples
-
-### Next.js Project
+## Usage in Projects
 
 ```bash
-pnpm add -D @perimetre/eslint-config-base
-pnpm add -D @perimetre/eslint-config-nextjs
-pnpm add -D @perimetre/prettier-config
-pnpm add -D @perimetre/lintstaged-config-nextjs
-pnpm add @perimetre/classnames
-pnpm add @perimetre/icons
-pnpm add @perimetre/helpers
-pnpm add @perimetre/ui
-```
-
-### tRPC Project
-
-```bash
-pnpm add -D @perimetre/eslint-config-trpc
-pnpm add -D @perimetre/prettier-config
-pnpm add @perimetre/service-builder
-pnpm add @perimetre/helpers
-```
-
-See `examples/trpc/` for full implementation patterns.
-
-### GraphQL Project
-
-```bash
-pnpm add -D @perimetre/eslint-config-graphql
-pnpm add -D @perimetre/eslint-config-react
-pnpm add -D @perimetre/prettier-config
-pnpm add @perimetre/helpers
-```
-
-See `examples/tanstack-query-and-graphql/` for implementation patterns.
-
-## Authentication Setup
-
-**GitHub Package Registry**: `https://npm.pkg.github.com`
-
-**For developers**:
-
-```bash
+# One-time auth
 gh auth login -h github.com -s read:packages
 npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
-npm config set @perimetre:registry https://npm.pkg.github.com
-```
 
-**For CI/CD**: Set `NPM_TOKEN` environment variable (GitHub Actions uses `GITHUB_TOKEN` automatically)
-
-**Project .npmrc**:
-
-```ini
-@perimetre:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NPM_TOKEN}
+# Install in project
+pnpm add @perimetre/eslint-config-nextjs
 ```
 
 ## Pattern Guides
@@ -346,6 +182,8 @@ Full-stack tRPC implementation with:
 - Optimistic updates
 - HTTP caching with stale-while-revalidate
 
+**Key files**: See `examples/trpc/README.md` for complete file listing
+
 ### TanStack Query + GraphQL Example (`examples/tanstack-query-and-graphql/`)
 
 GraphQL integration with:
@@ -355,36 +193,97 @@ GraphQL integration with:
 - Server and client component patterns
 - Type-safe queries and mutations
 
-## Important Notes for AI Agents
+**Key files**: See `examples/tanstack-query-and-graphql/README.md` for details
 
-- **Always read package README** before using - contains specific usage patterns
-- **Check peer dependencies** - Many packages require specific versions (e.g., react >= 19, eslint >= 9)
-- **Config packages don't build** - Published as-is (JavaScript config files)
-- **Utility packages ship built code** - service-builder, helpers, icons, classnames, ui
-- **Error-as-values pattern** - Service builder returns Result types, never throws exceptions
-- **Accessibility required** - Icons package requires aria-hidden or label at compile time
-- **Brand CSS required** - UI library components need brand CSS import to work
-- **Named groups/peers need dual classes** - When using `group/name` or `peer/name` in PUI components, always include both `group/name` and `pui:group/name` on the marker element. See `packages/ui/docs/tailwind-named-groups-and-peers.md`
-- **Use workspace:\*** protocol - For internal dependencies during monorepo development
-- **Never manual version bumps** - Always use changesets workflow
-- **Absolute GitHub URLs** - When referencing LLM documentation or examples
+### UI SDK Forms Example (`examples/ui-sdk-forms/`)
+
+React Hook Form + Zod with UI SDK form controls:
+
+- `register()` for `Input`, `Textarea` and a native `<select>`
+- `Controller` for `Checkbox`, `RadioGroup`, `Select` and `Combobox`
+- Errors through `Field invalid` and `FieldError`
+
+Standalone, not part of the pnpm workspace: install with `pnpm install --ignore-workspace`.
+
+**Key files**: See `examples/ui-sdk-forms/README.md` for details
+
+## Important Notes
+
+- Configuration packages are configs only (no `dev` scripts needed)
+- Utility packages (service-builder, helpers, icons, classnames) ship built code
+- All packages private to organization (access: restricted)
+- Uses GitHub Package Registry, NOT npm public registry
+- Changesets creates automated version PR after merging
+- Turborepo caches builds to avoid redundant work
+- `workspace:*` protocol ensures local development uses local packages
+- Always use absolute GitHub URLs when referencing documentation
+
+## Writing Documentation
+
+Two rules hold for every doc in this repo.
+
+**Reference the source, document the delta.** When something is built on another project or package, link its docs and write only what we add or do differently. Never retell what the source already says: the copy goes stale and nobody knows which one to trust. `packages/ui-behaviors` documents what it adds to UI SDK and nothing of UI SDK itself. A package README does not repeat this file, and this file does not repeat a package README.
+
+**Write for the reader the file has.**
+
+| File                                | Reader                                | Holds                                                     |
+| ----------------------------------- | ------------------------------------- | --------------------------------------------------------- |
+| `README.md` (root and each package) | A person                              | What it is, why it exists, how to start, where to go next |
+| `SKILL.md` and its `references/`    | An agent doing the work               | Rules, entry points, file paths, what gets missed         |
+| JSDoc                               | An agent or a person at the call site | The API: every option, reason, part and CSS variable      |
+| `AGENTS.md`                         | An agent working in this repo         | How the repo is laid out and how to work in it            |
+| `CONTRIBUTING.md`                   | A person contributing                 | Changesets and versioning                                 |
+
+A README never lists exports, file paths inside `node_modules` or implementation rules. Those belong to the skill or the JSDoc. When a README and a skill say the same thing, cut it from the README.
+
+**Update a README when** one of these changes, in the same pull request:
+
+- **The root `README.md`:** a package is added, removed, renamed or deprecated; the setup, the checks to run or the release flow changes; an example is added or removed.
+- **A package `README.md`:** what a person can do with the package changes, or how they start. A new export alone is not a reason: update the skill or the JSDoc.
+
+Keep a README short enough to read in two minutes. Link to the package README from the root rather than describing the package twice.
+
+`CLAUDE.md` is a symlink to this file. Edit `AGENTS.md`.
+
+## Troubleshooting
+
+### Named `group/` and `peer/` in PUI components
+
+When using named Tailwind groups or peers (e.g., `group/myName`, `peer/myName`) inside `@perimetre/ui` components, you **must** include both the unprefixed and `pui:`-prefixed marker class. The `@custom-variant pui` integration used by consumer apps generates selectors that reference the unprefixed group name, while the DOM class includes the `pui:` prefix.
+
+```tsx
+{
+  /* Always use both */
+}
+<div className="group/myName pui:group/myName">
+  <div className="pui:group-hover/myName:opacity-100">...</div>
+</div>;
+```
+
+See `packages/ui/docs/tailwind-named-groups-and-peers.md` for full details.
 
 ## Commands Reference
 
 ```bash
 pnpm install              # Install all dependencies
 pnpm turbo run build      # Build all packages
-pnpm turbo run lint       # Lint all packages
+pnpm test                 # Run every package's tests (turbo run test)
 pnpm changeset            # Create changeset for version bump
 pnpm version              # Apply changesets (usually in CI)
 pnpm release              # Build + publish (usually in CI)
 ```
 
----
+## Current State
 
-**Last Updated**: 2026-01-13
-**For contributing**: See `CONTRIBUTING.md`
-**For setup**: See `README.md`
+- 14 published packages (7 configs + 4 utilities + UI behaviours + the deprecated component library)
+- CI/CD pipelines with automated releases
+- Pattern guides maintained in the ai-toolkit repo (`perimetre-apps` plugin)
+- Working examples for tRPC, GraphQL and UI SDK form patterns
+- Apps own their components, built from UI SDK and `@perimetre/ui-behaviors`. `@perimetre/ui` is deprecated
+- Authentication via GitHub CLI for developers
+
+**For contributing and commit guidelines**: `@CONTRIBUTING.md`
+**For setup instructions**: `@README.md`
 
 ## Browser Automation
 

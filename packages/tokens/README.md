@@ -1,5 +1,7 @@
 # @perimetre/tokens
 
+> **Deprecated as a shared package. Design tokens are not.** Each app still defines its own tokens, and its components still read tokens and never raw values. What changes is where they live: in the app's own stylesheet, next to the components it owns. In a Tailwind CSS v4 app that is the `@theme` block of the global stylesheet. `@perimetre/tokens` stays published and working for the apps that install it, and existing token sets still release when they change. No new brand and no new token is added here.
+
 Design tokens for the Perimetre design system. Contains the single source of truth as W3C DTCG JSON token sets, plus a build pipeline that generates CSS custom properties.
 
 ## Architecture
