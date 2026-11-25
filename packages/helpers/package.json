@@ -18,7 +18,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "docs"
   ],
   "license": "GPL-3.0",
   "name": "@perimetre/helpers",

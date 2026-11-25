@@ -43,6 +43,12 @@ framework/
 │   ├── eslint-config-trpc/              # tRPC-optimized ESLint config
 │   ├── lintstaged-config-nextjs/        # lint-staged for Next.js
 │   ├── prettier-config/                 # Prettier configuration
+│   ├── oxlint-config-base/              # Base Oxlint rules, type-aware on tsrs
+│   ├── oxlint-config-nextjs/            # Next.js Oxlint config
+│   ├── oxlint-config-react/             # React Oxlint config
+│   ├── oxlint-config-trpc/              # tRPC Oxlint config
+│   ├── lintstaged-config-oxc/           # lint-staged with Oxlint and Oxfmt
+│   ├── oxfmt-config/                    # Oxfmt configuration
 │   ├── service-builder/                 # Type-safe service layer builder
 │   ├── helpers/                         # Shared TypeScript utilities
 │   ├── icons/                           # Accessible React icon wrapper
@@ -122,6 +128,27 @@ Each package has:
 - **@perimetre/eslint-config-trpc** - tRPC-optimized ESLint configuration
 - **@perimetre/lintstaged-config-nextjs** - lint-staged config for Next.js projects
 - **@perimetre/prettier-config** - Prettier configuration
+
+The Oxc counterparts, for projects on [Oxlint and Oxfmt](https://oxc.rs) instead of ESLint and Prettier. They carry the same rules, with type-aware rules running on [tsrs](https://github.com/oxc-project/tsrs). There is no GraphQL counterpart: `@graphql-eslint` needs a custom parser, and Oxlint's JS plugins do not support one.
+
+- **@perimetre/oxlint-config-base** - Base Oxlint rules. Turns on `typeAware`, and exports `ignorePatterns` for the app's root config
+- **@perimetre/oxlint-config-react** - React Oxlint: hooks and React Compiler (native), a11y, TanStack Query
+- **@perimetre/oxlint-config-nextjs** - Next.js `core-web-vitals` on Oxlint's native `nextjs` plugin
+- **@perimetre/oxlint-config-trpc** - The tRPC rule adjustments, for Oxlint
+- **@perimetre/lintstaged-config-oxc** - lint-staged running `oxlint --fix`, then `oxfmt`
+- **@perimetre/oxfmt-config** - Oxfmt, formatting like the Prettier config
+
+Each config is a base plus our deltas, like its ESLint counterpart. The base is Oxlint's own `correctness` category, plus the upstream presets in each package's `presets.mjs` (`@eslint/js`, typescript-eslint, jsdoc, jsx-a11y, react-hooks, `@next/eslint-plugin-next`). Oxlint ships no presets, so those are mapped to Oxlint's names by hand, keeping only the rules Oxlint implements outside nursery, and each lists what it leaves out. `presets.mjs` holds upstream's rules only: our own rules go in `index.mjs`, after the presets. Each package's `test` runs `oxlint --print-config` on its config stack, which fails on any rule Oxlint does not have.
+
+The app-best-practices conventions a linter can check live in `restrictions.mjs`, kept identical in `eslint-config-base` and `oxlint-config-base`: change both together. `restrictedImports()` builds the `no-restricted-imports` options, because every block that sets a rule replaces its options wholesale: every override, ours or an app's, calls it. In ESLint the shared list sits on the core `no-restricted-imports` rule, so the `@typescript-eslint/no-restricted-imports` blocks the ai-toolkit setup writes add to it instead of replacing it. Keep it there. Oxlint has no `no-restricted-syntax`, so `oxlint-config-base/plugin.mjs` is a local JS plugin with the same rule as `perimetre/no-restricted-syntax`, taking the same selectors.
+
+When changing them, what Oxlint does differently from the docs' wording:
+
+- Each config is an object an app passes to `extends` in `oxlint.config.ts`. `.oxlintrc.json` cannot extend a package, and Oxfmt has no `extends` at all, so its config is spread
+- A bare `jsPlugins` specifier resolves against the app's config file, where pnpm hides our dependencies. Resolve plugins to absolute paths with `import.meta.resolve`
+- `plugins`, `jsPlugins`, `rules`, `overrides` and `options` merge across `extends`. `ignorePatterns` is dropped from an extended config, which is why base exports it
+- Rules in an extended config's `overrides` beat the app's root `rules`. Set rules at the root, and use overrides only to switch rules off where the ESLint config did not apply them
+- Rules Oxlint lacks natively run through their ESLint plugin. When the name is reserved for a native plugin, alias it: `jsdoc-js`, `react-js`
 
 ### Utility Packages
 
@@ -241,13 +268,14 @@ Two rules hold for every doc in this repo.
 
 **Write for the reader the file has.**
 
-| File                                | Reader                                | Holds                                                     |
-| ----------------------------------- | ------------------------------------- | --------------------------------------------------------- |
-| `README.md` (root and each package) | A person                              | What it is, why it exists, how to start, where to go next |
-| `SKILL.md` and its `references/`    | An agent doing the work               | Rules, entry points, file paths, what gets missed         |
-| JSDoc                               | An agent or a person at the call site | The API: every option, reason, part and CSS variable      |
-| `AGENTS.md`                         | An agent working in this repo         | How the repo is laid out and how to work in it            |
-| `CONTRIBUTING.md`                   | A person contributing                 | Changesets and versioning                                 |
+| File                                | Reader                                | Holds                                                      |
+| ----------------------------------- | ------------------------------------- | ---------------------------------------------------------- |
+| `README.md` (root and each package) | A person                              | What it is, why it exists, how to start, where to go next  |
+| `SKILL.md` and its `references/`    | An agent doing the work               | Rules, entry points, file paths, what gets missed          |
+| A package's `docs/`                 | An agent using the package in an app  | The full reference the README's prompt points the agent to |
+| JSDoc                               | An agent or a person at the call site | The API: every option, reason, part and CSS variable       |
+| `AGENTS.md`                         | An agent working in this repo         | How the repo is laid out and how to work in it             |
+| `CONTRIBUTING.md`                   | A person contributing                 | Changesets and versioning                                  |
 
 A README never lists exports, file paths inside `node_modules` or implementation rules. Those belong to the skill or the JSDoc. The one exception is a prompt the README gives a person to paste into their agent: the prompt is for the agent, so it may name the files the agent must read. When a README and a skill say the same thing, cut it from the README.
 
@@ -290,7 +318,7 @@ pnpm release              # Build + publish (usually in CI)
 
 ## Current State
 
-- 14 published packages (7 configs + 4 utilities + UI behaviours + the deprecated component library)
+- 20 published packages (7 ESLint and Prettier configs + their 6 Oxc counterparts + 4 utilities + UI behaviours + the deprecated component library)
 - CI/CD pipelines with automated releases
 - Project setup and coding conventions maintained in the ai-toolkit repo (`perimetre-apps` plugin)
 - Working examples for tRPC, GraphQL and UI SDK form patterns

@@ -6,7 +6,7 @@ Packages are private and published to GitHub Packages under `@perimetre/*`.
 
 ## Packages
 
-Each package has its own README with usage.
+Each package's README says what it's for, and gives you a prompt that sets it up through your agent.
 
 ### Configuration
 
@@ -19,6 +19,19 @@ Each package has its own README with usage.
 | [`eslint-config-trpc`](packages/eslint-config-trpc)             | ESLint for tRPC                                        |
 | [`lintstaged-config-nextjs`](packages/lintstaged-config-nextjs) | lint-staged for Next.js                                |
 | [`prettier-config`](packages/prettier-config)                   | Prettier                                               |
+
+The same configs for [Oxlint and Oxfmt](https://oxc.rs), with type-aware rules on [tsrs](https://github.com/oxc-project/tsrs):
+
+| Package                                                   | What it is                                                     |
+| --------------------------------------------------------- | -------------------------------------------------------------- |
+| [`oxlint-config-base`](packages/oxlint-config-base)       | Base Oxlint rules for TypeScript. Start here: it has the setup |
+| [`oxlint-config-nextjs`](packages/oxlint-config-nextjs)   | Oxlint for Next.js                                             |
+| [`oxlint-config-react`](packages/oxlint-config-react)     | Oxlint for React: hooks, accessibility, TanStack Query         |
+| [`oxlint-config-trpc`](packages/oxlint-config-trpc)       | Oxlint for tRPC                                                |
+| [`lintstaged-config-oxc`](packages/lintstaged-config-oxc) | lint-staged with Oxlint and Oxfmt                              |
+| [`oxfmt-config`](packages/oxfmt-config)                   | Oxfmt                                                          |
+
+GraphQL has no Oxlint config: its ESLint plugin needs a custom parser, which Oxlint's JS plugins do not support.
 
 ### Code
 
@@ -74,11 +87,7 @@ Its README has the one-line install for Claude Code, Codex and other agents.
    npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
    ```
 
-3. Install what you need:
-
-   ```bash
-   pnpm add -D @perimetre/eslint-config-nextjs
-   ```
+3. Open the package's README and copy its quick-start prompt into your agent. The agent installs the package and wires it into the project.
 
 ### On Vercel
 

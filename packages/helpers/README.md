@@ -1,98 +1,22 @@
 # @perimetre/helpers
 
-Shared TypeScript utilities and reusable helpers for Perimetre projects.
+Small utilities our projects kept rewriting: arrays, objects, strings, the clipboard, value mappers, type predicates and utility types, plus server-only helpers for CSV files, the file system and URLs. Each group is its own entry, so a project bundles only what it imports.
 
-## Installation
+## Quick start
 
-```bash
-pnpm add @perimetre/helpers
+The [ai-toolkit](https://github.com/perimetre/ai-toolkit) project setup doesn't add this package. To add it, copy this prompt into your agent, in the project:
+
+```text
+Set up @perimetre/helpers in this project.
+
+1. Check that .npmrc has `@perimetre:registry=https://npm.pkg.github.com`. If it
+   doesn't, or the install is refused, stop and ask me.
+2. Install @perimetre/helpers with the project's package manager. If a
+   release-age policy blocks the install, stop and ask me instead of
+   changing it.
+3. Add a note to AGENTS.md/CLAUDE.md, creating it if needed: before writing a
+   small utility, check node_modules/@perimetre/helpers/docs/reference.md for
+   one. Import the csv, file and url entries in server code only.
 ```
 
-## Usage
-
-### Tree-shakeable Imports
-
-This package is designed to be tree-shakeable. You can import only the helpers you need:
-
-```typescript
-// Import specific helpers (tree-shakeable)
-import { insertIntoArray, removeFromArray } from '@perimetre/helpers/array';
-import { slugify } from '@perimetre/helpers/string';
-import { valueNotUndefined } from '@perimetre/helpers/predicates/value';
-```
-
-### Available Exports
-
-#### Client-safe Helpers
-
-These helpers work in both browser and Node.js environments:
-
-- `@perimetre/helpers/array` - Array manipulation utilities
-- `@perimetre/helpers/clipboard` - Browser clipboard utilities
-- `@perimetre/helpers/object` - Object manipulation utilities
-- `@perimetre/helpers/string` - String utilities (slugify, etc.)
-- `@perimetre/helpers/predicates` - Type predicates
-- `@perimetre/helpers/types` - TypeScript utility types
-- `@perimetre/helpers/mappers` - Value mappers
-
-#### Server-only Helpers
-
-These helpers require Node.js APIs and should only be used on the server:
-
-- `@perimetre/helpers/csv` - CSV parsing and generation (requires `fs`, `path`, `csv` package)
-- `@perimetre/helpers/file` - File system utilities (requires `fs`, `path`)
-- `@perimetre/helpers/url` - URL utilities (requires Node.js `url`, `path`)
-
-### Examples
-
-#### Array Helpers
-
-```typescript
-import {
-  insertIntoArray,
-  removeFromArray,
-  shiftIndexInArray
-} from '@perimetre/helpers/array';
-
-const arr = [1, 2, 3, 4];
-const withInserted = insertIntoArray(arr, 2, 99); // [1, 2, 99, 3, 4]
-const withRemoved = removeFromArray(arr, (x) => x === 3); // [1, 2, 4]
-const shifted = shiftIndexInArray(arr, 0, 2); // [2, 3, 1, 4]
-```
-
-#### String Helpers
-
-```typescript
-import { slugify, replaceSpecial } from '@perimetre/helpers/string';
-
-const slug = slugify('Hello World!'); // 'Hello-world'
-const clean = replaceSpecial('café'); // 'cafe'
-```
-
-#### CSV Helpers (Server-only)
-
-```typescript
-import { parseCsv, makeCsv } from '@perimetre/helpers/csv';
-
-// Parse CSV file in chunks
-await parseCsv<{ name: string; age: number }>(
-  './data.csv',
-  async (rows) => {
-    // Process each chunk of rows
-    console.log(rows);
-  },
-  { columns: true },
-  1000 // chunk size
-);
-
-// Generate CSV file
-await makeCsv('./output', 'data.csv', [
-  ['Name', 'Age'],
-  ['John', '30'],
-  ['Jane', '25']
-]);
-```
-
-## TypeScript Support
-
-This package includes full TypeScript definitions. All helpers are strongly typed.
+What each entry exports is in [docs/reference.md](docs/reference.md).

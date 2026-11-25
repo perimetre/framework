@@ -6,7 +6,9 @@ You do not write against this package by hand. You give your agent its skill and
 
 ## Quick start
 
-Copy this prompt into your agent, in the app:
+**Starting a project?** Use the [ai-toolkit](https://github.com/perimetre/ai-toolkit) project setup. It runs the prompt below for you.
+
+**Adding it to a project yourself?** Copy this prompt into your agent, in the app:
 
 ```text
 Set up @perimetre/ui-behaviors in this React project. It needs React 19 or newer.

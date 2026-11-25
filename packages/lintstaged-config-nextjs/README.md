@@ -1,36 +1,27 @@
 # @perimetre/lintstaged-config-nextjs
 
-Lint-staged configuration for Next.js projects at Perimetre.
+Runs `eslint --fix` on the files you stage, before each commit, so a lint error stops the commit instead of reaching review.
 
-## What it does
+## Quick start
 
-Automatically runs ESLint on staged files before commits, fixing issues when possible.
+**Starting a project?** Use the [ai-toolkit](https://github.com/perimetre/ai-toolkit) project setup. It installs this config with Husky.
 
-## Why it exists
+**Adding it to a project yourself?** Copy this prompt into your agent, in the project:
 
-Prevents committing code with linting errors by catching and fixing issues automatically during the commit process.
+```text
+Set up @perimetre/lintstaged-config-nextjs in this project. It needs ESLint set
+up already.
 
-## Usage
-
-```bash
-pnpm add -D @perimetre/lintstaged-config-nextjs lint-staged
+1. Check that .npmrc has `@perimetre:registry=https://npm.pkg.github.com`. If it
+   doesn't, or the install is refused, stop and ask me.
+2. Install @perimetre/lintstaged-config-nextjs, lint-staged and husky as dev
+   dependencies with the project's package manager. If a release-age policy
+   blocks the install, stop and ask me instead of changing it.
+3. Create lint-staged.config.mjs that default-exports the default export of
+   @perimetre/lintstaged-config-nextjs.
+4. Run husky init if .husky doesn't exist, and make .husky/pre-commit run
+   lint-staged with the project's package manager.
+5. Stage one file and run lint-staged once, so we see it work.
 ```
 
-```js
-// lint-staged.config.mjs
-import config from '@perimetre/lintstaged-config-nextjs';
-
-export default config;
-```
-
-Or use `package.json`:
-
-```json
-{
-  "lint-staged": "@perimetre/lintstaged-config-nextjs"
-}
-```
-
-## Requirements
-
-- lint-staged >= 16
+Projects on Oxlint and Oxfmt use [`@perimetre/lintstaged-config-oxc`](https://github.com/perimetre/framework/tree/main/packages/lintstaged-config-oxc).
