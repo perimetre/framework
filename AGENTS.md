@@ -12,7 +12,7 @@
 
 - Contributing: `@CONTRIBUTING.md` - Development workflow and changeset usage
 - README: `@README.md` - Setup instructions for developers
-- Pattern guides: ai-toolkit repo, plugin `perimetre-apps` (`app-code-review/references/*.md`, `app-caching`, `seo`)
+- How projects use these packages: the [ai-toolkit](https://github.com/perimetre/ai-toolkit) repo, plugin `perimetre-apps` (`app-project-setup`, `app-best-practices`, `app-authenticate`). See [Projects That Use the Framework](#projects-that-use-the-framework)
 - examples/: Working example projects demonstrating integrations
 
 ## Technical Architecture
@@ -159,13 +159,28 @@ npm config set //npm.pkg.github.com/:_authToken "$(gh auth token)"
 pnpm add @perimetre/eslint-config-nextjs
 ```
 
-## Pattern Guides
+## Projects That Use the Framework
 
-The pattern guides that used to live in `LLMs/` now live in the [ai-toolkit](https://github.com/perimetre/ai-toolkit) repo, plugin `perimetre-apps`: see the `app-code-review` skill's `references/*.md` (services, error handling, tRPC, TanStack Query, GraphQL, forms, icons), plus the `app-caching` and `seo` skills.
+This repo publishes packages. How a project is created with them, and how its code is written, lives in the [ai-toolkit](https://github.com/perimetre/ai-toolkit) repo, plugin `perimetre-apps`. Read it there and do not restate it here.
 
-**Access pattern**: Always use absolute GitHub URLs when referencing docs:
+| For                                                                                                                                                  | Skill in `perimetre-apps` |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| Creating a project. This is how a project that uses the framework is set up                                                                          | `app-project-setup`       |
+| Conventions while writing or changing code: services, errors, tRPC, TanStack Query, GraphQL, forms, components, tokens, testing, caching             | `app-best-practices`      |
+| Signing in to GitHub Packages so `@perimetre/*` installs                                                                                             | `app-authenticate`        |
+| Where a component's behaviour comes from in an app. It hands over to `create-ui-behavior` here when the behaviour belongs in `packages/ui-behaviors` | `app-ui-behaviour`        |
+| The app's own design tokens                                                                                                                          | `app-design-system`       |
+| Reviewing a diff against the conventions                                                                                                             | `app-code-review`         |
 
-- GitHub viewer: `https://github.com/perimetre/framework/tree/main/examples/trpc`
+Install the plugin with `/plugin marketplace add perimetre/ai-toolkit`, or read one skill without installing:
+
+```bash
+gh api repos/perimetre/ai-toolkit/contents/plugins/perimetre-apps/skills/app-best-practices/SKILL.md -H "Accept: application/vnd.github.raw"
+```
+
+When a change here alters how an app uses a package (an import path, a setup step, a deprecation), the matching skill in ai-toolkit needs the same change. Say so in the pull request.
+
+Link to this repo's own docs and examples with absolute GitHub URLs, like `https://github.com/perimetre/framework/tree/main/examples/trpc`.
 
 ## Examples
 
@@ -277,7 +292,7 @@ pnpm release              # Build + publish (usually in CI)
 
 - 14 published packages (7 configs + 4 utilities + UI behaviours + the deprecated component library)
 - CI/CD pipelines with automated releases
-- Pattern guides maintained in the ai-toolkit repo (`perimetre-apps` plugin)
+- Project setup and coding conventions maintained in the ai-toolkit repo (`perimetre-apps` plugin)
 - Working examples for tRPC, GraphQL and UI SDK form patterns
 - Apps own their components, built from UI SDK and `@perimetre/ui-behaviors`. `@perimetre/ui` is deprecated
 - Authentication via GitHub CLI for developers

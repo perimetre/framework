@@ -49,6 +49,16 @@ Apps own their components. There is no shared component library to add to.
 
 In practice you ask your agent for the component, and it builds it in your app. The [`ui-behaviors` README](packages/ui-behaviors) has the prompt to set a project up.
 
+## Starting a project
+
+This repo holds the packages. The [ai-toolkit](https://github.com/perimetre/ai-toolkit) repo holds how we use them, as skills your agent follows:
+
+- **A new project** is created with its project setup skill. That is how every project that uses the framework should start.
+- **Best practices** for the code you write afterwards: services, forms, components, testing, caching.
+- **Authentication**, so your machine can install the packages published here.
+
+Its README has the one-line install for Claude Code, Codex and other agents.
+
 ## Using a package in a project
 
 1. Point the `@perimetre` scope at GitHub Packages, in the project's `.npmrc`. Commit this file, and never put a token or a `${VAR}` placeholder in it:
@@ -57,7 +67,7 @@ In practice you ask your agent for the component, and it builds it in your app. 
    @perimetre:registry=https://npm.pkg.github.com
    ```
 
-2. Sign in once on your machine. This writes the token to your own `~/.npmrc`:
+2. Sign in once on your machine. This writes the token to your own `~/.npmrc`. The ai-toolkit's authentication skill does this step for you:
 
    ```bash
    gh auth login -h github.com -s read:packages
@@ -105,8 +115,6 @@ Give `actions/setup-node` the registry and the scope, and pass the token to the 
 - [`examples/trpc`](examples/trpc): tRPC with the service layer
 - [`examples/tanstack-query-and-graphql`](examples/tanstack-query-and-graphql): GraphQL with TanStack Query
 - [`examples/ui-sdk-forms`](examples/ui-sdk-forms): React Hook Form and Zod with UI SDK form controls
-
-Our coding conventions live in the [ai-toolkit](https://github.com/perimetre/ai-toolkit) repo.
 
 ## Contributing
 
