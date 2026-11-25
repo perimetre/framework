@@ -1,5 +1,13 @@
 # @perimetre/ui
 
+## 16.13.3
+
+### Patch Changes
+
+- Updated dependencies [899ff86]
+  - @perimetre/helpers@6.0.0
+  - @perimetre/icons@0.0.4
+
 ## 16.13.2
 
 ### Patch Changes
