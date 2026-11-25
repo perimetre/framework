@@ -9,7 +9,7 @@ import {
   type GraphqlRequestPlugin
 } from './apq.js';
 import type { GraphqlSpan, StartSpanFn } from './middlewares.js';
-import { getOperationName } from './utils.js';
+import { getOperationName, variablesObject } from './utils.js';
 
 /**
  * Wraps `fn` in a tracer span when `startSpan` is provided; runs it bare
@@ -156,7 +156,7 @@ export const createGraphqlTanstack = ({
             op: 'graphql.mutation',
             attributes: { operationName }
           },
-          async () => client.request(document, variables as object | undefined)
+          async () => client.request(document, variablesObject(variables))
         ),
       mutationKey: [operationName]
     });

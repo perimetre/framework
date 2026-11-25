@@ -1,10 +1,71 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { parse } from 'graphql';
+import { isRecord } from '../utils.js';
 
 /**
  * Shared fixtures for the executor tests. `src/__tests__/` is excluded from
  * the build and from the typecheck of the published surface.
  */
+
+/** A function shaped like `fetch`, as a test double writes it. */
+export type FetchLike = (
+  input: Parameters<typeof fetch>[0],
+  init?: RequestInit
+) => Promise<Response>;
+
+/**
+ * Types a fetch double as `fetch`. Bun's `fetch` type also carries a
+ * `preconnect` method, which a double gets as a no-op.
+ * @param fn - The double
+ */
+export const asFetch = (fn: FetchLike): typeof fetch =>
+  Object.assign(fn, {
+    /** Not used by the code under test. */
+    preconnect: () => undefined
+  });
+
+/**
+ * Narrows a thrown or returned value to a class, failing the test when it
+ * isn't an instance of it.
+ * @param value - What the call threw or returned
+ * @param type - The class it should be an instance of
+ */
+export const expectInstance = <T>(
+  value: unknown,
+  type: abstract new (...args: never[]) => T
+): T => {
+  if (value instanceof type) return value;
+  throw new Error(`Expected an instance of ${type.name}`);
+};
+
+/**
+ * Reads a recorded call's body as a JSON object, failing the test when it
+ * isn't one.
+ * @param call - The recorded call
+ */
+export const jsonBody = (
+  call: RecordedCall | undefined
+): Record<string, unknown> => {
+  const body = call?.init?.body;
+  if (typeof body !== 'string') throw new Error('Expected a string body');
+  const parsed: unknown = JSON.parse(body);
+  if (!isRecord(parsed)) throw new Error('Expected a JSON object body');
+  return parsed;
+};
+
+/**
+ * A script that answers a GET with `get` and anything else with `post`, for
+ * tests of what follows a failed GET.
+ * @param get - The GET's answer
+ * @param post - The POST's answer
+ */
+export const getThenPost =
+  (
+    get: () => Promise<Response> | Response,
+    post: () => Promise<Response> | Response
+  ): FetchScript =>
+  (call) =>
+    call.init?.method === 'GET' ? get() : post();
 
 /** A scripted fetch: decides each response from the method + URL. */
 export type FetchScript = (
@@ -32,14 +93,11 @@ export const createFetchMock = (
         ? input.href
         : input.url;
   /** Records the call, then answers from the script. */
-  const fetchImpl = (async (
-    input: Parameters<typeof fetch>[0],
-    init?: RequestInit
-  ) => {
+  const fetchImpl = asFetch(async (input, init) => {
     const call: RecordedCall = { init, url: toUrl(input) };
     calls.push(call);
     return script(call, calls.length - 1);
-  }) as typeof fetch;
+  });
   return { calls, fetch: fetchImpl };
 };
 

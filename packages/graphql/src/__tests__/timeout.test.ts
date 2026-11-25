@@ -2,8 +2,10 @@ import { describe, expect, test } from 'bun:test';
 import { createWpGraphql } from '../index.js';
 import { createTimeoutFetch, RequestTimeoutError } from '../middlewares.js';
 import {
+  asFetch,
   createFetchMock,
   documentWithHash,
+  expectInstance,
   GET_POSTS_DATA,
   GET_POSTS_HASH,
   GET_POSTS_SOURCE,
@@ -21,7 +23,12 @@ const hangingFetch = createFetchMock(
     new Promise<Response>((_resolve, reject) => {
       const signal = call.init?.signal;
       signal?.addEventListener('abort', () => {
-        reject(signal.reason as Error);
+        const reason: unknown = signal.reason;
+        reject(
+          reason instanceof Error
+            ? reason
+            : new DOMException('Aborted', 'AbortError')
+        );
       });
     })
 );
@@ -37,10 +44,10 @@ describe('createTimeoutFetch', () => {
     const error = await timed(ENDPOINT).catch((e: unknown) => e);
 
     expect(error).toBeInstanceOf(RequestTimeoutError);
-    expect((error as RequestTimeoutError).message).toBe(
+    expect(expectInstance(error, RequestTimeoutError).message).toBe(
       'Stelpro CMS request timed out after 20ms (no response)'
     );
-    expect((error as RequestTimeoutError).timeoutMs).toBe(20);
+    expect(expectInstance(error, RequestTimeoutError).timeoutMs).toBe(20);
   });
 
   test('defaults to a "CMS request" prefix', async () => {
@@ -50,7 +57,8 @@ describe('createTimeoutFetch', () => {
     });
 
     expect(
-      ((await timed(ENDPOINT).catch((e: unknown) => e)) as Error).message
+      expectInstance(await timed(ENDPOINT).catch((e: unknown) => e), Error)
+        .message
     ).toBe('CMS request timed out after 10ms (no response)');
   });
 
@@ -120,10 +128,10 @@ describe('createWpGraphql({ requestTimeoutMs })', () => {
     const { executeGraphqlRequest } = createWpGraphql({
       apq: true,
       endpoint: ENDPOINT,
-      fetch: (async (input, init) => {
+      fetch: asFetch(async (input, init) => {
         methods.push(init?.method);
         return hangingFetch.fetch(input, init);
-      }) as typeof fetch,
+      }),
       persistedDocuments: { [GET_POSTS_HASH]: GET_POSTS_SOURCE },
       requestTimeoutMs: 20
     });
@@ -148,7 +156,7 @@ describe('createWpGraphql({ requestTimeoutMs })', () => {
       (e: unknown) => e
     );
 
-    expect((error as Error).message).toBe(
+    expect(expectInstance(error, Error).message).toBe(
       'WordPress request timed out after 20ms (no response)'
     );
   });

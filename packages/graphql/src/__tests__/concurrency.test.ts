@@ -4,7 +4,7 @@ import {
   createConcurrencyLimitFetch,
   RequestTimeoutError
 } from '../middlewares.js';
-import { documentWithHash } from './helpers.js';
+import { asFetch, documentWithHash } from './helpers.js';
 
 const ENDPOINT = 'https://cms.example.test/graphql';
 
@@ -86,7 +86,7 @@ const origin = () => {
     return promise;
   };
   return {
-    fetch: send as typeof fetch,
+    fetch: asFetch(send),
     /** Requests open right now. */
     open: () => open,
     /** The most requests open at once. */
@@ -145,13 +145,14 @@ describe('createConcurrencyLimitFetch', () => {
 
   test('the response comes back whole: status, headers and body', async () => {
     const limited = createConcurrencyLimitFetch({
-      fetch: (() =>
+      fetch: asFetch(() =>
         Promise.resolve(
           Response.json(
             { data: { ok: true } },
             { headers: { 'X-GraphQL-Keys': 'post:1' }, status: 202 }
           )
-        )) as unknown as typeof fetch,
+        )
+      ),
       maxConcurrent: 1
     });
 
@@ -164,10 +165,9 @@ describe('createConcurrencyLimitFetch', () => {
 
   test('a 204 comes back with no body', async () => {
     const limited = createConcurrencyLimitFetch({
-      fetch: (() =>
-        Promise.resolve(
-          new Response(null, { status: 204 })
-        )) as unknown as typeof fetch,
+      fetch: asFetch(() =>
+        Promise.resolve(new Response(null, { status: 204 }))
+      ),
       maxConcurrent: 1
     });
 

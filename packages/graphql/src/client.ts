@@ -57,6 +57,48 @@ const chainResponseMiddleware = (
   };
 };
 
+/** The headers a `GraphQLClient` takes: a value, or a function returning one. */
+type ClientHeaders = NonNullable<GraphqlClientOptions>['headers'];
+
+/**
+ * Reads any `HeadersInit` as a plain record: a `Headers` instance, entry
+ * pairs or a record. A plain record keeps its keys as written.
+ * @param headers - The headers, if any
+ */
+const headersRecord = (
+  headers: HeadersInit | undefined
+): Record<string, string> => {
+  if (headers === undefined) return {};
+  if (Array.isArray(headers)) return Object.fromEntries(headers);
+  if (headers instanceof Headers) {
+    const record: Record<string, string> = {};
+    headers.forEach((value, key) => {
+      record[key] = value;
+    });
+    return record;
+  }
+  return headers;
+};
+
+/**
+ * Merges two plugins' headers, the later one winning. A lazy headers
+ * function stays lazy, so it still runs on every request.
+ * @param base - The headers so far
+ * @param next - The headers the next plugin adds
+ */
+const mergeHeaders = (
+  base: ClientHeaders,
+  next: ClientHeaders
+): ClientHeaders => {
+  if (typeof base === 'function' || typeof next === 'function') {
+    return () => ({
+      ...headersRecord(typeof base === 'function' ? base() : base),
+      ...headersRecord(typeof next === 'function' ? next() : next)
+    });
+  }
+  return { ...headersRecord(base), ...headersRecord(next) };
+};
+
 /**
  * Merges plugin options into an accumulated options bag, chaining middlewares
  * and merging headers so each plugin layers on top of the previous one
@@ -68,10 +110,7 @@ const mergeOptions = (
 ): GraphqlClientOptions => ({
   ...base,
   ...next,
-  headers: {
-    ...(base?.headers as Record<string, string> | undefined),
-    ...(next?.headers as Record<string, string> | undefined)
-  },
+  headers: mergeHeaders(base?.headers, next?.headers),
   // Inner plugin's fetch overrides earlier ones if both define one. This is
   // the natural composition order: later plugins wrap earlier behavior.
   fetch: next?.fetch ?? base?.fetch,

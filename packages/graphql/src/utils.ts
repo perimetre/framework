@@ -1,4 +1,4 @@
-import type { DocumentNode, OperationDefinitionNode } from 'graphql';
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { Kind } from 'graphql';
 
 /**
@@ -30,6 +30,52 @@ export type GraphqlRequestBody = {
 };
 
 /**
+ * Whether a value is a plain object, so its keys can be read as `unknown`.
+ * Parsed JSON and documents from outside go through this, not a cast.
+ */
+export const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/**
+ * Whether a value can be sent as GraphQL variables: graphql-request takes any
+ * object there.
+ */
+export const variablesObject = (value: unknown): object | undefined =>
+  typeof value === 'object' && value !== null ? value : undefined;
+
+/**
+ * Hands a response's `data` to the caller as the typed document's result.
+ * Nothing can check it at runtime: the typed document is the contract, and
+ * the server validated `data` against the schema the document was generated
+ * from. Every executor goes through here, so this is the one place that
+ * trusts it.
+ * @param _document - The document `data` answers, which sets its type
+ * @param data - The response's `data`
+ */
+export const resultData = <TResult>(
+  _document: TypedDocumentNode<TResult, never>,
+  data: unknown
+): TResult =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- the typed document is the contract for `data`, as explained above
+  data as TResult;
+
+/**
+ * Finds the operation definition of a document, whatever was passed in.
+ * Hand-built and generated documents both work.
+ */
+export const operationDefinitionOf = (
+  document: unknown
+): Record<string, unknown> | undefined => {
+  if (!isRecord(document) || !Array.isArray(document.definitions)) {
+    return undefined;
+  }
+  const definitions: unknown[] = document.definitions;
+  return definitions
+    .filter(isRecord)
+    .find((definition) => definition.kind === Kind.OPERATION_DEFINITION);
+};
+
+/**
  * Extracts the GraphQL operation name from a serialized request body so
  * middleware can correlate logs across the request/response pair.
  */
@@ -37,13 +83,8 @@ export const parseOperationName = (body: unknown): string => {
   if (typeof body !== 'string') return 'UnknownOperation';
   try {
     const parsed: unknown = JSON.parse(body);
-    if (
-      typeof parsed === 'object' &&
-      parsed !== null &&
-      'operationName' in parsed &&
-      typeof (parsed as GraphqlRequestBody).operationName === 'string'
-    ) {
-      return (parsed as GraphqlRequestBody).operationName ?? 'UnknownOperation';
+    if (isRecord(parsed) && typeof parsed.operationName === 'string') {
+      return parsed.operationName;
     }
   } catch {
     // fall through
@@ -68,19 +109,8 @@ export const hostFromUrl = (url: string): string => {
  * stable query-key fragment and for debugging.
  */
 export const getOperationName = (document: unknown): string => {
-  if (
-    typeof document !== 'object' ||
-    document === null ||
-    !('definitions' in document)
-  ) {
-    return 'AnonymousOperation';
-  }
-
-  const definitions = (document as DocumentNode).definitions;
-  const operation = definitions.find(
-    (definition): definition is OperationDefinitionNode =>
-      definition.kind === Kind.OPERATION_DEFINITION
-  );
-
-  return operation?.name?.value ?? 'AnonymousOperation';
+  const name = operationDefinitionOf(document)?.name;
+  return isRecord(name) && typeof name.value === 'string'
+    ? name.value
+    : 'AnonymousOperation';
 };

@@ -1,5 +1,4 @@
 import { describe, expect, test } from 'bun:test';
-import assert from 'node:assert/strict';
 import {
   assertTagContract,
   post,
@@ -22,7 +21,7 @@ import {
 /** `resolveInvalidation`, asserting the body was accepted. */
 const flush = (body: unknown): Omit<WpInvalidation, 'event'> => {
   const invalidation = resolveInvalidation(body);
-  assert.ok(invalidation, 'expected a flush');
+  if (!invalidation) throw new Error('expected a flush');
   return {
     expire: invalidation.expire,
     stale: invalidation.stale,
@@ -32,10 +31,10 @@ const flush = (body: unknown): Omit<WpInvalidation, 'event'> => {
 
 describe('resolveInvalidation', () => {
   test('refuses a body that is not a webhook payload', () => {
-    assert.equal(resolveInvalidation(null), null);
-    assert.equal(resolveInvalidation([]), null);
-    assert.equal(resolveInvalidation({ post_id: 1 }), null);
-    assert.equal(resolveInvalidation({ event: '' }), null);
+    expect(resolveInvalidation(null)).toBe(null);
+    expect(resolveInvalidation([])).toBe(null);
+    expect(resolveInvalidation({ post_id: 1 })).toBe(null);
+    expect(resolveInvalidation({ event: '' })).toBe(null);
   });
 
   test('a page save expires the entry, what embeds it, its type and index', () => {
@@ -58,10 +57,10 @@ describe('resolveInvalidation', () => {
       'index-page',
       relay('post', 30)
     ]) {
-      assert.ok(result.expire.includes(tag), tag);
+      expect(result.expire).toContain(tag);
     }
-    assert.ok(!result.expire.includes('list:page'), 'list keys are mapped');
-    assert.deepEqual(result.stale, []);
+    expect(result.expire).not.toContain('list:page');
+    expect(result.stale).toStrictEqual([]);
   });
 
   test('a re-slug needs no path: the index and the entry both expire', () => {
@@ -80,9 +79,9 @@ describe('resolveInvalidation', () => {
         })
       );
 
-      assert.ok(result.expire.includes('entry-30'), postType);
-      assert.ok(result.expire.includes(`index-${postType}`), postType);
-      assert.deepEqual(Object.keys(result).sort(), ['expire', 'stale']);
+      expect(result.expire).toContain('entry-30');
+      expect(result.expire).toContain(`index-${postType}`);
+      expect(Object.keys(result).sort()).toStrictEqual(['expire', 'stale']);
     }
   });
 
@@ -104,11 +103,11 @@ describe('resolveInvalidation', () => {
       })
     );
 
-    assert.ok(result.expire.includes('term-product_room-kitchen'));
-    assert.ok(result.expire.includes(relay('post', 22)));
+    expect(result.expire).toContain('term-product_room-kitchen');
+    expect(result.expire).toContain(relay('post', 22));
     // The node key: pages that print the room (a PDP's room list) refresh too.
-    assert.ok(result.expire.includes(relay('term', 35)));
-    assert.deepEqual(result.stale, ['skipped:term', 'skipped:post']);
+    expect(result.expire).toContain(relay('term', 35));
+    expect(result.stale).toStrictEqual(['skipped:term', 'skipped:post']);
   });
 
   test('a plain content save leaves the URL index alone', () => {
@@ -116,8 +115,8 @@ describe('resolveInvalidation', () => {
     // save expired 203 of 285 prerendered routes for one product edit.
     for (const postType of ['page', 'product']) {
       const result = flush(post({ post_id: 30, post_type: postType }));
-      assert.ok(result.expire.includes('entry-30'), postType);
-      assert.ok(!result.expire.includes(`index-${postType}`), postType);
+      expect(result.expire).toContain('entry-30');
+      expect(result.expire).not.toContain(`index-${postType}`);
     }
   });
 
@@ -131,8 +130,8 @@ describe('resolveInvalidation', () => {
         taxonomies: terms
       })
     );
-    assert.ok(plain.expire.includes('term-product_room-bedroom'));
-    assert.ok(!plain.expire.includes('taxonomy-product_room'));
+    expect(plain.expire).toContain('term-product_room-bedroom');
+    expect(plain.expire).not.toContain('taxonomy-product_room');
 
     const joined = flush(
       post({
@@ -142,7 +141,7 @@ describe('resolveInvalidation', () => {
         taxonomies: terms
       })
     );
-    assert.ok(joined.expire.includes('taxonomy-product_room'));
+    expect(joined.expire).toContain('taxonomy-product_room');
 
     const left = flush(
       post({
@@ -152,7 +151,7 @@ describe('resolveInvalidation', () => {
         taxonomies_removed: { product_room: ['kitchen'] }
       })
     );
-    assert.ok(left.expire.includes('taxonomy-product_room'));
+    expect(left.expire).toContain('taxonomy-product_room');
   });
 
   test('a payload that cannot say whether the post moved flushes the index', () => {
@@ -162,7 +161,7 @@ describe('resolveInvalidation', () => {
       post_type: 'page'
     });
     delete body.old_permalink;
-    assert.ok(flush(body).expire.includes('index-page'));
+    expect(flush(body).expire).toContain('index-page');
   });
 
   test('a product flushes the terms it has AND the terms it just lost', () => {
@@ -186,7 +185,7 @@ describe('resolveInvalidation', () => {
       'taxonomy-product_use_case',
       'term-product_use_case-garage'
     ]) {
-      assert.ok(result.expire.includes(tag), tag);
+      expect(result.expire).toContain(tag);
     }
   });
 
@@ -207,27 +206,25 @@ describe('resolveInvalidation', () => {
       'entry-22',
       'term-document_type-installation-guides'
     ]) {
-      assert.ok(result.expire.includes(tag), tag);
+      expect(result.expire).toContain(tag);
     }
   });
 
   test('a document without embedders names itself for the dependents lookup', () => {
     const result = flush(post({ post_id: 900, post_type: 'document' }));
 
-    assert.deepEqual(result.saved, { id: 900, type: 'document' });
-    assert.ok(result.expire.includes('entry-900'));
+    expect(result.saved).toStrictEqual({ id: 900, type: 'document' });
+    expect(result.expire).toContain('entry-900');
   });
 
   test('only a document is ever looked up', () => {
-    assert.equal(
-      flush(post({ post_id: 30, post_type: 'page' })).saved,
+    expect(flush(post({ post_id: 30, post_type: 'page' })).saved).toBe(
       undefined
     );
-    assert.equal(
+    expect(
       flush(post({ embedders: [22], post_id: 900, post_type: 'document' }))
-        .saved,
-      undefined
-    );
+        .saved
+    ).toBe(undefined);
   });
 
   test('a post type the site does not render flushes its own tags only', () => {
@@ -239,17 +236,17 @@ describe('resolveInvalidation', () => {
       })
     );
 
-    assert.deepEqual(result.stale, [], 'its skipped:post marks nothing stale');
-    assert.ok(result.expire.includes('type-graphql_document'));
-    assert.ok(!result.expire.includes(CMS_TAGS.all));
+    expect(result.stale).toStrictEqual([]);
+    expect(result.expire).toContain('type-graphql_document');
+    expect(result.expire).not.toContain(CMS_TAGS.all);
   });
 
   test('a blog post flushes its own tags only', () => {
     const result = flush(post({ post_id: 9, post_type: 'post' }));
 
-    assert.deepEqual(result.stale, []);
-    assert.ok(result.expire.includes('type-post'));
-    assert.ok(!result.expire.includes(CMS_TAGS.all));
+    expect(result.stale).toStrictEqual([]);
+    expect(result.expire).toContain('type-post');
+    expect(result.expire).not.toContain(CMS_TAGS.all);
   });
 
   test('a truncated descendant list makes the whole site stale, never expired', () => {
@@ -262,8 +259,8 @@ describe('resolveInvalidation', () => {
       })
     );
 
-    assert.deepEqual(result.stale, [CMS_TAGS.all]);
-    assert.ok(!result.expire.includes(CMS_TAGS.all));
+    expect(result.stale).toStrictEqual([CMS_TAGS.all]);
+    expect(result.expire).not.toContain(CMS_TAGS.all);
   });
 
   test('options.saved flushes the page and Yoast, and ignores its purge_all', () => {
@@ -274,11 +271,11 @@ describe('resolveInvalidation', () => {
       purge_keys: []
     });
 
-    assert.deepEqual(result.expire, [
+    expect(result.expire).toStrictEqual([
       'options-stelpro-us-global-settings',
       'options-seo'
     ]);
-    assert.deepEqual(result.stale, []);
+    expect(result.stale).toStrictEqual([]);
   });
 
   test('a menu event flushes every location', () => {
@@ -289,27 +286,26 @@ describe('resolveInvalidation', () => {
     });
 
     for (const location of ['primary', 'top_bar', 'footer', 'footer_legal']) {
-      assert.ok(result.expire.includes(`menu-${location}`), location);
+      expect(result.expire).toContain(`menu-${location}`);
     }
   });
 
   test('a Gravity Forms event flushes that form', () => {
     for (const event of ['form.saved', 'form.trashed', 'form.deleted']) {
-      assert.deepEqual(
+      expect(
         flush({
           embedded_in: [
             { permalink: '/en/contact', post_id: 3, post_type: 'page' }
           ],
           event,
           form_id: 26
-        }),
-        { expire: ['form-26'], stale: [] }
-      );
+        })
+      ).toStrictEqual({ expire: ['form-26'], stale: [] });
     }
   });
 
   test('a form event without a form id goes stale site-wide instead of 400', () => {
-    assert.deepEqual(flush({ event: 'form.saved' }), {
+    expect(flush({ event: 'form.saved' })).toStrictEqual({
       expire: [],
       stale: [CMS_TAGS.all]
     });
@@ -322,11 +318,11 @@ describe('resolveInvalidation', () => {
       purge_keys: [relay('term', 7), 'list:productcategory', 'skipped:term']
     });
 
-    assert.deepEqual(result.expire, [
+    expect(result.expire).toStrictEqual([
       relay('term', 7),
       'taxonomy-product_category'
     ]);
-    assert.deepEqual(result.stale, ['skipped:term']);
+    expect(result.stale).toStrictEqual(['skipped:term']);
   });
 
   test('a purge-all goes stale site-wide', () => {
@@ -336,7 +332,7 @@ describe('resolveInvalidation', () => {
       purge_keys: []
     });
 
-    assert.deepEqual(result.stale, [CMS_TAGS.all]);
+    expect(result.stale).toStrictEqual([CMS_TAGS.all]);
   });
 
   test('an import is one stale-while-revalidate flush', () => {
@@ -347,8 +343,8 @@ describe('resolveInvalidation', () => {
       post_types: ['product']
     });
 
-    assert.deepEqual(result.expire, []);
-    assert.deepEqual(result.stale, [
+    expect(result.expire).toStrictEqual([]);
+    expect(result.stale).toStrictEqual([
       'type-product',
       'index-product',
       'entry-1',
@@ -357,7 +353,7 @@ describe('resolveInvalidation', () => {
   });
 
   test('an unmodelled event flushes the catch-all, stale', () => {
-    assert.deepEqual(flush({ event: 'user.saved' }), {
+    expect(flush({ event: 'user.saved' })).toStrictEqual({
       expire: [],
       stale: [CMS_TAGS.all]
     });
@@ -373,8 +369,8 @@ describe('resolveInvalidation', () => {
       taxonomies: []
     });
 
-    assert.ok(result.expire.includes('entry-32'));
-    assert.ok(result.expire.includes('index-page'));
+    expect(result.expire).toContain('entry-32');
+    expect(result.expire).toContain('index-page');
   });
 });
 
@@ -595,7 +591,9 @@ describe('tag contract', () => {
   ];
 
   test('every read × every change that alters it shares an expired tag', () => {
-    assertTagContract(resolveInvalidation, contract);
+    expect(() => {
+      assertTagContract(resolveInvalidation, contract);
+    }).not.toThrow();
   });
 
   test('a broken row fails the contract, naming the read and the change', () => {
@@ -613,7 +611,9 @@ describe('tag contract', () => {
 
   test('an entry is not flushed by saves of other entries of its type', () => {
     const { expire } = flush(post({ post_id: 99, post_type: 'product' }));
-    assert.ok(!READ_TAGS.product(22).some((tag) => expire.includes(tag)));
+    expect(READ_TAGS.product(22).filter((tag) => expire.includes(tag))).toEqual(
+      []
+    );
   });
 
   test('a term archive is not flushed by a product outside that term', () => {
@@ -623,11 +623,11 @@ describe('tag contract', () => {
         product_room: ['kitchen']
       })
     );
-    assert.ok(
-      !READ_TAGS.taxonomyArchive('product_room', 'bedroom').some((tag) =>
+    expect(
+      READ_TAGS.taxonomyArchive('product_room', 'bedroom').filter((tag) =>
         expire.includes(tag)
       )
-    );
+    ).toEqual([]);
   });
 
   test('a node key a read resolved is flushed when the CMS purges it', () => {
@@ -640,6 +640,6 @@ describe('tag contract', () => {
         purge_keys: [relay('post', 22)]
       })
     );
-    assert.ok(expire.includes(relay('post', 22)));
+    expect(expire).toContain(relay('post', 22));
   });
 });

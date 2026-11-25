@@ -15,10 +15,13 @@ import {
 import {
   createFetchMock,
   documentWithHash,
+  expectInstance,
   GET_POSTS_DATA,
   GET_POSTS_HASH,
   GET_POSTS_KEYS,
   GET_POSTS_SOURCE,
+  getThenPost,
+  jsonBody,
   jsonResponse,
   keysOf,
   UPDATE_POST_SOURCE,
@@ -123,9 +126,9 @@ describe('createTrustedDocumentExecutor', () => {
 
     expect(calls.map((c) => c.init?.method)).toEqual(['GET']);
     expect(error).toBeInstanceOf(ClientError);
-    expect((error as ClientError).response.errors?.[0]?.message).toBe(
-      'This query document has been blocked.'
-    );
+    expect(
+      expectInstance(error, ClientError).response.errors?.[0]?.message
+    ).toBe('This query document has been blocked.');
     expect(errorResponseMeta(error).transport).toBe('trusted-get');
     expect(keysOf(outcomes[0]?.result.headers)).toBe('from-get');
   });
@@ -155,7 +158,7 @@ describe('createTrustedDocumentExecutor', () => {
       const error = await execute.withMeta(GetPosts).catch((e: unknown) => e);
 
       expect(calls.map((c) => c.init?.method)).toEqual(['GET']);
-      expect((error as ClientError).response.status).toBe(status);
+      expect(expectInstance(error, ClientError).response.status).toBe(status);
       expect(errorResponseMeta(error).transport).toBe('trusted-get');
     });
   }
@@ -187,7 +190,7 @@ describe('createTrustedDocumentExecutor', () => {
 
       expect(calls.map((c) => c.init?.method)).toEqual(['GET', 'POST']);
       expect(calls[1]?.url).toBe(ENDPOINT);
-      expect(JSON.parse(calls[1]?.init?.body as string)).toEqual({
+      expect(jsonBody(calls[1])).toEqual({
         operationName: 'GetPosts',
         queryId: GET_POSTS_HASH,
         variables: {}
@@ -221,20 +224,19 @@ describe('createTrustedDocumentExecutor', () => {
     const error = await execute.withMeta(GetPosts).catch((e: unknown) => e);
 
     expect(calls).toHaveLength(2);
-    expect((error as ClientError).response.status).toBe(503);
+    expect(expectInstance(error, ClientError).response.status).toBe(503);
     expect(errorResponseMeta(error).transport).toBe('trusted-post');
   });
 
   test("postFallback 'any' restores the client POST on any GET failure", async () => {
+    /** The POST that recovers each failed GET. */
+    const recovered = () => jsonResponse({ data: GET_POSTS_DATA });
     const scripts: FetchScript[] = [
-      (call) =>
-        call.init?.method === 'GET'
-          ? jsonResponse({}, { status: 504 })
-          : jsonResponse({ data: GET_POSTS_DATA }),
-      (call) =>
-        call.init?.method === 'GET'
-          ? jsonResponse({ errors: [{ message: 'partial' }] })
-          : jsonResponse({ data: GET_POSTS_DATA })
+      getThenPost(() => jsonResponse({}, { status: 504 }), recovered),
+      getThenPost(
+        () => jsonResponse({ errors: [{ message: 'partial' }] }),
+        recovered
+      )
     ];
 
     for (const script of scripts) {
@@ -261,7 +263,7 @@ describe('createTrustedDocumentExecutor', () => {
       .withMeta(GetPosts, undefined, { signal: controller.signal })
       .catch((e: unknown) => e);
 
-    expect((error as Error).name).toBe('AbortError');
+    expect(expectInstance(error, Error).name).toBe('AbortError');
     expect(calls).toHaveLength(1);
     expect(calls[0]?.init?.signal).toBe(controller.signal);
   });

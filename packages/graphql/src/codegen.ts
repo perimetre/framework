@@ -6,7 +6,7 @@ import {
   registerTrustedDocuments,
   type RegisterTrustedDocumentsResult
 } from './trusted-documents.js';
-import type { GraphqlLogger } from './utils.js';
+import { isRecord, type GraphqlLogger } from './utils.js';
 
 /**
  * Hashes a GraphQL operation **exactly the way WPGraphQL Smart Cache does on
@@ -177,9 +177,15 @@ export const trustedDocumentsCodegenHook = ({
       return;
     }
 
-    const persistedDocuments = JSON.parse(
-      await readFile(file, 'utf8')
-    ) as Record<string, string>;
+    const parsed: unknown = JSON.parse(await readFile(file, 'utf8'));
+    // The persisted-documents file maps each hash to its document text
+    const persistedDocuments = isRecord(parsed)
+      ? Object.fromEntries(
+          Object.entries(parsed).filter(
+            (entry): entry is [string, string] => typeof entry[1] === 'string'
+          )
+        )
+      : {};
 
     const result: RegisterTrustedDocumentsResult =
       await registerTrustedDocuments({

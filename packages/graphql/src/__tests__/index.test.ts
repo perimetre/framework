@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/react-query';
 import { describe, expect, test } from 'bun:test';
 import { createWpGraphql, parseGraphqlKeys } from '../index.js';
 import {
@@ -83,9 +84,7 @@ describe('createWpGraphql', () => {
     });
 
     const options = graphqlOptions(GetPosts);
-    const data = await (
-      options.queryFn as unknown as () => Promise<typeof GET_POSTS_DATA>
-    )();
+    const data = await new QueryClient().fetchQuery(options);
     expect(data).toEqual(GET_POSTS_DATA);
   });
 });

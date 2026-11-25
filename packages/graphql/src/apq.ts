@@ -1,23 +1,15 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { print } from 'graphql';
+import { print, type DocumentNode, type GraphQLError } from 'graphql';
 import { ClientError, type GraphQLClient } from 'graphql-request';
 import type { GraphqlSpan, StartSpanFn } from './middlewares.js';
-import { OPERATION_DEFINITION_KIND, type GraphqlLogger } from './utils.js';
-
-/**
- * Document with the codegen-emitted persisted-query hash attached under
- * `__meta__.hash`. `@graphql-codegen/client-preset` with
- * `persistedDocuments: { mode: 'embedHashInDocument' }` writes this onto
- * every generated `DocumentNode`.
- */
-type DocumentWithHash = {
-  __meta__?: { hash?: string };
-  definitions?: readonly {
-    kind: string;
-    name?: { value?: string };
-    operation?: string;
-  }[];
-};
+import {
+  getOperationName,
+  isRecord,
+  operationDefinitionOf,
+  resultData,
+  variablesObject,
+  type GraphqlLogger
+} from './utils.js';
 
 /**
  * Reads the codegen-emitted persisted-query hash and the operation kind
@@ -28,30 +20,22 @@ type DocumentWithHash = {
 const apqMetaFromDocument = (
   document: unknown
 ): { hash?: string; operationKind: 'mutation' | 'query' | 'subscription' } => {
-  const doc = document as DocumentWithHash;
-  const hash = doc.__meta__?.hash;
+  // `@graphql-codegen/client-preset` with
+  // `persistedDocuments: { mode: 'embedHashInDocument' }` writes the hash onto
+  // every generated document, under `__meta__.hash`.
+  const meta =
+    isRecord(document) && isRecord(document.__meta__)
+      ? document.__meta__
+      : undefined;
+  const hash = typeof meta?.hash === 'string' ? meta.hash : undefined;
 
-  let operationKind: 'mutation' | 'query' | 'subscription' = 'query';
-  const opDef = doc.definitions?.find(
-    (d) => d.kind === OPERATION_DEFINITION_KIND
-  );
-  if (opDef?.operation === 'mutation') operationKind = 'mutation';
-  else if (opDef?.operation === 'subscription') operationKind = 'subscription';
+  const operation = operationDefinitionOf(document)?.operation;
+  const operationKind =
+    operation === 'mutation' || operation === 'subscription'
+      ? operation
+      : 'query';
 
   return { hash, operationKind };
-};
-
-/**
- * Extracts the operation name from a parsed document so we can use it as
- * the `operationName` URL/body parameter when sending APQ requests. Falls
- * back to `'AnonymousOperation'` for hand-built documents with no name.
- */
-const operationNameFromDocument = (document: unknown): string => {
-  const doc = document as DocumentWithHash;
-  const opDef = doc.definitions?.find(
-    (d) => d.kind === OPERATION_DEFINITION_KIND
-  );
-  return opDef?.name?.value ?? 'AnonymousOperation';
 };
 
 /**
@@ -201,7 +185,9 @@ export const contextFromDocument = (
   document: unknown
 ): GraphqlRequestContext => ({
   ...apqMetaFromDocument(document),
-  operationName: operationNameFromDocument(document)
+  // The `operationName` URL/body parameter of APQ requests. Falls back to
+  // `'AnonymousOperation'` for hand-built documents with no name
+  operationName: getOperationName(document)
 });
 
 /**
@@ -305,6 +291,46 @@ export type PersistedQueryResponse = {
 type ApqResponse = PersistedQueryResponse;
 
 /**
+ * Reads a parsed JSON body as a persisted-query response. Keeps `errors` only
+ * as an array of objects with a string `message`, which is all the callers
+ * read. Anything that isn't an object reads as an empty response.
+ */
+export const parsePersistedQueryResponse = (
+  value: unknown
+): PersistedQueryResponse => {
+  if (!isRecord(value)) return {};
+  const rawErrors: unknown = value.errors;
+  const errors = Array.isArray(rawErrors)
+    ? (rawErrors satisfies unknown[]).filter(
+        (error): error is { message: string } =>
+          isRecord(error) && typeof error.message === 'string'
+      )
+    : undefined;
+  return { data: value.data, errors, extensions: value.extensions };
+};
+
+/**
+ * The response a graphql-request `ClientError` carries, built from a
+ * persisted-query response.
+ */
+const clientErrorResponse = (
+  res: Response,
+  text: string,
+  body: PersistedQueryResponse | undefined
+): ConstructorParameters<typeof ClientError>[0] => ({
+  ...body,
+  body: text,
+  data: body?.data,
+  // graphql-request types these as GraphQLError, yet its own client fills
+  // them with the response's JSON errors, as this does, so a catch site sees
+  // the same shape from every transport
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- matches what graphql-request's client puts here, as explained above
+  errors: body?.errors as GraphQLError[] | undefined,
+  headers: res.headers,
+  status: res.status
+});
+
+/**
  * The error a persisted-query request throws for a non-2xx or a GraphQL-errors
  * response: the same graphql-request `ClientError` the client's POST throws
  * for that response (`response.status`, `response.headers`, `response.body`,
@@ -317,24 +343,15 @@ export const persistedQueryClientError = (
   res: Response,
   text: string,
   body: PersistedQueryResponse | undefined,
-  document: unknown,
+  document: DocumentNode,
   variables: unknown,
   transport: GraphqlTransport = 'apq-get'
 ): ClientError =>
   tagErrorTransport(
-    new ClientError(
-      {
-        ...body,
-        body: text,
-        data: body?.data,
-        headers: res.headers,
-        status: res.status
-      } as ConstructorParameters<typeof ClientError>[0],
-      {
-        query: print(document as TypedDocumentNode),
-        variables: variables as Record<string, unknown> | undefined
-      }
-    ),
+    new ClientError(clientErrorResponse(res, text, body), {
+      query: print(document),
+      variables: variablesObject(variables)
+    }),
     transport
   );
 
@@ -630,7 +647,7 @@ export const postViaClient = async <TResult, TVariables>(
     const response = await client.rawRequest<TResult>({
       query: print(document),
       signal,
-      variables: variables as object | undefined
+      variables: variablesObject(variables)
     });
     return {
       data: response.data,
@@ -784,7 +801,10 @@ export const createApqExecutor = ({
       throw new Error(`APQ POST returned HTTP ${String(res.status)}`);
     }
 
-    return { body: (await res.json()) as ApqResponse, headers: res.headers };
+    return {
+      body: parsePersistedQueryResponse(await res.json()),
+      headers: res.headers
+    };
   };
 
   /**
@@ -820,7 +840,7 @@ export const createApqExecutor = ({
             registered.body.data !== undefined
           ) {
             return {
-              data: registered.body.data as TResult,
+              data: resultData(document, registered.body.data),
               headers: registered.headers,
               transport: 'apq-register-post'
             };
@@ -942,7 +962,7 @@ export const createApqExecutor = ({
 
         let body: ApqResponse | undefined;
         try {
-          body = JSON.parse(text) as ApqResponse;
+          body = parsePersistedQueryResponse(JSON.parse(text));
         } catch (error) {
           // A 2xx that isn't JSON (a WAF challenge page) is a failure; a non-2xx
           // that isn't JSON is reported by its status below.
@@ -1006,7 +1026,7 @@ export const createApqExecutor = ({
         }
 
         return {
-          data: body?.data as TResult,
+          data: resultData(document, body?.data),
           headers: res.headers,
           transport: 'apq-get'
         };

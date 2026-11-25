@@ -1,3 +1,4 @@
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { describe, expect, test } from 'bun:test';
 import type { GraphqlExecuteResult, GraphqlExecutor } from '../apq.js';
 import { GRAPHQL_KEYS_HEADER } from '../keys.js';
@@ -8,6 +9,7 @@ import {
   type LastGoodOptions,
   type LastGoodStore
 } from '../last-good.js';
+import { resultData } from '../utils.js';
 import { documentWithHash } from './helpers.js';
 
 /*
@@ -46,7 +48,10 @@ const keysHeader = (...ids: number[]) =>
   ].join(' ');
 
 /** A response, as an executor's `.withMeta` resolves it. */
-const response = (data: Data, header?: string): GraphqlExecuteResult<Data> => ({
+const response = (
+  data: Data | undefined,
+  header?: string
+): GraphqlExecuteResult<Data | undefined> => ({
   data,
   durationMs: 12,
   headers: new Headers(header ? { [GRAPHQL_KEYS_HEADER]: header } : {}),
@@ -59,22 +64,30 @@ const DOWN = new Error('fetch failed: CERT_HAS_EXPIRED');
 
 type Answer =
   | Error
-  | GraphqlExecuteResult<Data>
-  | Promise<GraphqlExecuteResult<Data>>;
+  | GraphqlExecuteResult<Data | undefined>
+  | Promise<GraphqlExecuteResult<Data | undefined>>;
 
 /** The CMS, scripted: each call takes the next answer. */
 const cmsAnswering = (...answers: Answer[]): GraphqlExecutor => {
-  /** The next scripted answer. */
-  const withMeta = <TResult>() => {
+  /**
+   * The next scripted answer, typed as the document's result the way the
+   * library types a CMS response.
+   * @param document - The document the answer is for
+   */
+  const withMeta = async <TResult>(
+    document: TypedDocumentNode<TResult, never>
+  ): Promise<GraphqlExecuteResult<TResult>> => {
     const next = answers.shift();
     if (next === undefined) throw new Error('No scripted answer left');
-    return (
-      next instanceof Error ? Promise.reject(next) : Promise.resolve(next)
-    ) as Promise<GraphqlExecuteResult<TResult>>;
+    if (next instanceof Error) throw next;
+    const answer = await next;
+    return { ...answer, data: resultData(document, answer.data) };
   };
-  return Object.assign(async <TResult>() => (await withMeta<TResult>()).data, {
-    withMeta
-  }) as GraphqlExecutor;
+  return Object.assign(
+    async <TResult>(document: TypedDocumentNode<TResult, never>) =>
+      (await withMeta(document)).data,
+    { withMeta }
+  ) satisfies GraphqlExecutor;
 };
 
 /** A store over a map, as the Runtime Cache behaves. */
@@ -261,11 +274,7 @@ describe('withLastGood', () => {
 
   test('an answer with no data at all is answered like a failure', async () => {
     const { read } = setup(
-      cmsAnswering(
-        response(PAGE_18),
-        response(undefined as unknown as Data),
-        response(undefined as unknown as Data)
-      )
+      cmsAnswering(response(PAGE_18), response(undefined), response(undefined))
     );
     await read(PAGE_BY_ID, { id: '18' });
     await flush();

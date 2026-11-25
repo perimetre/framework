@@ -2,9 +2,9 @@ import { ClientError } from 'graphql-request';
 import type { GraphqlClientPlugin } from './client.js';
 import {
   hostFromUrl,
+  isRecord,
   parseOperationName,
-  type GraphqlLogger,
-  type GraphqlRequestBody
+  type GraphqlLogger
 } from './utils.js';
 
 // ---------------------------------------------------------------------------
@@ -61,12 +61,14 @@ export const withRequestLogger = ({
 
       if (debug && 'body' in request && typeof request.body === 'string') {
         try {
-          const body = JSON.parse(request.body) as GraphqlRequestBody;
-          logger.debug(`graphql.request.body ${operationName}`, {
-            operationName,
-            variables: body.variables,
-            query: body.query
-          });
+          const body: unknown = JSON.parse(request.body);
+          if (isRecord(body)) {
+            logger.debug(`graphql.request.body ${operationName}`, {
+              operationName,
+              variables: body.variables,
+              query: body.query
+            });
+          }
         } catch {
           // Ignore JSON parse errors — already logged at start.
         }
@@ -707,8 +709,8 @@ const isTransientNetworkError = (err: unknown): boolean => {
 const isQueryOperation = (body: BodyInit | null | undefined): boolean => {
   if (typeof body !== 'string') return false;
   try {
-    const parsed = JSON.parse(body) as { query?: string };
-    return typeof parsed.query === 'string'
+    const parsed: unknown = JSON.parse(body);
+    return isRecord(parsed) && typeof parsed.query === 'string'
       ? parsed.query.trimStart().startsWith('query')
       : false;
   } catch {

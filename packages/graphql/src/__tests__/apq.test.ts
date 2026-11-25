@@ -13,10 +13,13 @@ import { createGraphqlClient } from '../client.js';
 import {
   createFetchMock,
   documentWithHash,
+  expectInstance,
   GET_POSTS_DATA,
   GET_POSTS_HASH,
   GET_POSTS_KEYS,
   GET_POSTS_SOURCE,
+  getThenPost,
+  jsonBody,
   jsonResponse,
   keysOf,
   UPDATE_POST_SOURCE,
@@ -119,10 +122,7 @@ describe('createApqExecutor', () => {
 
     expect(calls.map((c) => c.init?.method)).toEqual(['GET', 'POST']);
     // The register POST carries both the query text and the id.
-    const registerBody = JSON.parse(calls[1]?.init?.body as string) as Record<
-      string,
-      unknown
-    >;
+    const registerBody = jsonBody(calls[1]);
     expect(registerBody.queryId).toBe(GET_POSTS_HASH);
     expect(registerBody.query).toBe(GET_POSTS_SOURCE);
 
@@ -184,10 +184,10 @@ describe('createApqExecutor', () => {
     expect(calls.map((c) => c.init?.method)).toEqual(['GET']);
     // The same shape the client's POST throws for this body.
     expect(error).toBeInstanceOf(ClientError);
-    expect((error as ClientError).response.status).toBe(200);
-    expect((error as ClientError).response.errors?.[0]?.message).toBe(
-      'Internal server error'
-    );
+    expect(expectInstance(error, ClientError).response.status).toBe(200);
+    expect(
+      expectInstance(error, ClientError).response.errors?.[0]?.message
+    ).toBe('Internal server error');
     expect(keysOf(errorResponseMeta(error).headers)).toBe('from-get');
     expect(errorResponseMeta(error).transport).toBe('apq-get');
     expect(keysOf(outcomes[0]?.result.headers)).toBe('from-get');
@@ -207,7 +207,7 @@ describe('createApqExecutor', () => {
 
     const meta = await execute.withMeta(GetPosts);
     expect(calls).toHaveLength(1);
-    expect(meta.data).toEqual(partial as never);
+    expect(meta.data).toEqual(partial);
     expect(meta.transport).toBe('apq-get');
   });
 
@@ -224,7 +224,7 @@ describe('createApqExecutor', () => {
 
       expect(calls.map((c) => c.init?.method)).toEqual(['GET']);
       expect(error).toBeInstanceOf(ClientError);
-      expect((error as ClientError).response.status).toBe(status);
+      expect(expectInstance(error, ClientError).response.status).toBe(status);
       expect(outcomes[0]?.result.transport).toBe('apq-get');
       expect(keysOf(outcomes[0]?.result.headers)).toBe('from-get');
     });
@@ -238,8 +238,10 @@ describe('createApqExecutor', () => {
     const error = await execute.withMeta(GetPosts).catch((e: unknown) => e);
 
     expect(calls).toHaveLength(1);
-    expect((error as ClientError).response.status).toBe(403);
-    expect((error as ClientError).response.body).toBe('<html>blocked</html>');
+    expect(expectInstance(error, ClientError).response.status).toBe(403);
+    expect(expectInstance(error, ClientError).response.body).toBe(
+      '<html>blocked</html>'
+    );
   });
 
   test('a throwing fetch (timeout, network) rejects with the same error object, without a POST', async () => {
@@ -278,19 +280,18 @@ describe('createApqExecutor', () => {
   }
 
   test("postFallback 'any' restores POST on any GET failure", async () => {
+    /** The POST that recovers each failed GET. */
+    const recovered = () => jsonResponse({ data: GET_POSTS_DATA });
     const scripts: Parameters<typeof setup>[0][] = [
-      (call) =>
-        call.init?.method === 'GET'
-          ? Promise.reject(new TypeError('fetch failed'))
-          : jsonResponse({ data: GET_POSTS_DATA }),
-      (call) =>
-        call.init?.method === 'GET'
-          ? jsonResponse({}, { status: 503 })
-          : jsonResponse({ data: GET_POSTS_DATA }),
-      (call) =>
-        call.init?.method === 'GET'
-          ? jsonResponse({ errors: [{ message: 'Internal server error' }] })
-          : jsonResponse({ data: GET_POSTS_DATA })
+      getThenPost(
+        () => Promise.reject(new TypeError('fetch failed')),
+        recovered
+      ),
+      getThenPost(() => jsonResponse({}, { status: 503 }), recovered),
+      getThenPost(
+        () => jsonResponse({ errors: [{ message: 'Internal server error' }] }),
+        recovered
+      )
     ];
 
     for (const script of scripts) {
@@ -316,7 +317,7 @@ describe('createApqExecutor', () => {
       .withMeta(GetPosts, undefined, { signal: controller.signal })
       .catch((e: unknown) => e);
 
-    expect((error as Error).name).toBe('AbortError');
+    expect(expectInstance(error, Error).name).toBe('AbortError');
     expect(calls).toHaveLength(1);
     expect(calls[0]?.init?.signal).toBe(controller.signal);
   });
@@ -376,7 +377,9 @@ describe('createApqExecutor', () => {
 
     const error = await execute.withMeta(Unhashed).catch((e: unknown) => e);
     expect(error).toBeInstanceOf(ClientError);
-    expect((error as Error).message).toContain('Cannot query field');
+    expect(expectInstance(error, Error).message).toContain(
+      'Cannot query field'
+    );
 
     expect(outcomes).toHaveLength(1);
     expect(outcomes[0]?.result.error).toBeDefined();
@@ -393,7 +396,7 @@ describe('createApqExecutor', () => {
     });
 
     const error = await execute.withMeta(GetPosts).catch((e: unknown) => e);
-    expect((error as Error).message).toBe('fetch failed');
+    expect(expectInstance(error, Error).message).toBe('fetch failed');
     expect(outcomes[0]?.result.headers).toBeUndefined();
     expect(outcomes[0]?.result.transport).toBeUndefined();
   });

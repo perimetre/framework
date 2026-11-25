@@ -8,7 +8,7 @@ import {
   type GraphqlTransport
 } from './apq.js';
 import { GRAPHQL_KEYS_HEADER, hasGraphqlNodeKeys } from './keys.js';
-import type { GraphqlLogger } from './utils.js';
+import { isRecord, resultData, type GraphqlLogger } from './utils.js';
 
 /**
  * # Stale-if-error for CMS reads
@@ -146,21 +146,68 @@ type LastGood<TResult> = {
   transport: GraphqlTransport;
 };
 
+/** Every transport a stored copy can name. */
+const TRANSPORTS: readonly GraphqlTransport[] = [
+  'apq-get',
+  'apq-register-post',
+  'post',
+  'trusted-get',
+  'trusted-post'
+];
+
+/**
+ * Reads a stored copy back, or `null` when the store holds nothing with the
+ * shape `remember` writes.
+ * @param document - The document the copy answers
+ * @param value - What the store returned
+ */
+const toLastGood = <TResult>(
+  document: TypedDocumentNode<TResult, never>,
+  value: unknown
+): LastGood<TResult> | null => {
+  if (!isRecord(value) || !('data' in value)) return null;
+  const transport = TRANSPORTS.find((known) => known === value.transport);
+  if (!transport) return null;
+  return {
+    data: resultData(document, value.data),
+    keys: typeof value.keys === 'string' ? value.keys : null,
+    transport
+  };
+};
+
+/** The handle the default clock's `setTimeout` returns: it clears itself. */
+type DefaultTimer = { clear: () => void };
+
 /** The live read's outcome by the soft deadline. */
 type Outcome<TResult> =
   | { error: unknown; kind: 'error' }
   | { kind: 'ok'; result: GraphqlExecuteResult<TResult> }
   | { kind: 'slow' };
 
+/**
+ * Whether a handle came from the default clock's `setTimeout`.
+ * @param handle - What `setTimeout` returned
+ */
+const isDefaultTimer = (handle: unknown): handle is DefaultTimer =>
+  isRecord(handle) && typeof handle.clear === 'function';
+
 const DEFAULT_CLOCK: LastGoodClock = {
-  /** Clears a global timer. */
+  /** Clears a timer the default clock started. */
   clearTimeout: (handle) => {
-    clearTimeout(handle as ReturnType<typeof setTimeout>);
+    if (isDefaultTimer(handle)) handle.clear();
   },
   /** `Date.now()`. */
   now: () => Date.now(),
-  /** A global timer. */
-  setTimeout: (callback, ms) => setTimeout(callback, ms)
+  /** A global timer, behind a handle that clears it. */
+  setTimeout: (callback, ms) => {
+    const timer = setTimeout(callback, ms);
+    return {
+      /** Clears the global timer. */
+      clear: () => {
+        clearTimeout(timer);
+      }
+    } satisfies DefaultTimer;
+  }
 };
 
 /** Swallows a rejection, so deferred work never rejects unhandled. */
@@ -185,9 +232,7 @@ export const stableStringify = (value: unknown): string =>
   JSON.stringify(value, (_key, inner: unknown) =>
     inner && typeof inner === 'object' && !Array.isArray(inner)
       ? Object.fromEntries(
-          Object.entries(inner as Record<string, unknown>).sort(([a], [b]) =>
-            a < b ? -1 : a > b ? 1 : 0
-          )
+          Object.entries(inner).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
         )
       : inner
   );
@@ -284,10 +329,11 @@ export const withLastGood = (
 
   /** The copy for `key`, or `null` (also when the store fails). */
   const recall = async <TResult>(
+    document: TypedDocumentNode<TResult, never>,
     key: string
   ): Promise<LastGood<TResult> | null> => {
     try {
-      return ((await store.get(key)) as LastGood<TResult> | null) ?? null;
+      return toLastGood(document, await store.get(key));
     } catch {
       return null;
     }
@@ -400,7 +446,7 @@ export const withLastGood = (
 
     // Both start now: the copy is read in parallel, so having one costs the
     // live read no latency.
-    const stored = recall<TResult>(key);
+    const stored = recall(document, key);
     const live = execute
       .withMeta(document, variables, options)
       .then(async (result) => {

@@ -4,6 +4,7 @@ import {
   applyEdgeCacheParam,
   createExecutor,
   GET_REJECTED_STATUSES,
+  parsePersistedQueryResponse,
   persistedQueryClientError,
   postViaClient,
   type GraphqlExecutor,
@@ -14,7 +15,7 @@ import {
   type PostFallback
 } from './apq.js';
 import type { GraphqlSpan, StartSpanFn } from './middlewares.js';
-import type { GraphqlLogger } from './utils.js';
+import { resultData, type GraphqlLogger } from './utils.js';
 
 /**
  * # Trusted Documents (a.k.a. Saved Queries / safelisting)
@@ -256,7 +257,11 @@ export const createTrustedDocumentExecutor = ({
       }
     }
 
-    return { data: body?.data as TResult, headers: res.headers, transport };
+    return {
+      data: resultData(document, body?.data),
+      headers: res.headers,
+      transport
+    };
   };
 
   /**
@@ -288,7 +293,7 @@ export const createTrustedDocumentExecutor = ({
     const text = await res.text();
     let body: PersistedQueryResponse | undefined;
     try {
-      body = JSON.parse(text) as PersistedQueryResponse;
+      body = parsePersistedQueryResponse(JSON.parse(text));
     } catch (error) {
       if (res.ok) throw error;
     }
@@ -403,7 +408,7 @@ export const createTrustedDocumentExecutor = ({
 
           let body: PersistedQueryResponse | undefined;
           try {
-            body = JSON.parse(text) as PersistedQueryResponse;
+            body = parsePersistedQueryResponse(JSON.parse(text));
           } catch (error) {
             // A 2xx that isn't JSON (a WAF challenge page) is a failure; a
             // non-2xx that isn't JSON is reported by its status below.
@@ -592,10 +597,7 @@ export const registerTrustedDocuments = async ({
         })
       });
 
-      const payload = (await res.json()) as {
-        data?: { createGraphqlDocument?: { graphqlDocument?: unknown } };
-        errors?: { message: string }[];
-      };
+      const payload = parsePersistedQueryResponse(await res.json());
 
       if (payload.errors && payload.errors.length > 0) {
         // The server rejects an existing document with an "already associated
