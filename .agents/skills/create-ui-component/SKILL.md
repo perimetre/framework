@@ -1,13 +1,22 @@
 ---
 name: create-ui-component
-description: Creates brand-aware React components in the @perimetre/ui library following the canonical Perimetre design system patterns (three-tier tokens, CVA brand variants with compose(), pui: prefix, Acorn-as-base). Use this skill whenever the user asks to create, scaffold, add, or build a new UI component in @perimetre/ui or packages/ui, set up the brands/ subfolder pattern, wire up the Acorn base + brand override files, or ensure a component can be restyled per brand by a designer. Triggers on phrases like "new UI component", "create a component in @perimetre/ui", "scaffold a component", "add a branded component", "make this a pui component", "component with brand variants", "create a component Vuong can restyle", "component using semantic tokens", or "add PaginatedCarousel/Button/Card/etc. to the library".
+description: DEPRECATED. Use the create-ui-behavior skill instead for anything new, a new component, a new shared interaction, or a request to add PaginatedCarousel/Button/Card/etc. to the library. @perimetre/ui gets no new components. Load this skill only to fix or adjust a component that already exists in packages/ui (brand variants, tokens, the pui prefix, Acorn-as-base).
 license: MIT
 metadata:
   author: perimetre
-  version: '1.0.0'
+  version: '1.1.0'
 ---
 
 # Create a `@perimetre/ui` Component
+
+> **Deprecated. Use the `create-ui-behavior` skill.**
+>
+> `@perimetre/ui` gets no new components. For anything new, load `create-ui-behavior` now (`.agents/skills/create-ui-behavior/SKILL.md`) and follow it. It decides where the work belongs:
+>
+> - **A new component** is written in the app that needs it, from [UI SDK](https://ui-sdk.dev) and `@perimetre/ui-behaviors`.
+> - **New reusable interaction logic**, the part two apps would otherwise both write, goes in `packages/ui-behaviors` as a behaviour or a primitive.
+>
+> Keep reading this skill only to fix or adjust a component that already exists in `packages/ui`. `packages/ui/docs/migrating-to-ui-behaviors.md` lists what each existing component becomes.
 
 Scaffold and implement a new React component in `packages/ui` that inherits the design system's brand-aware styling pipeline: semantic design tokens, `pui:`-prefixed Tailwind utilities, CVA brand variants composed from an Acorn base, and RSC-safe brand resolution via `getBrandVariant`.
 

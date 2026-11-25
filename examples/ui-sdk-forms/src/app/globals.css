@@ -1,0 +1,7 @@
+/*
+ * UI SDK adds a little behaviour CSS in a cascade layer named `ui-sdk`.
+ * Declaring it first means every style of ours wins over it.
+ */
+@layer ui-sdk;
+
+@import 'tailwindcss';

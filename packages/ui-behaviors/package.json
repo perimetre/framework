@@ -1,0 +1,78 @@
+{
+  "description": "UI behaviours and primitives for Perimetre projects, built on UI SDK. Apps own their components; this owns what they are made of",
+  "devDependencies": {
+    "@googlemaps/js-api-loader": "^2.0.2",
+    "@happy-dom/global-registrator": "^20.0.0",
+    "@ladle/react": "^5.1.1",
+    "@perimetre/eslint-config-base": "workspace:*",
+    "@perimetre/eslint-config-react": "workspace:*",
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/bun": "^1.3.9",
+    "@types/google.maps": "^3.58.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@ui-sdk/core": "0.1.0-beta.17",
+    "@ui-sdk/react": "0.1.0-beta.17",
+    "cn": "0.5.2",
+    "eslint": "^9.39.2",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite": "npm:rolldown-vite@7.3.1"
+  },
+  "exports": {
+    "./*": {
+      "default": "./dist/*/index.js",
+      "types": "./dist/*/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "skills",
+    "src",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx"
+  ],
+  "license": "GPL-3.0",
+  "name": "@perimetre/ui-behaviors",
+  "peerDependencies": {
+    "@googlemaps/js-api-loader": ">=2",
+    "@types/google.maps": ">=3.58",
+    "@ui-sdk/core": "0.1.0-beta.17",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "@googlemaps/js-api-loader": {
+      "optional": true
+    },
+    "@types/google.maps": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "directory": "packages/ui-behaviors",
+    "type": "git",
+    "url": "https://github.com/perimetre/framework.git"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "ladle serve --viteConfig .ladle/vite.config.ts",
+    "lint": "eslint . --max-warnings 0",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "version": "0.0.0"
+}

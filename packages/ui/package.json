@@ -78,6 +78,7 @@
   },
   "files": [
     "dist",
+    "docs",
     "src",
     "tailwind.config.js",
     "README.md"

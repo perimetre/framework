@@ -39,6 +39,7 @@
     "lint:fix": "eslint . --fix",
     "prepare": "husky",
     "release": "turbo run build && changeset publish",
+    "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "version": "changeset version"
   },

@@ -1,0 +1,38 @@
+# @perimetre/ui-behaviors
+
+> Behaviours, primitives and utilities Périmètre adds to UI SDK. The app builds its own components from them. Everything here assumes UI SDK's docs and documents only what differs.
+
+Paths are relative to `node_modules/@perimetre/ui-behaviors/`.
+
+## Start here
+
+- [The skill](../skills/ui-behaviors/SKILL.md): the rules, the entries and which reference to read
+- [Primitives](../skills/ui-behaviors/references/primitives.md): `magnify`, `sequence`, `locator`
+- [Behaviours and utilities](../skills/ui-behaviors/references/behaviors.md): `createFollowPoint`, `createScrub`, `createAutoProgress`, `createLinkedHighlight`
+- [Google Places and Google Maps](../skills/ui-behaviors/references/google.md)
+
+## Reference
+
+- The API of every export is the JSDoc in `dist/**/*.d.ts`
+- [Updating UI SDK](updating-ui-sdk.md): for maintainers of this package
+
+## Stories
+
+One per entry, next to its source, under `src/`. Each is the shortest working example of its entry.
+
+- `behaviors/follow-point/follow-point.stories.tsx`: a light that follows the pointer
+- `behaviors/scrub/scrub.stories.tsx`: a before and after divider
+- `behaviors/auto-progress/auto-progress.stories.tsx`: a bar that fills once
+- `behaviors/linked-highlight/linked-highlight.stories.tsx`: a chart and its legend
+- `behaviors/google-map/google-map.stories.tsx`: the locator with a Google map
+- `primitives/magnify/magnify.stories.tsx`
+- `primitives/sequence/sequence.stories.tsx`
+- `primitives/locator/locator.stories.tsx`: with a map the app draws
+- `utilities/google-places/google-places.stories.tsx`: an address field
+- `react/icon/icon.stories.tsx`
+
+## UI SDK
+
+- Installed: `node_modules/@ui-sdk/react/docs/llms.txt`, and the skill at `node_modules/@ui-sdk/core/skills/ui-sdk/SKILL.md`
+- Online: https://ui-sdk.dev/llms.txt
+- Source: `gh api repos/vercel-labs/ui/contents/<path> -H "Accept: application/vnd.github.raw"`, like `packages/core/src/foundation/direct-manipulation/area.ts`

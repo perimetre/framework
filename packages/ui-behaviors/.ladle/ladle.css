@@ -1,0 +1,10 @@
+/*
+ * Used only by Ladle. The package ships no CSS: these classes style the
+ * stories the way an app would style its own components.
+ *
+ * UI SDK adds a little behaviour CSS in a cascade layer named `ui-sdk`.
+ * Declaring it first means every style of ours wins over it.
+ */
+@layer ui-sdk;
+@import 'tailwindcss';
+@source '../src';

@@ -1,0 +1,112 @@
+# Runs every package's tests, and one `Tests` check a ruleset can require (an aggregate, so the required check name
+# never changes when jobs do). Lint, type check and build are in ci.yml.
+#
+# No test runs twice against the same code:
+#
+# - Each package's `test` is a Turbo task cached on its inputs, and `.turbo/cache` is kept between runs. A run that
+#   does not touch a package's inputs replays its tests in under a second. GitHub scopes a cache to its branch and
+#   that branch's base, so the runs on `main` seed the cache every pull request restores.
+# - The Changesets release pull request is skipped outright. It carries the same code under new version numbers, and
+#   Turbo cannot see that: a package.json is always part of its package's task hash, so a version bump is a cache
+#   miss (https://github.com/vercel/turborepo/issues/6132). `release` reads the diff instead, and when it holds only
+#   what `changeset version` writes (.github/scripts/release-only-diff.mjs), the tests that passed on the commit it
+#   was cut from stand. The same goes for the push to `main` that merges it.
+#
+# What this cannot share: a cache saved on a pull request is not visible to `main`, so the push that merges a pull
+# request runs that package's tests once more. Turborepo Remote Cache would close that gap.
+#
+# There is no `paths` filter on the trigger: a required check whose workflow never starts stays pending and blocks
+# the merge. A skipped suite passes the gate.
+
+name: Tests
+
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  FORCE_COLOR: 1
+  TURBO_TELEMETRY_DISABLED: 1
+  DO_NOT_TRACK: 1
+
+jobs:
+  release:
+    name: Release-only change
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      # A manual run tests everything.
+      only: ${{ github.event_name != 'workflow_dispatch' && steps.diff.outputs.release-only == 'true' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # The script diffs two commits, so it needs both and their merge base.
+          fetch-depth: 0
+
+      - id: diff
+        if: github.event_name != 'workflow_dispatch'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+          HEAD: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha || github.sha }}
+        run: node .github/scripts/release-only-diff.mjs "$BASE" "$HEAD"
+
+  unit:
+    name: Unit
+    needs: release
+    if: needs.release.outputs.only != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read # @perimetre/* from GitHub Packages
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4 # the version is the root package.json `packageManager`
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Restore the Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo/cache
+          key: ${{ runner.os }}-turbo-tests-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-turbo-tests-
+
+      # `test` depends on `build`, so Turbo builds what the tests import, from cache when it can.
+      - name: Tests
+        run: pnpm turbo run test --continue
+
+  tests:
+    name: Tests
+    # always(): a job whose dependency failed is skipped, and a skipped required check counts as passed.
+    if: always()
+    needs: [release, unit]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      # A suite skipped because the change is release-only passes; a failed or cancelled one (or `release`) does not.
+      - name: Every suite passed or was not needed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "::error::release: ${{ needs.release.result }}, unit: ${{ needs.unit.result }}"
+          exit 1

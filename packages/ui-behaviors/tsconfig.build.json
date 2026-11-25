@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+    "noEmit": false,
+    "outDir": "./dist",
+    // Keep comments: the JSDoc is the API reference agents read in the types
+    "removeComments": false,
+    "rootDir": "./src",
+    "sourceMap": true,
+    "types": ["google.maps"]
+  },
+  // Stories are for Ladle and tests for bun. Neither ships.
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.stories.tsx",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ],
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*"]
+}

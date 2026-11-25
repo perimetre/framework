@@ -1,5 +1,16 @@
 # @perimetre/classnames
 
+> **Deprecated.** Use [`cn`](https://github.com/shadcn-ui/cn) directly. It replaces `clsx` and `tailwind-merge` with the same API and the same output, and is much faster. `@perimetre/classnames` stays published and working for the apps that install it.
+>
+> | From `@perimetre/classnames` | Now                                 |
+> | ---------------------------- | ----------------------------------- |
+> | `cn`, `clsx`                 | `cn` from `cn`                      |
+> | `createCn(config)`           | `createCn(config)` from `cn/config` |
+> | `ClassValue`                 | `ClassValue` from `cn`              |
+> | `TailwindMergeConfig`        | `ConfigExtension` from `cn/config`  |
+>
+> `createCn` takes the same `{ extend, override, prefix }` config, so custom class groups move over unchanged. `cn` needs Tailwind CSS v4 and Node 22 or newer.
+
 Utility for merging and managing CSS class names with Tailwind CSS.
 
 ## What it does
